@@ -102,5 +102,6 @@ pair <int,int> Board::getCoordinates(int hexagon, int position){
     }
 }
 vector<pair<int,int>> Board::showpossiblemoves(int hexagon, int position){
-    return null;
+    vector<pair<int,int>> myvec;
+    return myvec;
 }

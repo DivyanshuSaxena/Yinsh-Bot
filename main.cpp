@@ -53,7 +53,7 @@
 int main ( int argc, char** argv )
 {
     Board *myboard = new Board();
-    myboard->addRing(1, 0, 0);
+    myboard->addRing(2, 0, 0);
     myboard->addRing(1, 2, 3);
     myboard->printnormalconfig();
 }
