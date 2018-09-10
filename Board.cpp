@@ -114,5 +114,12 @@ pair <int,int> Board::getCoordinates(int hexagon, int position){
 }
 vector<pair<int,int>> Board::showpossiblemoves(int hexagon, int position){
     vector<pair<int,int>> myvec;
+    auto thisringpair = this->getCoordinates(hexagon,position);
+    int ringnum = this->config[thisringpair.first][thisringpair.second];
+    auto freevecinfislope = this->getFreePointsAdjacentToPoint(thisringpair, 2);
+    return myvec;
+}
+vector<pair<int,int>> Board::getFreePointsAdjacentToPoint(pair<int,int> argpair, int slope){
+    vector<pair<int,int>> myvec;
     return myvec;
 }

@@ -52,7 +52,7 @@
 #include "Board.h"
 int main ( int argc, char** argv )
 {
-    Board *myboard = new Board();
+    Board *myboard = new Board(5,5,5,3);
     myboard->addRing(2, 0, 0);
     myboard->addRing(1, 2, 3);
     myboard->printnormalconfig();
