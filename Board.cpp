@@ -5,7 +5,6 @@
  */
 
 // player 1 ring is 2 , player 2 ring is 3, player 1 marker is 4, player 2 marker is 5
-// for now we are considering conventional boards
 
 #include "Board.h"
 
@@ -119,11 +118,292 @@ vector<pair<int,int>> Board::showpossiblemoves(int hexagon, int position){
     vector<pair<int,int>> myvec;
     auto thisringpair = this->getCoordinates(hexagon,position);
     int ringnum = this->config[thisringpair.first][thisringpair.second];
-    auto freevecinfislope = this->getFreePointsAdjacentToPoint(thisringpair, 2);
+    // cout << "aloha" <<endl;
+    auto freevecinfislope = this->getFreePointsAdjacentToPoint(thisringpair, 90);
+    auto freevecminusinfislope = this->getFreePointsAdjacentToPoint(thisringpair, 270);
+    auto freeveczeroslope = this->getFreePointsAdjacentToPoint(thisringpair, 0);
+    auto freevecminuszeroslope = this->getFreePointsAdjacentToPoint(thisringpair, 180);
+    auto freeveconeslope = this->getFreePointsAdjacentToPoint(thisringpair, 45);
+    auto freevecminusoneslope = this->getFreePointsAdjacentToPoint(thisringpair, 225);
+    myvec.insert(myvec.end(), freevecinfislope.begin(),freevecinfislope.end());
+    myvec.insert(myvec.end(), freevecminusinfislope.begin(),freevecminusinfislope.end());
+    myvec.insert(myvec.end(), freeveczeroslope.begin(),freeveczeroslope.end());
+    myvec.insert(myvec.end(), freevecminuszeroslope.begin(),freevecminuszeroslope.end());
+    myvec.insert(myvec.end(), freeveconeslope.begin(),freeveconeslope.end());
+    myvec.insert(myvec.end(), freevecminusoneslope.begin(),freevecminusoneslope.end());
+
+    auto freepointinfislope = this->getPairAfterMarkers(thisringpair, 90);
+    auto freepointminusinfislope = this->getPairAfterMarkers(thisringpair, 270);
+    auto freepointzeroslope = this->getPairAfterMarkers(thisringpair, 0);
+    auto freepointminuszeroslope = this->getPairAfterMarkers(thisringpair, 180);
+    auto freepointoneslope = this->getPairAfterMarkers(thisringpair, 45);
+    auto freepointminusoneslope = this->getPairAfterMarkers(thisringpair, 225);
+    if(freepointinfislope.first != -1 && freepointinfislope.second != -1){
+        myvec.push_back(freepointinfislope);
+    }
+    if(freepointminusinfislope.first != -1 && freepointminusinfislope.second != -1){
+        myvec.push_back(freepointminusinfislope);
+    }
+    if(freepointzeroslope.first != -1 && freepointzeroslope.second != -1){
+        myvec.push_back(freepointzeroslope);
+    }
+    if(freepointminuszeroslope.first != -1 && freepointminuszeroslope.second != -1){
+        myvec.push_back(freepointminuszeroslope);
+    }
+    if(freepointoneslope.first != -1 && freepointoneslope.second != -1){
+        myvec.push_back(freepointoneslope);
+    }
+    if(freepointminusoneslope.first != -1 && freepointminusoneslope.second != -1){
+        myvec.push_back(freepointminusoneslope);
+    }
     return myvec;
 }
 
 vector<pair<int,int>> Board::getFreePointsAdjacentToPoint(pair<int,int> argpair, int slope){
     vector<pair<int,int>> myvec;
+    int tempi = argpair.first;
+    int tempj = argpair.second;
+    if(slope==90){
+        while(true && tempj<2*this->n){
+            tempj++;
+            // cout << "tempi is "<<tempi<< " tempj is "<< tempj<<endl;
+            if(this->config[tempi][tempj]!=1){
+                break;
+            }else{
+                // cout<< "lets push " << myvec.size()<<endl;
+                myvec.push_back(make_pair(tempi,tempj));
+            }
+        }
+    }else if(slope==270){
+        while(true && tempj>0){
+            tempj--;
+            if(this->config[tempi][tempj]!=1){
+                break;
+            }else{
+                myvec.push_back(make_pair(tempi,tempj));
+            }
+        }
+    }else if(slope==0 ){
+        while(true && tempi < 2 * this->n){
+            tempi++;
+            if(this->config[tempi][tempj]!=1){
+                break;
+            }else{
+                myvec.push_back(make_pair(tempi,tempj));
+            }
+        }
+    }else if(slope == 180){
+        while(true && tempi > 0){
+            tempi--;
+            if(this->config[tempi][tempj]!=1){
+                break;
+            }else{
+                myvec.push_back(make_pair(tempi,tempj));
+            }
+        }
+    }else if(slope == 45){
+        while(true && tempi < 2 * this->n && tempj < 2 * this->n){
+            tempi++;
+            tempj++;
+            if(this->config[tempi][tempj]!=1){
+                break;
+            }else{
+                myvec.push_back(make_pair(tempi,tempj));
+            }
+        }
+    }else if(slope = 225){
+        while(true && tempi >0 && tempj >0){
+            tempi--;
+            tempj--;
+            if(this->config[tempi][tempj]!=1){
+                break;
+            }else{
+                myvec.push_back(make_pair(tempi,tempj));
+            }
+        }
+    }
+    // cout << "finvec size is "<< myvec.size()<<endl;
     return myvec;
+}
+pair<int,int> Board::getPairAfterMarkers(pair<int,int> argpair, int slope){
+    int tempi = argpair.first;
+    int tempj = argpair.second;
+    if(slope==90){
+        if(this->config[tempi][tempj+1]>3){
+            tempj++;
+            while(true && tempj<this->n*2){
+                tempj++;
+                if(this->config[tempi][tempj]!=4 && this->config[tempi][tempj]!=5){
+                    break;
+                }
+            }
+            if(this->config[tempi][tempj]==1){
+                return make_pair(tempi,tempj);
+            }else{
+                return make_pair(-1,-1);
+            }
+        }else{
+            return make_pair(-1,-1);
+        }
+    }else if(slope==270){
+        if(this->config[tempi][tempj-1]>3){
+            tempj--;
+            while(true && tempj>0){
+                tempj--;
+                if(this->config[tempi][tempj]!=4 && this->config[tempi][tempj]!=5){
+                    break;
+                }
+            }
+            if(this->config[tempi][tempj]==1){
+                return make_pair(tempi,tempj);
+            }else{
+                return make_pair(-1,-1);
+            }
+        }else{
+            return make_pair(-1,-1);
+        }
+    }else if(slope==0){
+        if(this->config[tempi+1][tempj]>3){
+            tempi++;
+            while(true && tempi<this->n*2){
+                tempi++;
+                if(this->config[tempi][tempj]!=4 && this->config[tempi][tempj]!=5){
+                    break;
+                }
+            }
+            if(this->config[tempi][tempj]==1){
+                return make_pair(tempi,tempj);
+            }else{
+                return make_pair(-1,-1);
+            }
+        }else{
+            return make_pair(-1,-1);
+        }
+    }else if(slope==180){
+        if(this->config[tempi-1][tempj]>3){
+            tempi--;
+            while(true && tempi>0){
+                tempi--;
+                if(this->config[tempi][tempj]!=4 && this->config[tempi][tempj]!=5){
+                    break;
+                }
+            }
+            if(this->config[tempi][tempj]==1){
+                return make_pair(tempi,tempj);
+            }else{
+                return make_pair(-1,-1);
+            }
+        }else{
+            return make_pair(-1,-1);
+        }
+    }else if(slope==45){
+        if(this->config[tempi+1][tempj+1]>3){
+            tempi++;
+            tempj++;
+            while(true && tempi<this->n*2 && tempj<this->n*2){
+                tempi++;
+                tempj++;
+                if(this->config[tempi][tempj]!=4 && this->config[tempi][tempj]!=5){
+                    break;
+                }
+            }
+            if(this->config[tempi][tempj]==1){
+                return make_pair(tempi,tempj);
+            }else{
+                return make_pair(-1,-1);
+            }
+        }else{
+            return make_pair(-1,-1);
+        }
+    }else if(slope==225){
+        if(this->config[tempi-1][tempj-1]>3){
+            tempi--;
+            tempj--;
+            while(true && tempi>0 && tempj>0){
+                tempi--;
+                tempj--;
+                if(this->config[tempi][tempj]!=4 && this->config[tempi][tempj]!=5){
+                    break;
+                }
+            }
+            if(this->config[tempi][tempj]==1){
+                return make_pair(tempi,tempj);
+            }else{
+                return make_pair(-1,-1);
+            }
+        }else{
+            return make_pair(-1,-1);
+        }
+    }else{
+        return make_pair(-1,-1);
+    }
+    return make_pair(-1,-1);
+}
+bool Board::setMarker(pair<int,int> argpair, int playerid){
+    //not complete function yet
+    if(playerid==2){
+        this->config[argpair.first][argpair.second] = 4;
+    }else if(playerid==3){
+        this->config[argpair.first][argpair.second] = 5;
+    }
+    return true;
+}
+bool Board::selectAndMoveRing(int ringhexagon, int ringposition, int finringhexagon, int finringposition){
+    //we are considering that the move is valid
+
+    auto inipair = this->getCoordinates(ringhexagon, ringposition);
+    auto destpair= this->getCoordinates(finringhexagon, finringposition);
+    auto dirvec = this->getDirectionVector(inipair, destpair);
+    // cout << "dirvec is "<< dirvec.first<< " "<<dirvec.second<<endl;
+    int ringnum = this->config[inipair.first][inipair.second];
+    int ringmarker = ringnum+2;
+    bool betweenMarkersThere;
+    if(this->config[inipair.first+dirvec.first][inipair.second+dirvec.second]>3){
+        betweenMarkersThere = true;
+    }else{
+        betweenMarkersThere = false;
+    }
+    if(betweenMarkersThere){
+        // cout<< "between markers true "<<endl;
+        this->config[inipair.first][inipair.second] = ringmarker;
+        int tempi = inipair.first+dirvec.first;
+        int tempj = inipair.second+dirvec.second;
+        while(this->config[tempi][tempj] == 4 || this->config[tempi][tempj]==5 ){
+            this->config[tempi][tempj] = 9 - this->config[tempi][tempj];
+            tempi = tempi + dirvec.first;
+            tempj = tempj + dirvec.second;
+        }
+        // tempi,tempj = destpair at this point
+        this->config[destpair.first][destpair.second] = ringnum;
+        return true;
+    }else{
+        this->config[inipair.first][inipair.second] = ringmarker;
+        this->config[destpair.first][destpair.second] = ringnum;
+        return true;
+    }
+}
+pair<int,int> Board::getDirectionVector(pair<int,int> inipoint, pair<int,int> finpoint){
+    // IT IS FROM FIRST ARGUMENT TO SECOND 
+    int xdiff = finpoint.first - inipoint.first;
+    int ydiff = finpoint.second - inipoint.second;
+    if(xdiff==0){
+        if(ydiff>0){
+            return make_pair(0,1);
+        }else if(ydiff<0){
+            return make_pair(0,-1);
+        }
+    }else if(ydiff==0){
+        if(xdiff>0){
+            return make_pair(1,0);
+        }else if(xdiff<0){
+            return make_pair(-1,0);
+        }
+    }else if(xdiff==ydiff){
+        if(xdiff>0){
+            return make_pair(1,1);
+        }else if(xdiff<0){
+            return make_pair(-1,-1);
+        }
+    }
+    return make_pair(0,0);
 }
