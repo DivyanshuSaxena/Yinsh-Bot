@@ -4,8 +4,8 @@
  * 
  */
 
-//player 1 ring is 2 , player 2 ring is 3, player 1 marker is 4, player 2 marker is 5
-//for now we are considering conventional boards
+// player 1 ring is 2 , player 2 ring is 3, player 1 marker is 4, player 2 marker is 5
+// for now we are considering conventional boards
 
 #include "Board.h"
 
@@ -14,37 +14,48 @@ int ** Board::getConfig(){
 }
 Board::Board(){
     //for now we are considering conventional boards
-    int ** tempconfig = new int*[11];
-    for(int i=0;i<11;i++){
-        tempconfig[i] = new int[11];
-        for(int j=0;j<11;j++){
+    Board(5,5,5,3);
+}
+
+Board::Board(int n0, int m0, int k0, int l0){
+    // General boards
+    this->n = n0;
+    this->m = m0;
+    this->k = k0;
+    this->l = l0;
+
+    int ** tempconfig = new int*[2*n+1];
+    for(int i=0; i<2*n+1; i++){
+        tempconfig[i] = new int[2*n+1];
+        for(int j=0; j<2*n+1; j++){
             tempconfig[i][j] = 0;
         }
     }
-    tempconfig[5][5] = 1;
-    for(int i=1;i<=5;i++){
-        if(i!=5){
-            tempconfig[5][5+i]=1;
-            tempconfig[5+i][5+i]=1;
-            tempconfig[5+i][5]=1;
-            tempconfig[5][5-i]=1;
-            tempconfig[5-i][5-i]=1;
-            tempconfig[5-i][5]=1;
+    tempconfig[n][n] = 1;
+    for(int i=1;i<=n;i++){
+        if(i!=n){
+            tempconfig[n][n+i]=1;
+            tempconfig[n+i][n+i]=1;
+            tempconfig[n+i][n]=1;
+            tempconfig[n][n-i]=1;
+            tempconfig[n-i][n-i]=1;
+            tempconfig[n-i][n]=1;
         }
         for(int j=0;j<i-1;j++){
-            tempconfig[6+j][5+i]=1;
-            tempconfig[4-j][5-i]=1;
-            tempconfig[5+i][6+j]=1;
-            tempconfig[5-i][4-j]=1;
-            tempconfig[6-i+j][6+j]=1;
-            tempconfig[4+i-j][4-j]=1;
+            tempconfig[n+1+j][n+i]=1;
+            tempconfig[n-1-j][n-i]=1;
+            tempconfig[n+i][n+1+j]=1;
+            tempconfig[n-i][n-1-j]=1;
+            tempconfig[n+1-i+j][n+1+j]=1;
+            tempconfig[n-1+i-j][n-1-j]=1;
         }
     }
     this->config = tempconfig;
 }
+
 void Board::printnormalconfig(){
-    for(int j=10;j>=0;j--){
-        for(int i=0;i<11;i++){
+    for(int j=2*n;j>=0;j--){
+        for(int i=0;i<2*n+1;i++){
             cout<< this->config[i][j] << " ";
         }
         cout<< endl;
@@ -74,7 +85,7 @@ bool Board::addRing(int player, int hexagon, int position){
 pair <int,int> Board::getCoordinates(int hexagon, int position){
     if(hexagon==0){
         if(position==0){
-            return make_pair(5,5);
+            return make_pair(n,n);
         }else{
             return make_pair(-1,-1);
         }
@@ -85,17 +96,17 @@ pair <int,int> Board::getCoordinates(int hexagon, int position){
         {
             case 0:
                 // if()
-                return make_pair(5+rempos, 5+hexagon);
+                return make_pair(n+rempos, n+hexagon);
             case 1:
-                return make_pair(5+hexagon, 5+hexagon-rempos);
+                return make_pair(n+hexagon, n+hexagon-rempos);
             case 2:
-                return make_pair(5+hexagon -rempos, 5-rempos);
+                return make_pair(n+hexagon-rempos, n-rempos);
             case 3:
-                return make_pair(5-rempos, 5- hexagon);
+                return make_pair(n-rempos, n-hexagon);
             case 4:
-                return make_pair(5-hexagon, 5-hexagon+rempos);
+                return make_pair(n-hexagon, n-hexagon+rempos);
             case 5:
-                return make_pair(5-hexagon+rempos,5+rempos);
+                return make_pair(n-hexagon+rempos,n+rempos);
             default:
                 return make_pair(-1,-1);
         }

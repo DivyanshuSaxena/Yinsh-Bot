@@ -13,8 +13,10 @@ class Board{
     private:
         int ** config;
     public:
+        int n, m, k, l;  
         int ** getConfig();
         Board();
+        Board(int, int, int, int);
         void printnormalconfig();
         bool addRing(int , int , int);
         pair <int, int> getCoordinates(int, int);
