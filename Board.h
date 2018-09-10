@@ -22,10 +22,11 @@ class Board{
         Board();
         Board(int n, int m, int k, int l);
         void printnormalconfig();
-        bool addRing(int , int , int);
+        bool addRing(int player, int hexagon, int position);
         pair <int, int> getCoordinates(int, int);
         vector<pair<int,int>> showpossiblemoves(int, int);
         vector<pair<int,int>> getFreePointsAdjacentToPoint(pair<int,int> thispair, int slope);
         pair<int,int> getPairAfterMarkers(pair<int,int> thispair, int slope);
+        bool setMarker(pair<int,int> thispair, int playermarker);
 };
 #endif /* Board_H */

@@ -5,7 +5,6 @@
  */
 
 // player 1 ring is 2 , player 2 ring is 3, player 1 marker is 4, player 2 marker is 5
-// for now we are considering conventional boards
 
 #include "Board.h"
 
@@ -118,12 +117,6 @@ vector<pair<int,int>> Board::showpossiblemoves(int hexagon, int position){
     int ringnum = this->config[thisringpair.first][thisringpair.second];
     // cout << "aloha" <<endl;
     auto freevecinfislope = this->getFreePointsAdjacentToPoint(thisringpair, 90);
-    // cout <<" do something bitch"<<endl;
-    // cout << "freevecsize is "<< freevecinfislope.size()<<endl;
-    // for(int i=0;i<freevecinfislope.size();i++){
-    //     cout << freevecinfislope[i].first << " , " << freevecinfislope[i].second << " | ";
-    // }
-    // cout << endl;
     auto freevecminusinfislope = this->getFreePointsAdjacentToPoint(thisringpair, 270);
     auto freeveczeroslope = this->getFreePointsAdjacentToPoint(thisringpair, 0);
     auto freevecminuszeroslope = this->getFreePointsAdjacentToPoint(thisringpair, 180);
@@ -135,7 +128,31 @@ vector<pair<int,int>> Board::showpossiblemoves(int hexagon, int position){
     myvec.insert(myvec.end(), freevecminuszeroslope.begin(),freevecminuszeroslope.end());
     myvec.insert(myvec.end(), freeveconeslope.begin(),freeveconeslope.end());
     myvec.insert(myvec.end(), freevecminusoneslope.begin(),freevecminusoneslope.end());
-    
+
+    auto freepointinfislope = this->getPairAfterMarkers(thisringpair, 90);
+    auto freepointminusinfislope = this->getPairAfterMarkers(thisringpair, 270);
+    auto freepointzeroslope = this->getPairAfterMarkers(thisringpair, 0);
+    auto freepointminuszeroslope = this->getPairAfterMarkers(thisringpair, 180);
+    auto freepointoneslope = this->getPairAfterMarkers(thisringpair, 45);
+    auto freepointminusoneslope = this->getPairAfterMarkers(thisringpair, 225);
+    if(freepointinfislope.first != -1 && freepointinfislope.second != -1){
+        myvec.push_back(freepointinfislope);
+    }
+    if(freepointminusinfislope.first != -1 && freepointminusinfislope.second != -1){
+        myvec.push_back(freepointminusinfislope);
+    }
+    if(freepointzeroslope.first != -1 && freepointzeroslope.second != -1){
+        myvec.push_back(freepointzeroslope);
+    }
+    if(freepointminuszeroslope.first != -1 && freepointminuszeroslope.second != -1){
+        myvec.push_back(freepointminuszeroslope);
+    }
+    if(freepointoneslope.first != -1 && freepointoneslope.second != -1){
+        myvec.push_back(freepointoneslope);
+    }
+    if(freepointminusoneslope.first != -1 && freepointminusoneslope.second != -1){
+        myvec.push_back(freepointminusoneslope);
+    }
     return myvec;
 }
 vector<pair<int,int>> Board::getFreePointsAdjacentToPoint(pair<int,int> argpair, int slope){
@@ -221,7 +238,109 @@ pair<int,int> Board::getPairAfterMarkers(pair<int,int> argpair, int slope){
             }else{
                 return make_pair(-1,-1);
             }
+        }else{
+            return make_pair(-1,-1);
         }
+    }else if(slope==270){
+        if(this->config[tempi][tempj-1]>3){
+            tempj--;
+            while(true && tempj>0){
+                tempj--;
+                if(this->config[tempi][tempj]!=4 && this->config[tempi][tempj]!=5){
+                    break;
+                }
+            }
+            if(this->config[tempi][tempj]==1){
+                return make_pair(tempi,tempj);
+            }else{
+                return make_pair(-1,-1);
+            }
+        }else{
+            return make_pair(-1,-1);
+        }
+    }else if(slope==0){
+        if(this->config[tempi+1][tempj]>3){
+            tempi++;
+            while(true && tempi<this->n*2){
+                tempi++;
+                if(this->config[tempi][tempj]!=4 && this->config[tempi][tempj]!=5){
+                    break;
+                }
+            }
+            if(this->config[tempi][tempj]==1){
+                return make_pair(tempi,tempj);
+            }else{
+                return make_pair(-1,-1);
+            }
+        }else{
+            return make_pair(-1,-1);
+        }
+    }else if(slope==180){
+        if(this->config[tempi-1][tempj]>3){
+            tempi--;
+            while(true && tempi>0){
+                tempi--;
+                if(this->config[tempi][tempj]!=4 && this->config[tempi][tempj]!=5){
+                    break;
+                }
+            }
+            if(this->config[tempi][tempj]==1){
+                return make_pair(tempi,tempj);
+            }else{
+                return make_pair(-1,-1);
+            }
+        }else{
+            return make_pair(-1,-1);
+        }
+    }else if(slope==45){
+        if(this->config[tempi+1][tempj+1]>3){
+            tempi++;
+            tempj++;
+            while(true && tempi<this->n*2 && tempj<this->n*2){
+                tempi++;
+                tempj++;
+                if(this->config[tempi][tempj]!=4 && this->config[tempi][tempj]!=5){
+                    break;
+                }
+            }
+            if(this->config[tempi][tempj]==1){
+                return make_pair(tempi,tempj);
+            }else{
+                return make_pair(-1,-1);
+            }
+        }else{
+            return make_pair(-1,-1);
+        }
+    }else if(slope==225){
+        if(this->config[tempi-1][tempj-1]>3){
+            tempi--;
+            tempj--;
+            while(true && tempi>0 && tempj>0){
+                tempi--;
+                tempj--;
+                if(this->config[tempi][tempj]!=4 && this->config[tempi][tempj]!=5){
+                    break;
+                }
+            }
+            if(this->config[tempi][tempj]==1){
+                return make_pair(tempi,tempj);
+            }else{
+                return make_pair(-1,-1);
+            }
+        }else{
+            return make_pair(-1,-1);
+        }
+    }else{
+        return make_pair(-1,-1);
     }
+    return make_pair(-1,-1);
 }
-// void Board::setMarker()
+bool Board::setMarker(pair<int,int> argpair, int playerid){
+    //not complete function yet
+    if(playerid==2){
+        this->config[argpair.first][argpair.second] = 4;
+    }else if(playerid==3){
+        this->config[argpair.first][argpair.second] = 5;
+    }
+    return true;
+}
