@@ -344,3 +344,62 @@ bool Board::setMarker(pair<int,int> argpair, int playerid){
     }
     return true;
 }
+bool Board::selectAndMoveRing(int ringhexagon, int ringposition, int finringhexagon, int finringposition){
+    //we are considering that the move is valid
+
+    auto inipair = this->getCoordinates(ringhexagon, ringposition);
+    auto destpair= this->getCoordinates(finringhexagon, finringposition);
+    auto dirvec = this->getDirectionVector(inipair, destpair);
+    // cout << "dirvec is "<< dirvec.first<< " "<<dirvec.second<<endl;
+    int ringnum = this->config[inipair.first][inipair.second];
+    int ringmarker = ringnum+2;
+    bool betweenMarkersThere;
+    if(this->config[inipair.first+dirvec.first][inipair.second+dirvec.second]>3){
+        betweenMarkersThere = true;
+    }else{
+        betweenMarkersThere = false;
+    }
+    if(betweenMarkersThere){
+        // cout<< "between markers true "<<endl;
+        this->config[inipair.first][inipair.second] = ringmarker;
+        int tempi = inipair.first+dirvec.first;
+        int tempj = inipair.second+dirvec.second;
+        while(this->config[tempi][tempj] == 4 || this->config[tempi][tempj]==5 ){
+            this->config[tempi][tempj] = 9 - this->config[tempi][tempj];
+            tempi = tempi + dirvec.first;
+            tempj = tempj + dirvec.second;
+        }
+        // tempi,tempj = destpair at this point
+        this->config[destpair.first][destpair.second] = ringnum;
+        return true;
+    }else{
+        this->config[inipair.first][inipair.second] = ringmarker;
+        this->config[destpair.first][destpair.second] = ringnum;
+        return true;
+    }
+}
+pair<int,int> Board::getDirectionVector(pair<int,int> inipoint, pair<int,int> finpoint){
+    // IT IS FROM FIRST ARGUMENT TO SECOND 
+    int xdiff = finpoint.first - inipoint.first;
+    int ydiff = finpoint.second - inipoint.second;
+    if(xdiff==0){
+        if(ydiff>0){
+            return make_pair(0,1);
+        }else if(ydiff<0){
+            return make_pair(0,-1);
+        }
+    }else if(ydiff==0){
+        if(xdiff>0){
+            return make_pair(1,0);
+        }else if(xdiff<0){
+            return make_pair(-1,0);
+        }
+    }else if(xdiff==ydiff){
+        if(xdiff>0){
+            return make_pair(1,1);
+        }else if(xdiff<0){
+            return make_pair(-1,-1);
+        }
+    }
+    return make_pair(0,0);
+}

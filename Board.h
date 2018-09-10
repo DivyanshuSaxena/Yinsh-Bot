@@ -28,5 +28,7 @@ class Board{
         vector<pair<int,int>> getFreePointsAdjacentToPoint(pair<int,int> thispair, int slope);
         pair<int,int> getPairAfterMarkers(pair<int,int> thispair, int slope);
         bool setMarker(pair<int,int> thispair, int playermarker);
+        bool selectAndMoveRing(int ringhexagon, int ringposition, int finringhexagon, int finringposition);
+        pair<int,int> getDirectionVector(pair<int,int> initialpoint, pair<int, int> finpoint);
 };
 #endif /* Board_H */
