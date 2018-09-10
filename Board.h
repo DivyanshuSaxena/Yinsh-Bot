@@ -26,5 +26,6 @@ class Board{
         pair <int, int> getCoordinates(int, int);
         vector<pair<int,int>> showpossiblemoves(int, int);
         vector<pair<int,int>> getFreePointsAdjacentToPoint(pair<int,int> thispair, int slope);
+        pair<int,int> getPairAfterMarkers(pair<int,int> thispair, int slope);
 };
 #endif /* Board_H */
