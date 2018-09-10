@@ -1,6 +1,6 @@
 /* 
  * File:   Board.h
- * Author: Akshat Khare
+ * Author: Akshat Khare Divyanshu Saxena
  * 
  */
 #ifndef Board_H

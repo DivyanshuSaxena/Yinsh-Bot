@@ -1,6 +1,6 @@
 /* 
  * File:   Board.cpp
- * Author: Akshat Khare
+ * Author: Akshat Khare Divyanshu Saxena
  * 
  */
 /**
