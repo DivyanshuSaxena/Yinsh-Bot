@@ -32,5 +32,7 @@ class Board{
         pair<int,int> getDirectionVector(pair<int,int> initialpoint, pair<int, int> finpoint);
         bool removeMarkers(int starthexagon, int starthexagonposition, int finhexagon, int finhexagonposition);
         bool removeRing(int hexagon, int position);
+        pair<int, int> getHexagonalCoordinate(int xarg, int yarg);
+        void printhexagonalconfig();
 };
 #endif /* Board_H */

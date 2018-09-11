@@ -470,3 +470,45 @@ bool Board::removeRing(int hexagon, int position){
     auto thispair = this->getCoordinates(hexagon, position);
     this->config[thispair.first][thispair.second] = 1;
 }
+pair<int, int> Board::getHexagonalCoordinate(int xarg, int yarg){
+    // xarg
+    // give xarg and yarg in 0,0 coordinates
+    if(xarg==0 && yarg==0){
+        return make_pair(0,0);
+    }else if(xarg>=0 && yarg>0){
+        if(yarg>xarg){
+            return make_pair(yarg, xarg);
+        }else{
+            return make_pair(xarg, xarg-yarg);
+        }
+    }else if(xarg>0 &&yarg<=0){
+        return make_pair(xarg-yarg, -yarg);
+    }else if(xarg<=0 && yarg<0){
+        if(xarg>yarg){
+            return make_pair(-yarg, -xarg);
+        }else{
+            return make_pair(-xarg, yarg-xarg);
+        }
+    }else if(xarg<0 && yarg>=0){
+        return make_pair(yarg-xarg,yarg);
+    }else{
+        return make_pair(-1, -1);
+    }
+}
+void Board::printhexagonalconfig(){
+    for(int j=2*n;j>=0;j--){
+        for(int i=0;i<2*n+1;i++){
+            // cout<< this->config[i][j] << " ";
+            pair<int,int> temphex;
+            if(this->config[i][j]==0){
+                // temphex = make_pair(-1,-1);
+                cout << "x" << " , "<< "x" << " | ";
+            }else{
+                temphex = this->getHexagonalCoordinate(i-n,j-n);
+                cout << temphex.first << " , "<< temphex.second << " | ";
+            }
+            // cout << temphex.first << " , "<< temphex.second << " | ";
+        }
+        cout<< endl;
+    }
+}
