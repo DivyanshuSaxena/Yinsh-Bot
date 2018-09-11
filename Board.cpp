@@ -457,3 +457,16 @@ pair<int,int> Board::getDirectionVector(pair<int,int> inipoint, pair<int,int> fi
     }
     return make_pair(0,0);
 }
+bool Board::removeMarkers(int starthexagon, int starthexagonposition, int finhexagon, int finhexagonposition){
+    auto inipair = this->getCoordinates(starthexagon, starthexagonposition);
+    auto destpair= this->getCoordinates(finhexagon, finhexagonposition);
+    auto dirvec = this->getDirectionVector(inipair, destpair);
+    for(int i=0;i< this->k;i++){
+        this->config[inipair.first + i*dirvec.first][inipair.second + i*dirvec.second] = 1;
+    }
+    return true;
+}
+bool Board::removeRing(int hexagon, int position){
+    auto thispair = this->getCoordinates(hexagon, position);
+    this->config[thispair.first][thispair.second] = 1;
+}

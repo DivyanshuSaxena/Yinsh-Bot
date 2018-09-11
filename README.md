@@ -43,6 +43,6 @@ The teacher bot shall be the winner bot from the previous game and the student b
 # To-do  
 - [x] Add ring for player  
 - [x] Select ring and move to some position  
-- [ ] Select ring + move ring + remove k markers + remove specific ring  
-- [ ] Remove k markers + remove specific ring + select ring + move ring  
-- [ ] Remove k markers + remove specific ring + select ring + move ring + remove k markers + remove specific ring  
+- [x] Select ring + move ring + remove k markers + remove specific ring  
+- [x] Remove k markers + remove specific ring + select ring + move ring  
+- [x] Remove k markers + remove specific ring + select ring + move ring + remove k markers + remove specific ring  

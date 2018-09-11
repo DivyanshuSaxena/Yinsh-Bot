@@ -30,5 +30,7 @@ class Board{
         bool setMarker(pair<int,int> thispair, int playermarker);
         bool selectAndMoveRing(int ringhexagon, int ringposition, int finringhexagon, int finringposition);
         pair<int,int> getDirectionVector(pair<int,int> initialpoint, pair<int, int> finpoint);
+        bool removeMarkers(int starthexagon, int starthexagonposition, int finhexagon, int finhexagonposition);
+        bool removeRing(int hexagon, int position);
 };
 #endif /* Board_H */
