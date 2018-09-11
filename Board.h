@@ -37,9 +37,12 @@ class Board{
         bool selectAndMoveRing(int, int, int, int);
         bool removeMarkers(int, int, int, int);
         bool removeRing(int, int);
+        pair<int, int> getHexagonalCoordinate(int, int);
+        void printhexagonalconfig();
 
         // Heuristics
         double getLinearMarkers();
         double getEvaluation();
+
 };
 #endif /* Board_H */
