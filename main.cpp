@@ -55,7 +55,7 @@ int main ( int argc, char** argv )
     Board *myboard = new Board(5,5,5,3);
     // auto freevecinfislope = myboard->getFreePointsAdjacentToPoint(make_pair(5,5), 90);
     
-    myboard->setMarker(myboard->getCoordinates(1, 0 ), 2);
+    // myboard->setMarker(myboard->getCoordinates(1, 0 ), 2);
     myboard->setMarker(myboard->getCoordinates(2, 0 ), 2);
     myboard->setMarker(myboard->getCoordinates(3, 0 ), 2);
     myboard->addRing(2, 0, 0);

@@ -120,17 +120,44 @@ vector<pair<int,int>> Board::showpossiblemoves(int hexagon, int position){
     int ringnum = this->config[thisringpair.first][thisringpair.second];
     // cout << "aloha" <<endl;
     auto freevecinfislope = this->getFreePointsAdjacentToPoint(thisringpair, 90);
+    auto skipfreevecinfislope = this->getPairAfterMarkers(freevecinfislope.back(), 90);
     auto freevecminusinfislope = this->getFreePointsAdjacentToPoint(thisringpair, 270);
+    auto skipfreevecminusinfislope = this->getPairAfterMarkers(freevecminusinfislope.back(), 270);
     auto freeveczeroslope = this->getFreePointsAdjacentToPoint(thisringpair, 0);
+    auto skipfreeveczeroslope = this->getPairAfterMarkers(freeveczeroslope.back(), 0);
     auto freevecminuszeroslope = this->getFreePointsAdjacentToPoint(thisringpair, 180);
+    auto skipfreevecminuszeroslope = this->getPairAfterMarkers(freevecminuszeroslope.back(), 180);
     auto freeveconeslope = this->getFreePointsAdjacentToPoint(thisringpair, 45);
+    auto skipfreeveconeslope = this->getPairAfterMarkers(freeveconeslope.back(), 45);
     auto freevecminusoneslope = this->getFreePointsAdjacentToPoint(thisringpair, 225);
+    auto skipfreevecminusoneslope = this->getPairAfterMarkers(freevecminusoneslope.back(), 225);
     myvec.insert(myvec.end(), freevecinfislope.begin(),freevecinfislope.end());
     myvec.insert(myvec.end(), freevecminusinfislope.begin(),freevecminusinfislope.end());
     myvec.insert(myvec.end(), freeveczeroslope.begin(),freeveczeroslope.end());
     myvec.insert(myvec.end(), freevecminuszeroslope.begin(),freevecminuszeroslope.end());
     myvec.insert(myvec.end(), freeveconeslope.begin(),freeveconeslope.end());
     myvec.insert(myvec.end(), freevecminusoneslope.begin(),freevecminusoneslope.end());
+
+    // insert issue #1 case
+    
+    if(skipfreevecinfislope.first != -1 && skipfreevecinfislope.second != -1){
+        myvec.push_back(skipfreevecinfislope);
+    }
+    if(skipfreevecminusinfislope.first != -1 && skipfreevecminusinfislope.second != -1){
+        myvec.push_back(skipfreevecminusinfislope);
+    }
+    if(skipfreeveczeroslope.first != -1 && skipfreeveczeroslope.second != -1){
+        myvec.push_back(skipfreeveczeroslope);
+    }
+    if(skipfreevecminuszeroslope.first != -1 && skipfreevecminuszeroslope.second != -1){
+        myvec.push_back(skipfreevecminuszeroslope);
+    }
+    if(skipfreeveconeslope.first != -1 && skipfreeveconeslope.second != -1){
+        myvec.push_back(skipfreeveconeslope);
+    }
+    if(skipfreevecminusoneslope.first != -1 && skipfreevecminusoneslope.second != -1){
+        myvec.push_back(skipfreevecminusoneslope);
+    }
 
     auto freepointinfislope = this->getPairAfterMarkers(thisringpair, 90);
     auto freepointminusinfislope = this->getPairAfterMarkers(thisringpair, 270);
@@ -357,6 +384,7 @@ bool Board::selectAndMoveRing(int ringhexagon, int ringposition, int finringhexa
     // cout << "dirvec is "<< dirvec.first<< " "<<dirvec.second<<endl;
     int ringnum = this->config[inipair.first][inipair.second];
     int ringmarker = ringnum+2;
+    // betweenMarkersThere is the contigous case
     bool betweenMarkersThere;
     if(this->config[inipair.first+dirvec.first][inipair.second+dirvec.second]>3){
         betweenMarkersThere = true;
@@ -377,9 +405,31 @@ bool Board::selectAndMoveRing(int ringhexagon, int ringposition, int finringhexa
         this->config[destpair.first][destpair.second] = ringnum;
         return true;
     }else{
-        this->config[inipair.first][inipair.second] = ringmarker;
-        this->config[destpair.first][destpair.second] = ringnum;
-        return true;
+        bool nonContinousMarkersThere;
+        if(this->config[destpair.first-dirvec.first][destpair.second-dirvec.second]>3){
+            nonContinousMarkersThere = true;
+        }else{
+            nonContinousMarkersThere = false;
+        }
+        if(nonContinousMarkersThere){
+            // we will do end iteration here
+            this->config[destpair.first][destpair.second]= ringnum;
+            int tempi = destpair.first - dirvec.first;
+            int tempj = destpair.second - dirvec.second;
+            while(this->config[tempi][tempj] == 4 || this->config[tempi][tempj]==5 ){
+                this->config[tempi][tempj] = 9 - this->config[tempi][tempj];
+                tempi = tempi - dirvec.first;
+                tempj = tempj - dirvec.second;
+            }
+            //tempi, tempj would not be equal to inipair
+            this->config[inipair.first][inipair.second] = ringmarker;
+            return true;
+        }else{
+            this->config[inipair.first][inipair.second] = ringmarker;
+            this->config[destpair.first][destpair.second] = ringnum;
+            return true;
+        }
+        
     }
 }
 pair<int,int> Board::getDirectionVector(pair<int,int> inipoint, pair<int,int> finpoint){
