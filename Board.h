@@ -22,15 +22,14 @@ class Board{
         Board();
         Board(int n, int m, int k, int l);
         void printnormalconfig();
-        bool addRing(int player, int hexagon, int position);
+        bool addRing(int, int, int);
         pair <int, int> getCoordinates(int, int);
         vector<pair<int,int>> showpossiblemoves(int, int);
-        vector<pair<int,int>> getFreePointsAdjacentToPoint(pair<int,int> thispair, int slope);
-        pair<int,int> getPairAfterMarkers(pair<int,int> thispair, int slope);
-        bool setMarker(pair<int,int> thispair, int playermarker);
-        bool selectAndMoveRing(int ringhexagon, int ringposition, int finringhexagon, int finringposition);
-        pair<int,int> getDirectionVector(pair<int,int> initialpoint, pair<int, int> finpoint);
-        bool removeMarkers(int starthexagon, int starthexagonposition, int finhexagon, int finhexagonposition);
-        bool removeRing(int hexagon, int position);
+        vector<pair<int,int>> getFreePointsAdjacentToPoint(pair<int,int>, int);
+        pair<int,int> getPairAfterMarkers(pair<int,int>, int);
+        bool setMarker(pair<int,int>, int);
+        bool selectAndMoveRing(int, int, int, int);
+        bool removeMarkers(int, int, int, int);
+        bool removeRing(int, int);
 };
 #endif /* Board_H */

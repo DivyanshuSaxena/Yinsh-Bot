@@ -8,9 +8,36 @@
 
 #include "Board.h"
 
+pair<int,int> getDirectionVector(pair<int,int> inipoint, pair<int,int> finpoint){
+    // IT IS FROM FIRST ARGUMENT TO SECOND 
+    int xdiff = finpoint.first - inipoint.first;
+    int ydiff = finpoint.second - inipoint.second;
+    if(xdiff==0){
+        if(ydiff>0){
+            return make_pair(0,1);
+        }else if(ydiff<0){
+            return make_pair(0,-1);
+        }
+    }else if(ydiff==0){
+        if(xdiff>0){
+            return make_pair(1,0);
+        }else if(xdiff<0){
+            return make_pair(-1,0);
+        }
+    }else if(xdiff==ydiff){
+        if(xdiff>0){
+            return make_pair(1,1);
+        }else if(xdiff<0){
+            return make_pair(-1,-1);
+        }
+    }
+    return make_pair(0,0);
+}
+
 int ** Board::getConfig(){
     return this->config;
 }
+
 Board::Board(){
     //for now we are considering conventional boards
     Board(5,5,5,3);
@@ -252,6 +279,7 @@ vector<pair<int,int>> Board::getFreePointsAdjacentToPoint(pair<int,int> argpair,
     // cout << "finvec size is "<< myvec.size()<<endl;
     return myvec;
 }
+
 pair<int,int> Board::getPairAfterMarkers(pair<int,int> argpair, int slope){
     int tempi = argpair.first;
     int tempj = argpair.second;
@@ -366,6 +394,7 @@ pair<int,int> Board::getPairAfterMarkers(pair<int,int> argpair, int slope){
     }
     return make_pair(-1,-1);
 }
+
 bool Board::setMarker(pair<int,int> argpair, int playerid){
     //not complete function yet
     if(playerid==2){
@@ -375,12 +404,13 @@ bool Board::setMarker(pair<int,int> argpair, int playerid){
     }
     return true;
 }
+
 bool Board::selectAndMoveRing(int ringhexagon, int ringposition, int finringhexagon, int finringposition){
     //we are considering that the move is valid
 
     auto inipair = this->getCoordinates(ringhexagon, ringposition);
     auto destpair= this->getCoordinates(finringhexagon, finringposition);
-    auto dirvec = this->getDirectionVector(inipair, destpair);
+    auto dirvec = getDirectionVector(inipair, destpair);
     // cout << "dirvec is "<< dirvec.first<< " "<<dirvec.second<<endl;
     int ringnum = this->config[inipair.first][inipair.second];
     int ringmarker = ringnum+2;
@@ -432,40 +462,17 @@ bool Board::selectAndMoveRing(int ringhexagon, int ringposition, int finringhexa
         
     }
 }
-pair<int,int> Board::getDirectionVector(pair<int,int> inipoint, pair<int,int> finpoint){
-    // IT IS FROM FIRST ARGUMENT TO SECOND 
-    int xdiff = finpoint.first - inipoint.first;
-    int ydiff = finpoint.second - inipoint.second;
-    if(xdiff==0){
-        if(ydiff>0){
-            return make_pair(0,1);
-        }else if(ydiff<0){
-            return make_pair(0,-1);
-        }
-    }else if(ydiff==0){
-        if(xdiff>0){
-            return make_pair(1,0);
-        }else if(xdiff<0){
-            return make_pair(-1,0);
-        }
-    }else if(xdiff==ydiff){
-        if(xdiff>0){
-            return make_pair(1,1);
-        }else if(xdiff<0){
-            return make_pair(-1,-1);
-        }
-    }
-    return make_pair(0,0);
-}
+
 bool Board::removeMarkers(int starthexagon, int starthexagonposition, int finhexagon, int finhexagonposition){
     auto inipair = this->getCoordinates(starthexagon, starthexagonposition);
     auto destpair= this->getCoordinates(finhexagon, finhexagonposition);
-    auto dirvec = this->getDirectionVector(inipair, destpair);
+    auto dirvec = getDirectionVector(inipair, destpair);
     for(int i=0;i< this->k;i++){
         this->config[inipair.first + i*dirvec.first][inipair.second + i*dirvec.second] = 1;
     }
     return true;
 }
+
 bool Board::removeRing(int hexagon, int position){
     auto thispair = this->getCoordinates(hexagon, position);
     this->config[thispair.first][thispair.second] = 1;
