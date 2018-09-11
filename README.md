@@ -40,6 +40,8 @@ The teacher bot shall be the winner bot from the previous game and the student b
 
 ## Further Considerations
 1. Transitional changes for evaluating heuristics
+2. Random moves with some small probability
+
 # To-do  
 - [x] Add ring for player  
 - [x] Select ring and move to some position  
