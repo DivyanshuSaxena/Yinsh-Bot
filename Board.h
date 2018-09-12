@@ -3,25 +3,28 @@
  * Author: Akshat Khare Divyanshu Saxena
  * 
  */
-#ifndef Board_H
-#define	Board_H
+#ifndef BOARD_H
+#define	BOARD_H
+
 #include <iostream>
 #include <fstream>
 #include <vector>
 using namespace std;
+
+extern int n, m, k, l;  
+// n is hexagon size
+// m is the number of rings each player has
+// k is number of markers in line each player has to create to remove k markers
+// l is number of rings one player must remove before other player to win
+
 class Board{
     public:
         int ** config;
-        int n, m, k, l;  
-        // n is hexagon size
-        // m is the number of rings each player has
-        // k is number of markers in line each player has to create to remove k markers
-        // l is number of rings one player must remove before other player to win
         int ** getConfig();
         
         // Initialization
         Board();
-        Board(int n, int m, int k, int l);
+        Board(int, int, int, int);
 
         // Accessor Methods
         pair <int, int> getCoordinates(int, int);
@@ -39,4 +42,8 @@ class Board{
         pair<int, int> getHexagonalCoordinate(int, int);
         void printhexagonalconfig();
 };
+
+extern vector<double> weights;
+extern Board* board;
+
 #endif /* Board_H */

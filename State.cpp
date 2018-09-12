@@ -4,7 +4,6 @@
  * 
  */
 
-#include "Board.h"
 #include "State.h"
 
 double State::getLinearMarkers() {
@@ -20,12 +19,12 @@ double State::getLinearMarkers() {
     for (int i = 0; i <= 2*n; i++) {
         int startj = i>n ? (i-n) : 0;
         int completej = i<n ? (n+i) : 2*n+1;
-        int prevMarkerVert = config[i][startj];
-        int prevMarkerHorz = config[startj][i];
+        int prevMarkerVert = board->config[i][startj];
+        int prevMarkerHorz = board->config[startj][i];
         int countVert = 1, countHorz = 1;
         for (int j = startj+1; j <= completej; j++) {
             // Vertical Rows
-            if (config[i][j] == prevMarkerVert) {
+            if (board->config[i][j] == prevMarkerVert) {
                 if (!(prevMarkerVert == player1 || prevMarkerVert == player2) ) continue;
                 countVert++;
                 if (countVert == k-2) {
@@ -41,14 +40,14 @@ double State::getLinearMarkers() {
                     }
                 }
             } else {
-                if (config[i][j] == player1 || config[i][j] == player2) {
+                if (board->config[i][j] == player1 || board->config[i][j] == player2) {
                     countVert = 1;
                 } 
-                prevMarkerVert = config[i][j];
+                prevMarkerVert = board->config[i][j];
             }
 
             // Horizontal Rows
-            if (config[j][i] == prevMarkerHorz) {
+            if (board->config[j][i] == prevMarkerHorz) {
                 if (!(prevMarkerHorz == player1 || prevMarkerHorz == player2) ) continue;
                 countHorz++;
                 if (countHorz == k-2) {
@@ -64,10 +63,10 @@ double State::getLinearMarkers() {
                     }
                 }
             } else {
-                if (config[j][i] == player1 || config[j][i] == player2) {
+                if (board->config[j][i] == player1 || board->config[j][i] == player2) {
                     countHorz = 1;
                 } 
-                prevMarkerHorz = config[j][i];
+                prevMarkerHorz = board->config[j][i];
             }
         }
     }
@@ -77,10 +76,10 @@ double State::getLinearMarkers() {
         // Let the slant line be x-y = c, then diff is the iterator for c
         int startj = (diff<=0) ? 0 : diff;
         int endj = (diff<=0) ? 10 : (10-diff);
-        int prevMarker = config[startj][startj-diff];
+        int prevMarker = board->config[startj][startj-diff];
         int count = 0;
         for (int j = startj+1; j <= endj; j++) {
-            if (config[j][j-diff] == prevMarker) {
+            if (board->config[j][j-diff] == prevMarker) {
                 if (prevMarker != player1 && prevMarker != player2) continue;
                 count++;
                 if (count == k-2) {
@@ -96,10 +95,10 @@ double State::getLinearMarkers() {
                     }
                 }
             } else {
-                if (config[j][j-diff] == player1 || config[j][j-diff] == player2) {
+                if (board->config[j][j-diff] == player1 || board->config[j][j-diff] == player2) {
                     count = 1;
                 } 
-                prevMarker = config[j][j-diff];
+                prevMarker = board->config[j][j-diff];
             }
         }
     }

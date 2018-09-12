@@ -50,6 +50,11 @@
  */
 
 #include "Board.h"
+
+int n, m, k, l;
+vector<double> weights;
+Board* board;
+
 int main ( int argc, char** argv )
 {
     Board *myboard = new Board(5,5,5,3);

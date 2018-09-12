@@ -14,9 +14,6 @@ using namespace std;
 
 class State {
     public:
-        Board * board;
-        vector<double> weights;
-
         // Heuristics
         double getLinearMarkers();
         double getEvaluation();

@@ -45,10 +45,10 @@ Board::Board(){
 
 Board::Board(int n0, int m0, int k0, int l0){
     // General boards
-    this->n = n0;
-    this->m = m0;
-    this->k = k0;
-    this->l = l0;
+    n = n0;
+    m = m0;
+    k = k0;
+    l = l0;
 
     int ** tempconfig = new int*[2*n+1];
     for(int i=0; i<2*n+1; i++){
@@ -218,7 +218,7 @@ vector<pair<int,int>> Board::getFreePointsAdjacentToPoint(pair<int,int> argpair,
     int tempi = argpair.first;
     int tempj = argpair.second;
     if(slope==90){
-        while(true && tempj<2*this->n){
+        while(true && tempj<2*n){
             tempj++;
             // cout << "tempi is "<<tempi<< " tempj is "<< tempj<<endl;
             if(this->config[tempi][tempj]!=1){
@@ -238,7 +238,7 @@ vector<pair<int,int>> Board::getFreePointsAdjacentToPoint(pair<int,int> argpair,
             }
         }
     }else if(slope==0 ){
-        while(true && tempi < 2 * this->n){
+        while(true && tempi < 2 * n){
             tempi++;
             if(this->config[tempi][tempj]!=1){
                 break;
@@ -256,7 +256,7 @@ vector<pair<int,int>> Board::getFreePointsAdjacentToPoint(pair<int,int> argpair,
             }
         }
     }else if(slope == 45){
-        while(true && tempi < 2 * this->n && tempj < 2 * this->n){
+        while(true && tempi < 2 * n && tempj < 2 * n){
             tempi++;
             tempj++;
             if(this->config[tempi][tempj]!=1){
@@ -286,7 +286,7 @@ pair<int,int> Board::getPairAfterMarkers(pair<int,int> argpair, int slope){
     if(slope==90){
         if(this->config[tempi][tempj+1]>3){
             tempj++;
-            while(true && tempj<this->n*2){
+            while(true && tempj<n*2){
                 tempj++;
                 if(this->config[tempi][tempj]!=4 && this->config[tempi][tempj]!=5){
                     break;
@@ -320,7 +320,7 @@ pair<int,int> Board::getPairAfterMarkers(pair<int,int> argpair, int slope){
     }else if(slope==0){
         if(this->config[tempi+1][tempj]>3){
             tempi++;
-            while(true && tempi<this->n*2){
+            while(true && tempi<n*2){
                 tempi++;
                 if(this->config[tempi][tempj]!=4 && this->config[tempi][tempj]!=5){
                     break;
@@ -355,7 +355,7 @@ pair<int,int> Board::getPairAfterMarkers(pair<int,int> argpair, int slope){
         if(this->config[tempi+1][tempj+1]>3){
             tempi++;
             tempj++;
-            while(true && tempi<this->n*2 && tempj<this->n*2){
+            while(true && tempi<n*2 && tempj<n*2){
                 tempi++;
                 tempj++;
                 if(this->config[tempi][tempj]!=4 && this->config[tempi][tempj]!=5){
@@ -467,7 +467,7 @@ bool Board::removeMarkers(int starthexagon, int starthexagonposition, int finhex
     auto inipair = this->getCoordinates(starthexagon, starthexagonposition);
     auto destpair= this->getCoordinates(finhexagon, finhexagonposition);
     auto dirvec = getDirectionVector(inipair, destpair);
-    for(int i=0;i< this->k;i++){
+    for(int i=0;i< k;i++){
         this->config[inipair.first + i*dirvec.first][inipair.second + i*dirvec.second] = 1;
     }
     return true;

@@ -27,8 +27,8 @@ w1, w2, ..., wn -> Weights of respective features
 
 ## Features
 Probable list of features:
-1. Number of markers in a row of 4 OR Number of rows of 4 markers :heavy_check_mark:
-2. Number of markers in a row of 3 OR Number of rows of 3 markers :heavy_check_mark:
+1. Number of markers in a row of 4 OR Number of rows of 4 markers [Both self and opponent] :heavy_check_mark:
+2. Number of markers in a row of 3 OR Number of rows of 3 markers [Both self and opponent] :heavy_check_mark:
 3. Number of markers that form a row and are not flippable in the next move
 4. Number of opponent markers that form a row and are not flippable in the next move
 5. A ring sharing a row of opponent markers 
