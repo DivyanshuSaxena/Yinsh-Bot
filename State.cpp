@@ -5,8 +5,9 @@
  */
 
 #include "Board.h"
+#include "State.h"
 
-double Board::getLinearMarkers() {
+double State::getLinearMarkers() {
     double h;
     int player1 = 4;
     int player2 = 5;
@@ -71,7 +72,7 @@ double Board::getLinearMarkers() {
         }
     }
 
-    // Slant Rows
+    // Slant Rows for both opponents
     for (int diff = -n; diff <= n; diff++) {
         // Let the slant line be x-y = c, then diff is the iterator for c
         int startj = (diff<=0) ? 0 : diff;
@@ -105,7 +106,9 @@ double Board::getLinearMarkers() {
     return h;
 }
 
-double Board::getEvaluation() {
+
+
+double State::getEvaluation() {
     double h;
 
     return h;

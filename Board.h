@@ -10,9 +10,8 @@
 #include <vector>
 using namespace std;
 class Board{
-    private:
-        int ** config;
     public:
+        int ** config;
         int n, m, k, l;  
         // n is hexagon size
         // m is the number of rings each player has
@@ -39,10 +38,5 @@ class Board{
         bool removeRing(int, int);
         pair<int, int> getHexagonalCoordinate(int, int);
         void printhexagonalconfig();
-
-        // Heuristics
-        double getLinearMarkers();
-        double getEvaluation();
-
 };
 #endif /* Board_H */
