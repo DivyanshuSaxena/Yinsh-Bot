@@ -207,7 +207,6 @@ vector<pair<int,int>> Board::showPossibleMoves(int hexagon, int position){
         myvec.push_back(skipfreevecminusoneslope);
     }
 
-    cout << "Part 2" << endl;
     auto freepointinfislope = this->getPairAfterMarkers(thisringpair, 90);
     auto freepointminusinfislope = this->getPairAfterMarkers(thisringpair, 270);
     auto freepointzeroslope = this->getPairAfterMarkers(thisringpair, 0);
@@ -232,7 +231,6 @@ vector<pair<int,int>> Board::showPossibleMoves(int hexagon, int position){
     if(freepointminusoneslope.first != -1 && freepointminusoneslope.second != -1){
         myvec.push_back(freepointminusoneslope);
     }
-    cout << "Part 3" << endl;
     return myvec;
 }
 
