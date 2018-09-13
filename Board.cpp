@@ -87,6 +87,50 @@ Board::Board(int n0, int m0, int k0, int l0){
     this->config = tempconfig;
 }
 
+pair<int,int> Board::makeInitialMoves(int movenum) {
+    pair<int,int> retPair;
+    if (movenum == 1 && config[n][n+1] == 1) {
+        retPair = make_pair(n,n+1);
+    } else if (movenum <= m/2) {
+        pair<int,int> ring = player_id==1 ? p2Rings.back() : p1Rings.back();
+        
+        bool madeMove = false;
+        if (ring.second >= n) {
+            if (config[ring.first+1][ring.second-1] == 1) {
+                retPair = make_pair(ring.first+1, ring.second-1);
+                madeMove = true;
+            } else if (config[ring.first-1][ring.second-2] == 1) {
+                retPair = make_pair(ring.first-1, ring.second-2);
+                madeMove = true;
+            } else if (config[ring.first-2][ring.second-1] == 1) {
+                retPair = make_pair(ring.first-2, ring.second-1);
+                madeMove = true;
+            }
+        } 
+        if (!madeMove) {
+            if (config[ring.first-1][ring.second+1] == 1) {
+                retPair = make_pair(ring.first-1, ring.second+1);
+                madeMove = true;
+            } else if (config[ring.first+1][ring.second+2] == 1) {
+                retPair = make_pair(ring.first+1, ring.second+2);
+                madeMove = true;
+            } else if (config[ring.first+2][ring.second+1] == 1) {
+                retPair = make_pair(ring.first+2, ring.second+1);
+                madeMove = true;
+            }
+        }
+    } else 
+        retPair = blockOpponentRings();
+
+    bool check = addRing(player_id, retPair.first, retPair.second);
+    if (!check) cout << "Some error in adding ring" << endl; // Debug
+    return retPair;
+}
+
+pair<int,int> Board::blockOpponentRings() {
+    // Make move so as to block possible rows of opponent rings
+}
+
 void Board::updateRingPositions(){
     p1Rings.clear();
     p2Rings.clear();
@@ -110,17 +154,18 @@ void Board::printnormalconfig(){
     }
 }
 
-bool Board::addRing(int player, int hexagon, int position){
-    pair <int, int> coor = this->getCoordinates(hexagon, position);
-    if(coor.first==-1 || coor.second ==-1){
+bool Board::addRing(int player, int xarg, int yarg){
+    if(xarg==-1 || yarg ==-1){
         return false;
-    }else if(this->config[coor.first][coor.second]==1){
-        //player 1 ring is 2 , player 2 ring is 3
+    }else if(this->config[xarg][yarg]==1){
+        // player 1 ring is 2 , player 2 ring is 3
         if(player==1){
-            this->config[coor.first][coor.second] = 2;
+            this->config[xarg][yarg] = 2;
+            p1Rings.push_back(make_pair(xarg, yarg));
             return true;
         }else if(player==2){
-            this->config[coor.first][coor.second] = 3;
+            this->config[xarg][yarg] = 3;
+            p2Rings.push_back(make_pair(xarg, yarg));
             return true;
         }else{
             return false;
@@ -160,8 +205,6 @@ pair <int,int> Board::getCoordinates(int hexagon, int position){
         }
     }
 }
-
-
 
 vector<pair<int,int>> Board::showPossibleMoves(int hexagon, int position){
     vector<pair<int,int>> myvec;
@@ -518,8 +561,7 @@ bool Board::isFlippable(int row, int col){
         // Ring pair available at index i
         pair<int,int> ring = flipMarker==2 ? p1Rings.at(i) : p2Rings.at(i);
         int ringx = ring.first, ringy = ring.second;
-        pair<int,int> ringHex = board->getHexagonalCoordinate(ring.first, ring.second);
-        vector<pair<int,int>> possibleMoves = board->showPossibleMoves(ringHex.first, ringHex.second);
+        vector<pair<int,int>> possibleMoves = board->showPossibleMoves(ring.first, ring.second);
         for (int k = 0; k < possibleMoves.size(); k++) {
             pair<int,int> move = possibleMoves.at(k);
             int movex = move.first, movey = move.second;

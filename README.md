@@ -33,6 +33,7 @@ Probable list of features:
 4. Number of opponent rows that are not flippable in the next move [Both self and opponent] :heavy_check_mark:
 5. A ring sharing a row of opponent markers 
 6. Number of blocked self rings
+7. Corner Occupancy
 
 ## Weights of Features
 Play two bots with similar features, with the exception of one of the features. One of the bots shall learn and the other shall be learning.  
