@@ -6,6 +6,16 @@
 
 #include "State.h"
 
+State::State(Board* board) {
+    // Duplicate the argument board
+    stboard = new Board(n,m,k,l);
+    for(int j=2*n;j>=0;j--){
+        for(int i=0;i<2*n+1;i++){
+            stboard->config[i][j] = board->config[i][j];
+        }
+    }
+}
+
 void State::setWeight(double weight, int feature) {
     if (feature < weights.size() && feature > 0) {
         weights.at(feature) = weight;
@@ -58,37 +68,38 @@ void State::getLinearMarkers() {
     // Vertical and Horizontal Rows for both opponents
     for (int i = 0; i <= 2*n; i++) {
         int startj = i>n ? (i-n) : 0;
-        int completej = i<n ? (n+i) : 2*n+1;
-        int prevMarkerVert = board->config[i][startj];
-        int prevMarkerHorz = board->config[startj][i];
+        int completej = i<=n ? (n+i) : 2*n+1;
+        int prevMarkerVert = stboard->config[i][startj];
+        int prevMarkerHorz = stboard->config[startj][i];
         int countVert = 1, countHorz = 1;
         bool flipVert = false, flipHorz = false; // Variables to check if the current streak is non-flippable or not
-        for (int j = startj+1; j <= completej; j++) {
+        for (int j = startj+1; j < completej; j++) {
             // Vertical Rows
-            if (board->config[i][j] == prevMarkerVert) {
-                if (!(prevMarkerVert == player1 || prevMarkerVert == player2) ) continue;
+            if (stboard->config[i][j] == prevMarkerVert) {
+                if (!(prevMarkerVert == player1 || prevMarkerVert == player2) ) goto horizontal;
                 countVert++;
-                flipVert = flipVert || board->isFlippable(i, j);
+                flipVert = flipVert || stboard->isFlippable(i, j);
                 if (countVert >= k-2) incrementRows(countVert, prevMarkerVert, flipVert);
             } else {
-                if (board->config[i][j] == player1 || board->config[i][j] == player2) {
+                if (stboard->config[i][j] == player1 || stboard->config[i][j] == player2) {
                     countVert = 1;
                 } 
-                prevMarkerVert = board->config[i][j];
+                prevMarkerVert = stboard->config[i][j];
                 flipVert = false;
             }
 
             // Horizontal Rows
-            if (board->config[j][i] == prevMarkerHorz) {
+            horizontal:
+            if (stboard->config[j][i] == prevMarkerHorz) {
                 if (!(prevMarkerHorz == player1 || prevMarkerHorz == player2) ) continue;
                 countHorz++;
-                flipHorz = flipHorz || board->isFlippable(j, i);
+                flipHorz = flipHorz || stboard->isFlippable(j, i);
                 if (countHorz >= k-2) incrementRows(countHorz, prevMarkerHorz, flipHorz);
             } else {
-                if (board->config[j][i] == player1 || board->config[j][i] == player2) {
+                if (stboard->config[j][i] == player1 || stboard->config[j][i] == player2) {
                     countHorz = 1;
                 } 
-                prevMarkerHorz = board->config[j][i];
+                prevMarkerHorz = stboard->config[j][i];
                 flipHorz = false;
             }
         }
@@ -100,26 +111,28 @@ void State::getLinearMarkers() {
         // Let the slant line be x-y = c, then diff is the iterator for c
         int startj = (diff<=0) ? 0 : diff;
         int endj = (diff<=0) ? 10 : (10-diff);
-        int prevMarker = board->config[startj][startj-diff];
+        int prevMarker = stboard->config[startj][startj-diff];
         int count = 0;
         for (int j = startj+1; j <= endj; j++) {
-            if (board->config[j][j-diff] == prevMarker) {
+            if (stboard->config[j][j-diff] == prevMarker) {
                 if (prevMarker != player1 && prevMarker != player2) continue;
                 count++;
-                flip = flip || board->isFlippable(j, j-diff);
+                flip = flip || stboard->isFlippable(j, j-diff);
                 if (count >= k-2) incrementRows(count, prevMarker, flip);
             } else {
-                if (board->config[j][j-diff] == player1 || board->config[j][j-diff] == player2) {
+                if (stboard->config[j][j-diff] == player1 || stboard->config[j][j-diff] == player2) {
                     count = 1;
                 } 
-                prevMarker = board->config[j][j-diff];
+                prevMarker = stboard->config[j][j-diff];
             }
         }
     }
 }
 
 double State::getEvaluation() {
+    // cout << "Starting Evaluation" << endl; // Debug
     double h = 0;
+    this->getLinearMarkers();
     // Rows of k-2 markers
     h += rowsktwo1 * weights.at(1);
     h += rowsktwo2 * weights.at(2);

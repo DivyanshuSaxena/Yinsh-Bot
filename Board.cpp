@@ -157,9 +157,10 @@ vector<pair<int,int>> Board::showPossibleMoves(int hexagon, int position){
     vector<pair<int,int>> myvec;
     auto thisringpair = this->getCoordinates(hexagon,position);
     int ringnum = this->config[thisringpair.first][thisringpair.second];
-    // cout << "aloha" <<endl;
+    cout << "aloha" <<endl;
     auto freevecinfislope = this->getFreePointsAdjacentToPoint(thisringpair, 90);
     auto skipfreevecinfislope = this->getPairAfterMarkers(freevecinfislope.back(), 90);
+    cout << "Part 1" << endl;
     auto freevecminusinfislope = this->getFreePointsAdjacentToPoint(thisringpair, 270);
     auto skipfreevecminusinfislope = this->getPairAfterMarkers(freevecminusinfislope.back(), 270);
     auto freeveczeroslope = this->getFreePointsAdjacentToPoint(thisringpair, 0);
@@ -178,7 +179,7 @@ vector<pair<int,int>> Board::showPossibleMoves(int hexagon, int position){
     myvec.insert(myvec.end(), freevecminusoneslope.begin(),freevecminusoneslope.end());
 
     // insert issue #1 case
-    
+
     if(skipfreevecinfislope.first != -1 && skipfreevecinfislope.second != -1){
         myvec.push_back(skipfreevecinfislope);
     }
@@ -198,6 +199,7 @@ vector<pair<int,int>> Board::showPossibleMoves(int hexagon, int position){
         myvec.push_back(skipfreevecminusoneslope);
     }
 
+    cout << "Part 2" << endl;
     auto freepointinfislope = this->getPairAfterMarkers(thisringpair, 90);
     auto freepointminusinfislope = this->getPairAfterMarkers(thisringpair, 270);
     auto freepointzeroslope = this->getPairAfterMarkers(thisringpair, 0);
@@ -222,6 +224,7 @@ vector<pair<int,int>> Board::showPossibleMoves(int hexagon, int position){
     if(freepointminusoneslope.first != -1 && freepointminusoneslope.second != -1){
         myvec.push_back(freepointminusoneslope);
     }
+    cout << "Part 3" << endl;
     return myvec;
 }
 
@@ -296,6 +299,7 @@ pair<int,int> Board::getPairAfterMarkers(pair<int,int> argpair, int slope){
     int tempi = argpair.first;
     int tempj = argpair.second;
     if(slope==90){
+        cout << "90" << endl;
         if(this->config[tempi][tempj+1]>3){
             tempj++;
             while(true && tempj<n*2){
@@ -313,6 +317,7 @@ pair<int,int> Board::getPairAfterMarkers(pair<int,int> argpair, int slope){
             return make_pair(-1,-1);
         }
     }else if(slope==270){
+        cout << "270" << endl;
         if(this->config[tempi][tempj-1]>3){
             tempj--;
             while(true && tempj>0){

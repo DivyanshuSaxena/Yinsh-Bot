@@ -47,7 +47,6 @@ class Board{
         void printhexagonalconfig();
 };
 
-extern vector<double> weights;
 extern Board* board;
 
 #endif /* Board_H */

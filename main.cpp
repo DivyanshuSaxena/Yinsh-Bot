@@ -50,6 +50,7 @@
  */
 
 #include "Board.h"
+#include "State.h"
 
 int n, m, k, l;
 vector<double> weights;
@@ -57,17 +58,31 @@ Board* board;
 
 int main ( int argc, char** argv )
 {
+    for (int i = 0; i < 11; i++) {
+        weights.push_back(i);
+    }
+
     board = new Board(5,5,5,3);
-    // auto freevecinfislope = board->getFreePointsAdjacentToPoint(make_pair(5,5), 90);
     board->printhexagonalconfig();
     cout << endl;
-    // board->setMarker(board->getCoordinates(1, 0 ), 2);
+
+    board->setMarker(board->getCoordinates(1, 0 ), 2);
+    cout << "First Marker Done." << endl;               // Debug
+
+    pair<int,int> p = board->getCoordinates(2, 0 );
+    cout << p.first << " " << p.second << endl;         // Debug
     board->setMarker(board->getCoordinates(2, 0 ), 2);
+    cout << "Second Marker Done." << endl;               // Debug
+
     board->setMarker(board->getCoordinates(3, 0 ), 2);
+    cout << "Third Marker Done." << endl;               // Debug
+
     board->addRing(2, 0, 0);
     board->addRing(1, 2, 3);
     // board->setMarker(board->getCoordinates(4, 0 ), 2);
+    cout << "Both rings added" << endl;
     auto adjpoints = board->showPossibleMoves(0,0);
+
     for(int i=0;i<adjpoints.size();i++){
         cout << adjpoints[i].first << " , " << adjpoints[i].second << " | ";
     }
@@ -82,5 +97,7 @@ int main ( int argc, char** argv )
     board->selectAndMoveRing(2,3,3,5);
     cout << "select n move done "<<endl;
     board->printnormalconfig();
-
+    
+    State* state = new State(board);
+    cout << state->getEvaluation() << endl;
 }

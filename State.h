@@ -12,6 +12,8 @@
 #include "Board.h"
 using namespace std;
 
+extern vector<double> weights;
+
 class State {
     private:
         // Number of rows with k markers for players 1 and 2
@@ -31,7 +33,8 @@ class State {
 
         void incrementRows(int, int, bool);
     public:
-        vector<double> weights;
+        State(Board* board);
+        Board* stboard;
         void setWeight(double weight, int feature);
 
         // Heuristics
