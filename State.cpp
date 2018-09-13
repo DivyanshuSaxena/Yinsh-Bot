@@ -6,6 +6,12 @@
 
 #include "State.h"
 
+void State::setWeight(double weight, int feature) {
+    if (feature < weights.size() && feature > 0) {
+        weights.at(feature) = weight;
+    }
+}
+
 void State::incrementRows(int count, int marker, bool flip) {
     // Increments all the in-a-row heuristic variables for the State object based on the count and the player marker
     if (count == k-2) {
@@ -113,7 +119,26 @@ void State::getLinearMarkers() {
 }
 
 double State::getEvaluation() {
-    double h;
+    double h = 0;
+    // Rows of k-2 markers
+    h += rowsktwo1 * weights.at(1);
+    h += rowsktwo2 * weights.at(2);
+
+    // Rows of k-2 non flippable markers
+    h += nonFlipRowsktwo1 * weights.at(3); 
+    h += nonFlipRowsktwo2 * weights.at(4); 
     
+    // Rows of k-1 markers
+    h += rowskone1 * weights.at(5);
+    h += rowskone2 * weights.at(6);
+
+    // Rows of k-1 non flippable markers
+    h += nonFlipRowskone1 * weights.at(7);
+    h += nonFlipRowskone2 * weights.at(8);
+
+    // Rows of k markers
+    h += rowsk1 * weights.at(9);
+    h += rowsk2 * weights.at(10);
+
     return h;
 }

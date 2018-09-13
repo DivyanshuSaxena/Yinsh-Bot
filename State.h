@@ -31,7 +31,8 @@ class State {
 
         void incrementRows(int, int, bool);
     public:
-        int * weights;
+        vector<double> weights;
+        void setWeight(double weight, int feature);
 
         // Heuristics
         void getLinearMarkers();
