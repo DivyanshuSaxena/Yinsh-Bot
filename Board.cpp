@@ -583,18 +583,18 @@ pair<int, int> Board::getHexagonalCoordinate(int xarg, int yarg){
         if(yarg>xarg){
             return make_pair(yarg, xarg);
         }else{
-            return make_pair(xarg, xarg-yarg);
+            return make_pair(xarg, xarg-yarg+1*xarg);
         }
     }else if(xarg>0 &&yarg<=0){
-        return make_pair(xarg-yarg, -yarg);
+        return make_pair(xarg-yarg, -yarg+2*(xarg-yarg));
     }else if(xarg<=0 && yarg<0){
         if(xarg>yarg){
-            return make_pair(-yarg, -xarg);
+            return make_pair(-yarg, -xarg+3*(-yarg));
         }else{
-            return make_pair(-xarg, yarg-xarg);
+            return make_pair(-xarg, yarg-xarg+4*(-xarg));
         }
     }else if(xarg<0 && yarg>=0){
-        return make_pair(yarg-xarg,yarg);
+        return make_pair(yarg-xarg,yarg+5*(yarg-xarg));
     }else{
         return make_pair(-1, -1);
     }
