@@ -8,6 +8,14 @@
 
 #include "Board.h"
 
+pair<int, int> backB7(vector<pair<int,int>> myvec){
+    if(myvec.size()!=0){
+        return myvec.back();
+    }else{
+        return make_pair(-1,-1);
+    }
+}
+
 pair<int,int> getDirectionVector(pair<int,int> inipoint, pair<int,int> finpoint){
     // IT IS FROM FIRST ARGUMENT TO SECOND 
     int xdiff = finpoint.first - inipoint.first;
@@ -153,24 +161,24 @@ pair <int,int> Board::getCoordinates(int hexagon, int position){
     }
 }
 
+
+
 vector<pair<int,int>> Board::showPossibleMoves(int hexagon, int position){
     vector<pair<int,int>> myvec;
     auto thisringpair = this->getCoordinates(hexagon,position);
     int ringnum = this->config[thisringpair.first][thisringpair.second];
-    cout << "aloha" <<endl;
     auto freevecinfislope = this->getFreePointsAdjacentToPoint(thisringpair, 90);
-    auto skipfreevecinfislope = this->getPairAfterMarkers(freevecinfislope.back(), 90);
-    cout << "Part 1" << endl;
+    auto skipfreevecinfislope = this->getPairAfterMarkers(backB7(freevecinfislope), 90);
     auto freevecminusinfislope = this->getFreePointsAdjacentToPoint(thisringpair, 270);
-    auto skipfreevecminusinfislope = this->getPairAfterMarkers(freevecminusinfislope.back(), 270);
+    auto skipfreevecminusinfislope = this->getPairAfterMarkers(backB7(freevecminusinfislope), 270);
     auto freeveczeroslope = this->getFreePointsAdjacentToPoint(thisringpair, 0);
-    auto skipfreeveczeroslope = this->getPairAfterMarkers(freeveczeroslope.back(), 0);
+    auto skipfreeveczeroslope = this->getPairAfterMarkers(backB7(freeveczeroslope), 0);
     auto freevecminuszeroslope = this->getFreePointsAdjacentToPoint(thisringpair, 180);
-    auto skipfreevecminuszeroslope = this->getPairAfterMarkers(freevecminuszeroslope.back(), 180);
+    auto skipfreevecminuszeroslope = this->getPairAfterMarkers(backB7(freevecminuszeroslope), 180);
     auto freeveconeslope = this->getFreePointsAdjacentToPoint(thisringpair, 45);
-    auto skipfreeveconeslope = this->getPairAfterMarkers(freeveconeslope.back(), 45);
+    auto skipfreeveconeslope = this->getPairAfterMarkers(backB7(freeveconeslope), 45);
     auto freevecminusoneslope = this->getFreePointsAdjacentToPoint(thisringpair, 225);
-    auto skipfreevecminusoneslope = this->getPairAfterMarkers(freevecminusoneslope.back(), 225);
+    auto skipfreevecminusoneslope = this->getPairAfterMarkers(backB7(freevecminusoneslope), 225);
     myvec.insert(myvec.end(), freevecinfislope.begin(),freevecinfislope.end());
     myvec.insert(myvec.end(), freevecminusinfislope.begin(),freevecminusinfislope.end());
     myvec.insert(myvec.end(), freeveczeroslope.begin(),freeveczeroslope.end());
@@ -227,6 +235,7 @@ vector<pair<int,int>> Board::showPossibleMoves(int hexagon, int position){
     cout << "Part 3" << endl;
     return myvec;
 }
+
 
 vector<pair<int,int>> Board::getFreePointsAdjacentToPoint(pair<int,int> argpair, int slope){
     vector<pair<int,int>> myvec;
@@ -296,10 +305,13 @@ vector<pair<int,int>> Board::getFreePointsAdjacentToPoint(pair<int,int> argpair,
 }
 
 pair<int,int> Board::getPairAfterMarkers(pair<int,int> argpair, int slope){
+    if(argpair.first == -1 || argpair.second==-1){
+        return make_pair(-1,-1);
+    }
     int tempi = argpair.first;
     int tempj = argpair.second;
     if(slope==90){
-        cout << "90" << endl;
+        // cout << "90" << endl;
         if(this->config[tempi][tempj+1]>3){
             tempj++;
             while(true && tempj<n*2){
