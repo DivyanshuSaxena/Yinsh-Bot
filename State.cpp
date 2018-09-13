@@ -7,22 +7,45 @@
 #include "State.h"
 
 void State::incrementRows(int count, int marker, bool flip) {
+    // Increments all the in-a-row heuristic variables for the State object based on the count and the player marker
     if (count == k-2) {
-        if (marker == 4) rowsktwo1++;
-        else rowsktwo2++;
+        if (marker == 4) {
+            rowsktwo1++;
+            if (!flip) nonFlipRowsktwo1++;
+        } else {
+            rowsktwo2++;
+            if (!flip) nonFlipRowsktwo2++;
+        } 
     } else if (count == k-1) {
         if (marker == 4) {
             rowskone1++;
             rowsktwo1--;
+            if (!flip) {
+                nonFlipRowskone1++;
+                nonFlipRowsktwo1--;
+            }
         } else {
             rowskone2++;
+            rowsktwo2--;
+            if (!flip) {
+                nonFlipRowskone2++;
+                nonFlipRowsktwo2--;
+            }
+        }
+    } else {
+        if (marker == 4) {
+            rowsk1++;
+            rowskone1--;
+            rowsktwo1--;
+        } else {
+            rowsk2++;
+            rowskone2--;
             rowsktwo2--;
         }
     }
 }
 
-double State::getLinearMarkers() {
-    double h;
+void State::getLinearMarkers() {
     int player1 = 4;
     int player2 = 5;
 
@@ -33,13 +56,14 @@ double State::getLinearMarkers() {
         int prevMarkerVert = board->config[i][startj];
         int prevMarkerHorz = board->config[startj][i];
         int countVert = 1, countHorz = 1;
-        bool flipVert = false, flipHorz = false;
+        bool flipVert = false, flipHorz = false; // Variables to check if the current streak is non-flippable or not
         for (int j = startj+1; j <= completej; j++) {
             // Vertical Rows
             if (board->config[i][j] == prevMarkerVert) {
                 if (!(prevMarkerVert == player1 || prevMarkerVert == player2) ) continue;
                 countVert++;
-                incrementRows(countVert, prevMarkerVert, flipVert);
+                flipVert = flipVert || board->isFlippable(i, j);
+                if (countVert >= k-2) incrementRows(countVert, prevMarkerVert, flipVert);
             } else {
                 if (board->config[i][j] == player1 || board->config[i][j] == player2) {
                     countVert = 1;
@@ -52,7 +76,8 @@ double State::getLinearMarkers() {
             if (board->config[j][i] == prevMarkerHorz) {
                 if (!(prevMarkerHorz == player1 || prevMarkerHorz == player2) ) continue;
                 countHorz++;
-                incrementRows(countHorz, prevMarkerHorz, flipHorz);
+                flipHorz = flipHorz || board->isFlippable(j, i);
+                if (countHorz >= k-2) incrementRows(countHorz, prevMarkerHorz, flipHorz);
             } else {
                 if (board->config[j][i] == player1 || board->config[j][i] == player2) {
                     countHorz = 1;
@@ -75,7 +100,8 @@ double State::getLinearMarkers() {
             if (board->config[j][j-diff] == prevMarker) {
                 if (prevMarker != player1 && prevMarker != player2) continue;
                 count++;
-                incrementRows(count, prevMarker, flip);
+                flip = flip || board->isFlippable(j, j-diff);
+                if (count >= k-2) incrementRows(count, prevMarker, flip);
             } else {
                 if (board->config[j][j-diff] == player1 || board->config[j][j-diff] == player2) {
                     count = 1;
@@ -84,13 +110,10 @@ double State::getLinearMarkers() {
             }
         }
     }
-    return h;
 }
-
-
 
 double State::getEvaluation() {
     double h;
-
+    
     return h;
 }

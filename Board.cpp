@@ -79,6 +79,20 @@ Board::Board(int n0, int m0, int k0, int l0){
     this->config = tempconfig;
 }
 
+void Board::updateRingPositions(){
+    p1Rings.clear();
+    p2Rings.clear();
+    for (int i=0;i<2*n+1;i++){
+        for (int j=0;j<2*n+1;j++){
+            if (config[i][j] == 2){
+                p1Rings.push_back(make_pair(i,j));
+            } else if (config[i][j] == 3){
+                p2Rings.push_back(make_pair(i,j));
+            }
+        }
+    }
+}
+
 void Board::printnormalconfig(){
     for(int j=2*n;j>=0;j--){
         for(int i=0;i<2*n+1;i++){
@@ -94,7 +108,6 @@ bool Board::addRing(int player, int hexagon, int position){
         return false;
     }else if(this->config[coor.first][coor.second]==1){
         //player 1 ring is 2 , player 2 ring is 3
-        
         if(player==1){
             this->config[coor.first][coor.second] = 2;
             return true;
@@ -104,7 +117,6 @@ bool Board::addRing(int player, int hexagon, int position){
         }else{
             return false;
         }
-
     }else{
         return false;
     }
@@ -141,7 +153,7 @@ pair <int,int> Board::getCoordinates(int hexagon, int position){
     }
 }
 
-vector<pair<int,int>> Board::showpossiblemoves(int hexagon, int position){
+vector<pair<int,int>> Board::showPossibleMoves(int hexagon, int position){
     vector<pair<int,int>> myvec;
     auto thisringpair = this->getCoordinates(hexagon,position);
     int ringnum = this->config[thisringpair.first][thisringpair.second];
@@ -476,6 +488,33 @@ bool Board::removeMarkers(int starthexagon, int starthexagonposition, int finhex
 bool Board::removeRing(int hexagon, int position){
     auto thispair = this->getCoordinates(hexagon, position);
     this->config[thispair.first][thispair.second] = 1;
+}
+
+bool Board::isFlippable(int row, int col){
+    if (config[row][col] !=4 && config[row][col] != 5)
+        return false;
+
+    updateRingPositions();
+    bool retVal = false;
+    int flipMarker = this->config[row][col]==4 ? 3 : 2;
+    for (int i = 0; i < m; i++) {
+        if ((flipMarker==2 && i==board->p1Rings.size()) || (flipMarker==3 && i==board->p2Rings.size())) break;
+        
+        // Ring pair available at index i
+        pair<int,int> ring = flipMarker==2 ? p1Rings.at(i) : p2Rings.at(i);
+        int ringx = ring.first, ringy = ring.second;
+        pair<int,int> ringHex = board->getHexagonalCoordinate(ring.first, ring.second);
+        vector<pair<int,int>> possibleMoves = board->showPossibleMoves(ringHex.first, ringHex.second);
+        for (int k = 0; k < possibleMoves.size(); k++) {
+            pair<int,int> move = possibleMoves.at(k);
+            int movex = move.first, movey = move.second;
+            if ((movey-ringy)*(movex-row) == (movey-col)*(movex-ringx)) {
+                retVal = true;
+                break;
+            }
+        }
+    }
+    return retVal;
 }
 
 pair<int, int> Board::getHexagonalCoordinate(int xarg, int yarg){

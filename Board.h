@@ -20,6 +20,8 @@ extern int n, m, k, l;
 class Board{
     public:
         int ** config;
+        vector<pair<int,int>> p1Rings;
+        vector<pair<int,int>> p2Rings;
         int ** getConfig();
         
         // Initialization
@@ -28,9 +30,10 @@ class Board{
 
         // Accessor Methods
         pair <int, int> getCoordinates(int, int);
-        vector<pair<int,int>> showpossiblemoves(int, int);
+        vector<pair<int,int>> showPossibleMoves(int, int);
         vector<pair<int,int>> getFreePointsAdjacentToPoint(pair<int,int>, int);
         pair<int,int> getPairAfterMarkers(pair<int,int>, int);
+        void updateRingPositions();
         void printnormalconfig();
         
         // Operate on rings and markers on board
@@ -39,6 +42,7 @@ class Board{
         bool selectAndMoveRing(int, int, int, int);
         bool removeMarkers(int, int, int, int);
         bool removeRing(int, int);
+        bool isFlippable(int, int);
         pair<int, int> getHexagonalCoordinate(int, int);
         void printhexagonalconfig();
 };
