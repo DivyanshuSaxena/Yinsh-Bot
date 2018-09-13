@@ -66,21 +66,12 @@ int main ( int argc, char** argv )
     board->printhexagonalconfig();
     cout << endl;
 
-    board->setMarker(board->getCoordinates(1, 0 ), 2);
-    cout << "First Marker Done." << endl;               // Debug
-
-    pair<int,int> p = board->getCoordinates(2, 0 );
-    cout << p.first << " " << p.second << endl;         // Debug
+    // board->setMarker(board->getCoordinates(1, 0 ), 2);
     board->setMarker(board->getCoordinates(2, 0 ), 2);
-    cout << "Second Marker Done." << endl;               // Debug
-
     board->setMarker(board->getCoordinates(3, 0 ), 2);
-    cout << "Third Marker Done." << endl;               // Debug
-
     board->addRing(2, 0, 0);
     board->addRing(1, 2, 3);
     // board->setMarker(board->getCoordinates(4, 0 ), 2);
-    cout << "Both rings added" << endl;
     auto adjpoints = board->showPossibleMoves(0,0);
 
     for(int i=0;i<adjpoints.size();i++){
