@@ -63,8 +63,8 @@ int main ( int argc, char** argv )
     }
 
     board = new Board(5,5,5,3);
-    // board->printhexagonalconfig();
-    // cout << endl;
+    board->printhexagonalconfig();
+    cout << endl;
 
     // board->setMarker(board->getCoordinates(1, 0 ), 2);
     board->setMarker(board->getCoordinates(2, 0 ), 2);
