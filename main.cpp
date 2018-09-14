@@ -55,6 +55,7 @@
 int n, m, k, l;
 vector<double> weights;
 Board* board;
+int player_id;
 
 int main ( int argc, char** argv )
 {
@@ -66,7 +67,7 @@ int main ( int argc, char** argv )
     board->printhexagonalconfig();
     cout << endl;
 
-    // board->setMarker(board->getCoordinates(1, 0 ), 2);
+    board->setMarker(board->getCoordinates(1, 0 ), 2);
     board->setMarker(board->getCoordinates(2, 0 ), 2);
     board->setMarker(board->getCoordinates(3, 0 ), 2);
     board->addRing(2, 0, 0);
@@ -77,9 +78,7 @@ int main ( int argc, char** argv )
     for(int i=0;i<adjpoints.size();i++){
         cout << adjpoints[i].first << " , " << adjpoints[i].second << " | ";
     }
-    cout <<endl;
-    // auto pointaftermarker = board->getPairAfterMarkers(board->getCoordinates(0,0), 90);
-    // cout<< "pointaftermarker is "<< pointaftermarker.first << " "<< pointaftermarker.second << endl;
+    cout << endl;
     
     board->printnormalconfig();
     board->selectAndMoveRing(0,0,4,0);

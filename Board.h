@@ -38,6 +38,9 @@ class Board{
         
         // Operate on rings and markers on board
         bool addRing(int, int, int);
+        pair<int,int> makeInitialMoves(int);
+        pair<int,int> blockOpponentRings();
+
         bool setMarker(pair<int,int>, int);
         bool selectAndMoveRing(int, int, int, int);
         bool removeMarkers(int, int, int, int);
@@ -48,5 +51,6 @@ class Board{
 };
 
 extern Board* board;
+extern int player_id;
 
 #endif /* Board_H */
