@@ -61,5 +61,6 @@ class State {
         double alphaBeta(int depth, int alpha, int beta, int currPlayer);
         vector<State*> getSuccessors(int currPlayer);
         vector<State*> getStatesForMoves(int currPlayer);
+        vector<pair< pair<int,int>, pair<int,int>>> getPossibleMarkerRemovals();
 };
 #endif /* State_H */

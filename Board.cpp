@@ -16,7 +16,7 @@ pair<int, int> backB7(vector<pair<int,int>> myvec){
     }
 }
 
-pair<int,int> getDirectionVector(pair<int,int> inipoint, pair<int,int> finpoint){
+pair<int,int> Board::getDirectionVector(pair<int,int> inipoint, pair<int,int> finpoint){
     // IT IS FROM FIRST ARGUMENT TO SECOND 
     int xdiff = finpoint.first - inipoint.first;
     int ydiff = finpoint.second - inipoint.second;

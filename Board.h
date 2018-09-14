@@ -50,6 +50,7 @@ class Board{
         bool isFlippable(int, int);
         pair<int, int> getHexagonalCoordinate(int, int);
         void printhexagonalconfig();
+        pair<int,int> getDirectionVector(pair<int,int> inipoint, pair<int,int> finpoint);
 };
 
 extern Board* board;

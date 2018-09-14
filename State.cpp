@@ -266,25 +266,28 @@ double State::alphaBeta(int depth, int alpha, int beta, int currPlayer){
 
 vector<State*> State::getSuccessors(int currPlayer){
     bool isKinRow = this->evaluate();
+    
     vector<State*> tempvec;
     vector<State*> movedStates;
     if(isKinRow){
         //there are k in row we need to remove them
-        //todo - if more than k then there is option
-        State * changedstate = new State(this->stboard);
-        changedstate->stboard->removeMarkers(startkx, startky, endkx, endky);
-        //removed markers
-        vector<pair<int,int>> remrings;
-        if(currPlayer==1){
-            remrings = changedstate->stboard->p1Rings;
-        }else if(currPlayer==2){
-            remrings = changedstate->stboard->p2Rings;
-        }
-        for(int ringsiter=0;ringsiter<remrings.size();ringsiter++){
-            State * removedRingState = new State(changedstate->stboard);
-            removedRingState->stboard->removeRing(remrings[ringsiter].first, remrings[ringsiter].second);
-            removedRingState->stboard->updateRingPositions();
-            tempvec.push_back(removedRingState);
+        vector<pair< pair<int,int>, pair<int,int>>> removalCoordinates = this->getPossibleMarkerRemovals();
+        for(auto removaliter= removalCoordinates.begin();removaliter<removalCoordinates.end();removaliter++){
+            State * changedstate = new State(this->stboard);
+            changedstate->stboard->removeMarkers(removaliter->first.first, removaliter->first.second, removaliter->second.first, removaliter->second.second);
+            //removed markers
+            vector<pair<int,int>> remrings;
+            if(currPlayer==1){
+                remrings = changedstate->stboard->p1Rings;
+            }else if(currPlayer==2){
+                remrings = changedstate->stboard->p2Rings;
+            }
+            for(int ringsiter=0;ringsiter<remrings.size();ringsiter++){
+                State * removedRingState = new State(changedstate->stboard);
+                removedRingState->stboard->removeRing(remrings[ringsiter].first, remrings[ringsiter].second);
+                removedRingState->stboard->updateRingPositions();
+                tempvec.push_back(removedRingState);
+            }
         }
         // vector<State*> movedStates;
         for(int tempiter=0;tempiter<tempvec.size();tempiter++){
@@ -346,4 +349,16 @@ bool State::evaluate() {
 
 double State::getEvaluation() {
     return heuristic;
+}
+vector<pair< pair<int,int>, pair<int,int>>> State::getPossibleMarkerRemovals(){
+    vector<pair< pair<int,int>, pair<int,int>>> ansvec;
+    int distance = max(abs(this->startkx-this->endkx),abs(this->endkx-this->endky));
+    if(distance==k){
+        ansvec.push_back(make_pair(make_pair(this->startkx,this->startky),make_pair(this->endkx, this->endky)));
+    }else{
+        auto dirvec = this->stboard->getDirectionVector(make_pair(this->startkx,this->startky), make_pair(this->endkx, this->endky));
+        ansvec.push_back(make_pair(make_pair(this->startkx,this->startky),make_pair(this->startkx + k*dirvec.first, this->startky+k*dirvec.second)));
+        ansvec.push_back(make_pair(make_pair(this->endkx-k*dirvec.first, this->endky-k*dirvec.second),make_pair(this->endkx, this->endky)));
+    }
+    return ansvec;
 }
