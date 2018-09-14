@@ -73,7 +73,7 @@ int main ( int argc, char** argv )
     board->addRing(2, 0, 0);
     board->addRing(1, 2, 3);
     // board->setMarker(board->getCoordinates(4, 0 ), 2);
-    auto adjpoints = board->showPossibleMoves(0,0);
+    auto adjpoints = board->showPossibleMoves(5,5);
 
     for(int i=0;i<adjpoints.size();i++){
         cout << adjpoints[i].first << " , " << adjpoints[i].second << " | ";
@@ -89,5 +89,6 @@ int main ( int argc, char** argv )
     board->printnormalconfig();
     
     State* state = new State(board);
+    cout << state->evaluate() << endl;
     cout << state->getEvaluation() << endl;
 }

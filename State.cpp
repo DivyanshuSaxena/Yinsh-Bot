@@ -37,12 +37,8 @@ void State::setWeight(double weight, int feature) {
 void State::incrementkRows(int marker, bool flip, int endx, int endy) {
     if (marker == 4) {
         rowsk1++;
-        rowskone1--;
-        rowsktwo1--;
     } else {
         rowsk2++;
-        rowskone2--;
-        rowsktwo2--;
     }
     endkx = endx;
     endky = endy;
@@ -63,17 +59,13 @@ void State::incrementRows(int count, int marker, bool flip) {
     } else if (count == k-1) {
         if (marker == 4) {
             rowskone1++;
-            rowsktwo1--;
             if (!flip) {
                 nonFlipRowskone1++;
-                nonFlipRowsktwo1--;
             }
         } else {
             rowskone2++;
-            rowsktwo2--;
             if (!flip) {
                 nonFlipRowskone2++;
-                nonFlipRowsktwo2--;
             }
         }
     } else {
@@ -97,17 +89,19 @@ void State::getLinearMarkers() {
         int countVert = 1, countHorz = 1;
         // Variables to check if the current streak is non-flippable or not
         bool flipVert = false, flipHorz = false; 
-        for (int j = startj+1; j < completej; j++) {
+        int j = startj+1;
+        for (j = startj+1; j < completej; j++) {
             // Vertical Rows
             if (stboard->config[i][j] == prevMarkerVert) {
                 if (!(prevMarkerVert == player1 || prevMarkerVert == player2) ) goto horizontal;
                 countVert++;
+                cout << "Checking flipability" << endl;
                 flipVert = flipVert || stboard->isFlippable(i, j);
-                if (countVert >= k-2 && countVert <= k-1) 
-                    incrementRows(countVert, prevMarkerVert, flipVert);
-                if (countVert >= k) incrementkRows(prevMarkerVert, flipVert, i, j);
             } else {
                 if (stboard->config[i][j] == player1 || stboard->config[i][j] == player2) {
+                    if (countVert >= k-2 && countVert <= k-1) 
+                        incrementRows(countVert, prevMarkerVert, flipVert);
+                    if (countVert >= k) incrementkRows(prevMarkerVert, flipVert, i, j);
                     countVert = 1;
                     startkx = i;
                     startky = j; // Set the start indices of streak start
@@ -115,6 +109,7 @@ void State::getLinearMarkers() {
                 prevMarkerVert = stboard->config[i][j];
                 flipVert = false;
             }
+            cout << "Checked vertical for " << i << " " << j << endl; // Debug
 
             // Horizontal Rows
             horizontal:
@@ -122,11 +117,11 @@ void State::getLinearMarkers() {
                 if (!(prevMarkerHorz == player1 || prevMarkerHorz == player2) ) continue;
                 countHorz++;
                 flipHorz = flipHorz || stboard->isFlippable(j, i);
-                if (countHorz >= k-2 && countVert <= k-1) 
-                    incrementRows(countHorz, prevMarkerHorz, flipHorz);
-                if (countHorz >= k) incrementkRows(prevMarkerHorz, flipHorz, j, i);
             } else {
                 if (stboard->config[j][i] == player1 || stboard->config[j][i] == player2) {
+                    if (countHorz >= k-2 && countVert <= k-1) 
+                        incrementRows(countHorz, prevMarkerHorz, flipHorz);
+                    if (countHorz >= k) incrementkRows(prevMarkerHorz, flipHorz, j, i);
                     countHorz = 1;
                     startkx = j;
                     startky = i; // Set the start indices of streak start
@@ -134,7 +129,17 @@ void State::getLinearMarkers() {
                 prevMarkerHorz = stboard->config[j][i];
                 flipHorz = false;
             }
+            cout << "Checked horizontal for " << j << " " << i << endl; // Debug
         }
+        
+        // Check for the last place
+        if (countVert >= k-2 && countVert <= k-1) 
+            incrementRows(countVert, prevMarkerVert, flipVert);
+        if (countVert >= k) incrementkRows(prevMarkerVert, flipVert, i, j);
+
+        if (countHorz >= k-2 && countVert <= k-1) 
+            incrementRows(countHorz, prevMarkerHorz, flipHorz);
+        if (countHorz >= k) incrementkRows(prevMarkerHorz, flipHorz, j, i);
     }
 
     // Slant Rows for both opponents
@@ -145,16 +150,17 @@ void State::getLinearMarkers() {
         int endj = (diff<=0) ? 10 : (10-diff);
         int prevMarker = stboard->config[startj][startj-diff];
         int count = 0;
-        for (int j = startj+1; j <= endj; j++) {
+        int j = startj+1;
+        for (j = startj+1; j <= endj; j++) {
             if (stboard->config[j][j-diff] == prevMarker) {
                 if (prevMarker != player1 && prevMarker != player2) continue;
                 count++;
                 flip = flip || stboard->isFlippable(j, j-diff);
-                if (count >= k-2 && count <= k-1) 
-                    incrementRows(count, prevMarker, flip);
-                if (count >= k) incrementkRows(prevMarker, flip, j, j-diff);
             } else {
                 if (stboard->config[j][j-diff] == player1 || stboard->config[j][j-diff] == player2) {
+                    if (count >= k-2 && count <= k-1) 
+                        incrementRows(count, prevMarker, flip);
+                    if (count > k) incrementkRows(prevMarker, flip, j, j-diff);
                     count = 1;
                     startkx = j;
                     startky = j-diff; // Set the start indices of streak start
@@ -163,6 +169,9 @@ void State::getLinearMarkers() {
                 flip = false;
             }
         }
+        if (count >= k-2 && count <= k-1) 
+            incrementRows(count, prevMarker, flip);
+        if (count > k) incrementkRows(prevMarker, flip, j, j-diff);
     }
 }
 
@@ -200,8 +209,7 @@ bool State::isTerminalNode() {
     } else {
         retVal = true;
         for (pair<int,int> ring : stboard->p1Rings) {
-            pair<int,int> ringHex = stboard->getHexagonalCoordinate(ring.first, ring.second);
-            vector<pair<int,int>> moves = stboard->showPossibleMoves(ringHex.first, ringHex.second);
+            vector<pair<int,int>> moves = stboard->showPossibleMoves(ring.first, ring.second);
             if (moves.size() != 0) {
                 retVal = false;
                 break;
@@ -243,12 +251,13 @@ vector<State*> State::getSuccessors(){
  */
 bool State::evaluate() {
     // Assumption - At a time, only a single row of k markers can be present
-    // cout << "Starting Evaluation" << endl; // Debug
+    cout << "Starting Evaluation" << endl; // Debug
     this->getLinearMarkers();
     if (kInRow) {
         return false;
     }
     double h = weightedSum();
+    cout << h << endl;
     heuristic = h;
     return true;
 }

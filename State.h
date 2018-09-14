@@ -58,7 +58,6 @@ class State {
         bool evaluate(); 
         double getEvaluation();
         double alphaBeta(int depth, int alpha, int beta);
-        bool isTerminalNode();
         vector<State*> getSuccessors();
 };
 #endif /* State_H */
