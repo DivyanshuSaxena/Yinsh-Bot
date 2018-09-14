@@ -247,10 +247,9 @@ pair <int,int> Board::getCoordinates(int hexagon, int position){
     }
 }
 
-vector<pair<int,int>> Board::showPossibleMoves(int hexagon, int position){
+vector<pair<int,int>> Board::showPossibleMoves(int x, int y){
     vector<pair<int,int>> myvec;
-    auto thisringpair = this->getCoordinates(hexagon,position);
-    int ringnum = this->config[thisringpair.first][thisringpair.second];
+    auto thisringpair = make_pair(x,y);
     auto freevecinfislope = this->getFreePointsAdjacentToPoint(thisringpair, 90);
     auto skipfreevecinfislope = this->getPairAfterMarkers(backB7(freevecinfislope), 90);
     auto freevecminusinfislope = this->getFreePointsAdjacentToPoint(thisringpair, 270);
@@ -258,6 +257,9 @@ vector<pair<int,int>> Board::showPossibleMoves(int hexagon, int position){
     auto freeveczeroslope = this->getFreePointsAdjacentToPoint(thisringpair, 0);
     auto skipfreeveczeroslope = this->getPairAfterMarkers(backB7(freeveczeroslope), 0);
     auto freevecminuszeroslope = this->getFreePointsAdjacentToPoint(thisringpair, 180);
+    pair<int,int> debug = backB7(freevecminuszeroslope);
+    cout << debug.first << " " << debug.second << endl;
+    cout << "Pair 1" << endl; // Debug
     auto skipfreevecminuszeroslope = this->getPairAfterMarkers(backB7(freevecminuszeroslope), 180);
     auto freeveconeslope = this->getFreePointsAdjacentToPoint(thisringpair, 45);
     auto skipfreeveconeslope = this->getPairAfterMarkers(backB7(freeveconeslope), 45);
@@ -271,7 +273,6 @@ vector<pair<int,int>> Board::showPossibleMoves(int hexagon, int position){
     myvec.insert(myvec.end(), freevecminusoneslope.begin(),freevecminusoneslope.end());
 
     // insert issue #1 case
-
     if(skipfreevecinfislope.first != -1 && skipfreevecinfislope.second != -1){
         myvec.push_back(skipfreevecinfislope);
     }
@@ -290,6 +291,7 @@ vector<pair<int,int>> Board::showPossibleMoves(int hexagon, int position){
     if(skipfreevecminusoneslope.first != -1 && skipfreevecminusoneslope.second != -1){
         myvec.push_back(skipfreevecminusoneslope);
     }
+    cout << "Pair 2" << endl; // Debug
 
     auto freepointinfislope = this->getPairAfterMarkers(thisringpair, 90);
     auto freepointminusinfislope = this->getPairAfterMarkers(thisringpair, 270);
@@ -315,6 +317,7 @@ vector<pair<int,int>> Board::showPossibleMoves(int hexagon, int position){
     if(freepointminusoneslope.first != -1 && freepointminusoneslope.second != -1){
         myvec.push_back(freepointminusoneslope);
     }
+    cout << "Returning from showPossibleMoves" << endl; // Debug
     return myvec;
 }
 
@@ -322,6 +325,7 @@ vector<pair<int,int>> Board::getFreePointsAdjacentToPoint(pair<int,int> argpair,
     vector<pair<int,int>> myvec;
     int tempi = argpair.first;
     int tempj = argpair.second;
+    cout << "Finding adjacent points to " << tempi << " " << tempj << endl;
     if(slope==90){
         while(true && tempj<2*n){
             tempj++;
@@ -348,6 +352,7 @@ vector<pair<int,int>> Board::getFreePointsAdjacentToPoint(pair<int,int> argpair,
             if(this->config[tempi][tempj]!=1){
                 break;
             }else{
+                cout << "Pushed " << tempi << " " << tempj << endl; // Debug
                 myvec.push_back(make_pair(tempi,tempj));
             }
         }
@@ -410,7 +415,6 @@ pair<int,int> Board::getPairAfterMarkers(pair<int,int> argpair, int slope){
             return make_pair(-1,-1);
         }
     }else if(slope==270){
-        cout << "270" << endl;
         if(this->config[tempi][tempj-1]>3){
             tempj--;
             while(true && tempj>0){
@@ -515,11 +519,10 @@ bool Board::setMarker(pair<int,int> argpair, int playerid){
     return true;
 }
 
-bool Board::selectAndMoveRing(int ringhexagon, int ringposition, int finringhexagon, int finringposition){
-    //we are considering that the move is valid
-
-    auto inipair = this->getCoordinates(ringhexagon, ringposition);
-    auto destpair= this->getCoordinates(finringhexagon, finringposition);
+bool Board::selectAndMoveRing(int ringx, int ringy, int finringx, int finringy){
+    // Assumption -> We are considering that the move is valid
+    auto inipair = make_pair(ringx, ringy);
+    auto destpair= make_pair(finringx, finringy);
     auto dirvec = getDirectionVector(inipair, destpair);
     // cout << "dirvec is "<< dirvec.first<< " "<<dirvec.second<<endl;
     int ringnum = this->config[inipair.first][inipair.second];
@@ -573,9 +576,9 @@ bool Board::selectAndMoveRing(int ringhexagon, int ringposition, int finringhexa
     }
 }
 
-bool Board::removeMarkers(int starthexagon, int starthexagonposition, int finhexagon, int finhexagonposition){
-    auto inipair = this->getCoordinates(starthexagon, starthexagonposition);
-    auto destpair= this->getCoordinates(finhexagon, finhexagonposition);
+bool Board::removeMarkers(int startx, int starty, int finx, int finy){
+    auto inipair = this->getCoordinates(startx, starty);
+    auto destpair= this->getCoordinates(finx, finy);
     auto dirvec = getDirectionVector(inipair, destpair);
     for(int i=0;i< k;i++){
         this->config[inipair.first + i*dirvec.first][inipair.second + i*dirvec.second] = 1;
@@ -583,25 +586,30 @@ bool Board::removeMarkers(int starthexagon, int starthexagonposition, int finhex
     return true;
 }
 
-bool Board::removeRing(int hexagon, int position){
-    auto thispair = this->getCoordinates(hexagon, position);
-    this->config[thispair.first][thispair.second] = 1;
+bool Board::removeRing(int xarg, int yarg){
+    if (config[xarg][yarg] == 2 || config[xarg][yarg] == 3) {
+        this->config[xarg][yarg] = 1;
+        return true;
+    }
+    return false;
 }
 
 bool Board::isFlippable(int row, int col){
+    cout << "Check flip for " << row << " " << col << endl; // Debug
     if (config[row][col] !=4 && config[row][col] != 5)
         return false;
 
     updateRingPositions();
+    cout << "Updated ring positions" << endl;
     bool retVal = false;
-    int flipMarker = this->config[row][col]==4 ? 3 : 2;
-    for (int i = 0; i < m; i++) {
-        if ((flipMarker==2 && i==p1Rings.size()) || (flipMarker==3 && i==p2Rings.size())) break;
-        
+    int len = p1Rings.size() + p2Rings.size();
+    for (int i = 0; i < len; i++) {
         // Ring pair available at index i
-        pair<int,int> ring = flipMarker==2 ? p1Rings.at(i) : p2Rings.at(i);
+        pair<int,int> ring = i==p1Rings.size() ? p2Rings.at(i-p1Rings.size()) : p1Rings.at(i);
         int ringx = ring.first, ringy = ring.second;
+        cout << "Check flip with ring: " << ringx << " " << ringy << " "; // Debug
         vector<pair<int,int>> possibleMoves = board->showPossibleMoves(ring.first, ring.second);
+        cout << "moves: " << possibleMoves.size() << endl;
         for (int k = 0; k < possibleMoves.size(); k++) {
             pair<int,int> move = possibleMoves.at(k);
             int movex = move.first, movey = move.second;
