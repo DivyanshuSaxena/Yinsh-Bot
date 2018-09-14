@@ -91,7 +91,7 @@ pair<int,int> Board::makeInitialMoves(int movenum) {
     pair<int,int> retPair;
     if (movenum == 1 && config[n][n+1] == 1) {
         retPair = make_pair(n,n+1);
-    } else if (movenum <= m/2) {
+    } else if (movenum <= (m+1)/2 || movenum <= (m-6)) {
         pair<int,int> ring = player_id==1 ? p2Rings.back() : p1Rings.back();
         
         bool madeMove = false;
@@ -119,8 +119,12 @@ pair<int,int> Board::makeInitialMoves(int movenum) {
                 madeMove = true;
             }
         }
-    } else 
-        retPair = blockOpponentRings();
+    } else retPair = blockOpponentRings();
+
+    if (retPair.first < 0 || retPair.second < 0) {
+        cout << "Could not find a valid move for next ring, occupy corners" << endl; // Debug
+        retPair = occupyCorners();
+    }
 
     bool check = addRing(player_id, retPair.first, retPair.second);
     if (!check) cout << "Some error in adding ring" << endl; // Debug
@@ -129,6 +133,43 @@ pair<int,int> Board::makeInitialMoves(int movenum) {
 
 pair<int,int> Board::blockOpponentRings() {
     // Make move so as to block possible rows of opponent rings
+    pair<int,int> ringi = player_id==1 ? p2Rings.back() : p1Rings.back();
+    pair<int,int> retPair = make_pair(-1,-1);
+    for (int j = 0; j < m; j++) {
+        if ((player_id==1 && j==p2Rings.size()) || (player_id==2 && j==p1Rings.size())) break;
+
+        pair<int,int> ringj = player_id==1 ? p2Rings.at(j) : p1Rings.at(j);
+        // Check if rings in line - Block the most recently added one
+        int xdiff = ringj.first - ringi.first;
+        int ydiff = ringj.second - ringi.second;
+        if (xdiff == 0) {
+            int y = ydiff > 0 ? ringi.second+1 : ringi.second-1;
+            if (config[ringi.first][y] != 1) continue;
+            retPair = make_pair(ringi.first, y);
+        } else if (ydiff == 0) {
+            int x = xdiff > 0 ? ringi.first+1 : ringi.first-1;
+            if (config[x][ringi.second] != 1) continue;
+            retPair = make_pair(x, ringi.second);
+        } else if (xdiff == ydiff) {
+            int x = xdiff > 0 ? ringi.first+1 : ringi.first-1;
+            int y = ydiff > 0 ? ringi.second+1 : ringi.second-1;
+            if (config[x][y] != 1) continue;
+            retPair = make_pair(x, y);
+        }
+    }
+    return retPair;
+}
+
+pair<int,int> Board::occupyCorners() {
+    int x = 0, y = 0;
+    for (x = 0; x <= 10; x+=5) {
+        for (y = 0; y <= 10; y+=5) {
+            if (abs(x-y) > 5 || (x==5 && y==5)) continue;
+            if (config[x][y] != 1) continue;
+            break;
+        }
+    }
+    return make_pair(x,y);
 }
 
 void Board::updateRingPositions(){
@@ -276,7 +317,6 @@ vector<pair<int,int>> Board::showPossibleMoves(int hexagon, int position){
     }
     return myvec;
 }
-
 
 vector<pair<int,int>> Board::getFreePointsAdjacentToPoint(pair<int,int> argpair, int slope){
     vector<pair<int,int>> myvec;
@@ -556,7 +596,7 @@ bool Board::isFlippable(int row, int col){
     bool retVal = false;
     int flipMarker = this->config[row][col]==4 ? 3 : 2;
     for (int i = 0; i < m; i++) {
-        if ((flipMarker==2 && i==board->p1Rings.size()) || (flipMarker==3 && i==board->p2Rings.size())) break;
+        if ((flipMarker==2 && i==p1Rings.size()) || (flipMarker==3 && i==p2Rings.size())) break;
         
         // Ring pair available at index i
         pair<int,int> ring = flipMarker==2 ? p1Rings.at(i) : p2Rings.at(i);
