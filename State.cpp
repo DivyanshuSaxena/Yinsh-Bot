@@ -6,6 +6,13 @@
 
 #include "State.h"
 
+vector<pair<int,int>> copyVectorOfPairs(vector<pair<int,int>> thisvec){
+    vector<pair<int,int>> tempring;
+    for(int i=0;i<thisvec.size();i++){
+        tempring.push_back(make_pair(thisvec[i].first, thisvec[i].second));
+    }
+    return tempring;
+}
 State::State(Board* board) {
     // Duplicate the argument board
     stboard = new Board(n,m,k,l);
@@ -14,10 +21,24 @@ State::State(Board* board) {
             stboard->config[i][j] = board->config[i][j];
         }
     }
-
+    // stboard->p1Rings = copyVectorOfPairs(board->p1Rings);
+    // stboard->p2Rings = copyVectorOfPairs(board->p2Rings);
+    stboard->updateRingPositions();
     heuristic = -1;
     kInRow = false;
     resetFeatures();
+}
+
+State::State(State* state){
+    stboard = new Board(n,m,k,l);
+    for(int j=2*n;j>=0;j--){
+        for(int i=0;i<2*n+1;i++){
+            stboard->config[i][j] = state->stboard->config[i][j];
+        }
+    }
+    heuristic= state->heuristic;
+    kInRow = state->kInRow;
+    duplicateFeatures(state);
 }
 
 void State::resetFeatures() {
@@ -26,6 +47,9 @@ void State::resetFeatures() {
     int rowsktwo1 = -1, nonFlipRowsktwo1 = -1;
     int rowskone2 = -1, nonFlipRowskone2 = -1;
     int rowsktwo2 = -1, nonFlipRowsktwo2 = -1;
+}
+void State::duplicateFeatures(State* state){
+
 }
 
 void State::setWeight(double weight, int feature) {
@@ -188,14 +212,14 @@ bool State::isTerminalNode(){
     return false;
 }
 
-double State::alphaBeta(int depth, int alpha, int beta){
+double State::alphaBeta(int depth, int alpha, int beta, int currPlayer){
     if(depth==0 || this->isTerminalNode()){
         return this->getEvaluation();
     }
     double tempscore = -DBL_MAX;
-    vector<State *> successsors = this->getSuccessors();
+    vector<State *> successsors = this->getSuccessors(currPlayer);
     for(int i=0;i<successsors.size();i++){
-        double value = -successsors[i]->alphaBeta(depth-1,-beta,-alpha);
+        double value = -successsors[i]->alphaBeta(depth-1,-beta,-alpha, 3-currPlayer);
         if(value>tempscore){
             tempscore=value;
         }
@@ -208,7 +232,39 @@ double State::alphaBeta(int depth, int alpha, int beta){
     }
     return tempscore;
 }
-vector<State*> State::getSuccessors(){
+vector<State*> State::getSuccessors(int currPlayer){
+    bool isKinRow = this->evaluate();
+    vector<State*> tempvec;
+    if(isKinRow){
+        //there are k in row we need to remove them
+        //todo - if more than k then there is option
+        State * changedstate = new State(this->stboard);
+        changedstate->stboard->removeMarkersCustomCoordinates(make_pair(this->startkx,this->startky), make_pair(this->endkx,this->endky));
+        //removed markers
+        vector<pair<int,int>> remrings;
+        if(currPlayer==1){
+            remrings = changedstate->stboard->p1Rings;
+        }else if(currPlayer==2){
+            remrings = changedstate->stboard->p2Rings;
+        }
+        for(int ringsiter=0;ringsiter<remrings.size();ringsiter++){
+            State * removedRingState = new State(changedstate->stboard);
+            removedRingState->stboard->removeRingCustomCoordinates(remrings[ringsiter]);
+            removedRingState->stboard->updateRingPositions();
+            tempvec.push_back(removedRingState);
+        }
+        vector<State*> movedStates;
+        for(int tempiter=0;tempiter<tempvec.size();tempiter++){
+            // tempvec[i]->stboard->pl
+            vector<State*> thismovedStates = tempvec[tempiter]->getStatesForMoves(currPlayer);
+        }
+
+    }else{
+
+    }
+}
+vector<State*> State::getStatesForMoves(int currPlayer){
+    vector<pair<int,int>> allRings;
     
 }
 /*

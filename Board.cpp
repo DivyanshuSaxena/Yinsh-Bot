@@ -583,11 +583,25 @@ bool Board::removeMarkers(int starthexagon, int starthexagonposition, int finhex
     return true;
 }
 
+bool Board::removeMarkersCustomCoordinates(pair<int,int> inipair, pair<int, int> destpair){
+    for(int i=0;i< k;i++){
+        this->config[inipair.first + i*dirvec.first][inipair.second + i*dirvec.second] = 1;
+    }
+    return true;
+}
+
 bool Board::removeRing(int hexagon, int position){
     auto thispair = this->getCoordinates(hexagon, position);
     this->config[thispair.first][thispair.second] = 1;
+
 }
 
+bool Board::removeRingCustomCoordinates(pair<int,int> thispoint){
+    // int whichplayer = this->config[thispoint.first][thispoint.second]-1;
+    this->config[thispoint.first][thispoint.second] = 1;
+
+
+}
 bool Board::isFlippable(int row, int col){
     if (config[row][col] !=4 && config[row][col] != 5)
         return false;

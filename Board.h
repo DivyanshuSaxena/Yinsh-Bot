@@ -45,8 +45,10 @@ class Board{
         pair<int, int> checkKRingsInRow();
         bool setMarker(pair<int,int>, int);
         bool selectAndMoveRing(int, int, int, int);
-        bool removeMarkers(int, int, int, int);
+        bool removeMarkers(int starthexagon, int starthexagonposition, int finhexagon, int finhexagonposition);
+        bool removeMarkersCustomCoordinates(pair<int,int> inipair, pair<int, int> destpair);
         bool removeRing(int, int);
+        bool removeRingCustomCoordinates(pair<int,int> thispoint);
         bool isFlippable(int, int);
         pair<int, int> getHexagonalCoordinate(int, int);
         void printhexagonalconfig();
