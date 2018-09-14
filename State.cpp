@@ -105,7 +105,7 @@ void State::getLinearMarkers() {
                 flipVert = flipVert || stboard->isFlippable(i, j);
                 if (countVert >= k-2 && countVert <= k-1) 
                     incrementRows(countVert, prevMarkerVert, flipVert);
-                if (countVert == k) incrementkRows(prevMarkerVert, flipVert, i, j);
+                if (countVert >= k) incrementkRows(prevMarkerVert, flipVert, i, j);
             } else {
                 if (stboard->config[i][j] == player1 || stboard->config[i][j] == player2) {
                     countVert = 1;
@@ -124,7 +124,7 @@ void State::getLinearMarkers() {
                 flipHorz = flipHorz || stboard->isFlippable(j, i);
                 if (countHorz >= k-2 && countVert <= k-1) 
                     incrementRows(countHorz, prevMarkerHorz, flipHorz);
-                if (countHorz == k) incrementkRows(prevMarkerHorz, flipHorz, j, i);
+                if (countHorz >= k) incrementkRows(prevMarkerHorz, flipHorz, j, i);
             } else {
                 if (stboard->config[j][i] == player1 || stboard->config[j][i] == player2) {
                     countHorz = 1;
@@ -152,7 +152,7 @@ void State::getLinearMarkers() {
                 flip = flip || stboard->isFlippable(j, j-diff);
                 if (count >= k-2 && count <= k-1) 
                     incrementRows(count, prevMarker, flip);
-                if (count == k) incrementkRows(prevMarker, flip, j, j-diff);
+                if (count >= k) incrementkRows(prevMarker, flip, j, j-diff);
             } else {
                 if (stboard->config[j][j-diff] == player1 || stboard->config[j][j-diff] == player2) {
                     count = 1;
@@ -199,7 +199,7 @@ bool State::isTerminalNode() {
         retVal = true;
     } else {
         retVal = true;
-        for (pair<int,int> ring : p1Rings) {
+        for (pair<int,int> ring : stboard->p1Rings) {
             pair<int,int> ringHex = stboard->getHexagonalCoordinate(ring.first, ring.second);
             vector<pair<int,int>> moves = stboard->showPossibleMoves(ringHex.first, ringHex.second);
             if (moves.size() != 0) {

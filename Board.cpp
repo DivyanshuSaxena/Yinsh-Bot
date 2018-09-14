@@ -657,6 +657,3 @@ void Board::printhexagonalconfig(){
         cout<< endl;
     }
 }
-pair<int, int> Board::checkKRingsInRow(){
-    //complete this
-}
