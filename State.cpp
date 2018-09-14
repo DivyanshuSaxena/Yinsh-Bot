@@ -270,7 +270,7 @@ vector<State*> State::getSuccessors(int currPlayer){
         //there are k in row we need to remove them
         //todo - if more than k then there is option
         State * changedstate = new State(this->stboard);
-        changedstate->stboard->removeMarkersCustomCoordinates(make_pair(this->startkx,this->startky), make_pair(this->endkx,this->endky));
+        changedstate->stboard->removeMarkers(startkx, startky, endkx, endky);
         //removed markers
         vector<pair<int,int>> remrings;
         if(currPlayer==1){
@@ -280,7 +280,7 @@ vector<State*> State::getSuccessors(int currPlayer){
         }
         for(int ringsiter=0;ringsiter<remrings.size();ringsiter++){
             State * removedRingState = new State(changedstate->stboard);
-            removedRingState->stboard->removeRingCustomCoordinates(remrings[ringsiter]);
+            removedRingState->stboard->removeRing(remrings[ringsiter].first, remrings[ringsiter].second);
             removedRingState->stboard->updateRingPositions();
             tempvec.push_back(removedRingState);
         }
