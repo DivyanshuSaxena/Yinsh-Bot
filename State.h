@@ -43,6 +43,7 @@ class State {
 
     public:
         State(Board* board);
+        State(State* state);
         Board* stboard;
         void setWeight(double weight, int feature);
 
@@ -51,13 +52,14 @@ class State {
 
         // Operations
         void resetFeatures();
-
+        void duplicateFeatures(State* state);
         // Heuristics
         void getLinearMarkers();
         double weightedSum();
         bool evaluate(); 
         double getEvaluation();
-        double alphaBeta(int depth, int alpha, int beta);
-        vector<State*> getSuccessors();
+        double alphaBeta(int depth, int alpha, int beta, int currPlayer);
+        vector<State*> getSuccessors(int currPlayer);
+        vector<State*> getStatesForMoves(int currPlayer);
 };
 #endif /* State_H */
