@@ -24,7 +24,7 @@ State::State(Board* board) {
     // stboard->p1Rings = copyVectorOfPairs(board->p1Rings);
     // stboard->p2Rings = copyVectorOfPairs(board->p2Rings);
     stboard->updateRingPositions();
-    heuristic = -1;
+    heuristic = -DBL_MAX;
     kInRow = false;
     resetFeatures();
 }
@@ -74,7 +74,8 @@ void State::incrementkRows(int marker, bool flip, int endx, int endy) {
 }
 
 void State::incrementRows(int count, int marker, bool flip) {
-    // Increments all the in-a-row heuristic variables for the State object based on the count and the player marker
+    // Increments all the in-a-row heuristic variables 
+    // for the State object based on the count and the player marker
     if (count == k-2) {
         if (marker == 4) {
             rowsktwo1++;
@@ -102,6 +103,7 @@ void State::incrementRows(int count, int marker, bool flip) {
     } else {
         // Presently, the code should never get into this -> 
         // k markers checked in getLinearMarkers
+        cout << "Unreachable piece of code reached" << endl;
         incrementkRows(marker, flip, -1, -1);
     }
 }
@@ -117,15 +119,17 @@ void State::getLinearMarkers() {
         int prevMarkerVert = stboard->config[i][startj];
         int prevMarkerHorz = stboard->config[startj][i];
         int countVert = 1, countHorz = 1;
-        bool flipVert = false, flipHorz = false; // Variables to check if the current streak is non-flippable or not
+        // Variables to check if the current streak is non-flippable or not
+        bool flipVert = false, flipHorz = false; 
         for (int j = startj+1; j < completej; j++) {
             // Vertical Rows
             if (stboard->config[i][j] == prevMarkerVert) {
                 if (!(prevMarkerVert == player1 || prevMarkerVert == player2) ) goto horizontal;
                 countVert++;
                 flipVert = flipVert || stboard->isFlippable(i, j);
-                if (countVert >= k-2 && countVert <= k-1) incrementRows(countVert, prevMarkerVert, flipVert);
-                if (countVert == k) incrementkRows(prevMarkerVert, flipVert, i, j);
+                if (countVert >= k-2 && countVert <= k-1) 
+                    incrementRows(countVert, prevMarkerVert, flipVert);
+                if (countVert >= k) incrementkRows(prevMarkerVert, flipVert, i, j);
             } else {
                 if (stboard->config[i][j] == player1 || stboard->config[i][j] == player2) {
                     countVert = 1;
@@ -142,8 +146,9 @@ void State::getLinearMarkers() {
                 if (!(prevMarkerHorz == player1 || prevMarkerHorz == player2) ) continue;
                 countHorz++;
                 flipHorz = flipHorz || stboard->isFlippable(j, i);
-                if (countHorz >= k-2 && countVert <= k-1) incrementRows(countHorz, prevMarkerHorz, flipHorz);
-                if (countHorz == k) incrementkRows(prevMarkerHorz, flipHorz, j, i);
+                if (countHorz >= k-2 && countVert <= k-1) 
+                    incrementRows(countHorz, prevMarkerHorz, flipHorz);
+                if (countHorz >= k) incrementkRows(prevMarkerHorz, flipHorz, j, i);
             } else {
                 if (stboard->config[j][i] == player1 || stboard->config[j][i] == player2) {
                     countHorz = 1;
@@ -169,8 +174,9 @@ void State::getLinearMarkers() {
                 if (prevMarker != player1 && prevMarker != player2) continue;
                 count++;
                 flip = flip || stboard->isFlippable(j, j-diff);
-                if (count >= k-2 && count <= k-1) incrementRows(count, prevMarker, flip);
-                if (count == k) incrementkRows(prevMarker, flip, j, j-diff);
+                if (count >= k-2 && count <= k-1) 
+                    incrementRows(count, prevMarker, flip);
+                if (count >= k) incrementkRows(prevMarker, flip, j, j-diff);
             } else {
                 if (stboard->config[j][j-diff] == player1 || stboard->config[j][j-diff] == player2) {
                     count = 1;
@@ -208,8 +214,25 @@ double State::weightedSum() {
     return h;
 }
 
-bool State::isTerminalNode(){
-    return false;
+bool State::isTerminalNode() {
+    // Assumption -> It shall never happen that 
+    // one player has no available moves while the other player has
+    bool retVal = false;
+    stboard->updateRingPositions();
+    if (stboard->p1Rings.size() == m-l || stboard->p2Rings.size() == m-l) {
+        retVal = true;
+    } else {
+        retVal = true;
+        for (pair<int,int> ring : stboard->p1Rings) {
+            pair<int,int> ringHex = stboard->getHexagonalCoordinate(ring.first, ring.second);
+            vector<pair<int,int>> moves = stboard->showPossibleMoves(ringHex.first, ringHex.second);
+            if (moves.size() != 0) {
+                retVal = false;
+                break;
+            }
+        }
+    }
+    return retVal;
 }
 
 double State::alphaBeta(int depth, int alpha, int beta, int currPlayer){
@@ -267,6 +290,7 @@ vector<State*> State::getStatesForMoves(int currPlayer){
     vector<pair<int,int>> allRings;
     
 }
+
 /*
  * evaluate() evaluates the current state and checks ->
  * if there exist any row of k markers, in which case, it returns false
