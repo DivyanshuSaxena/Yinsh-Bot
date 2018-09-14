@@ -9,6 +9,8 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <cfloat>
+#include <limits>
 #include "Board.h"
 using namespace std;
 
@@ -40,5 +42,8 @@ class State {
         // Heuristics
         void getLinearMarkers();
         double getEvaluation();
+        double alphaBeta(int depth, int alpha, int beta);
+        bool isTerminalNode();
+        vector<State*> getSuccessors();
 };
 #endif /* State_H */

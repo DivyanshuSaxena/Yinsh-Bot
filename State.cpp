@@ -155,3 +155,31 @@ double State::getEvaluation() {
 
     return h;
 }
+
+bool State::isTerminalNode(){
+    return false;
+}
+
+double State::alphaBeta(int depth, int alpha, int beta){
+    if(depth==0 || this->isTerminalNode()){
+        return this->getEvaluation();
+    }
+    double tempscore = -DBL_MAX;
+    vector<State *> successsors = this->getSuccessors();
+    for(int i=0;i<successsors.size();i++){
+        double value = -successsors[i]->alphaBeta(depth-1,-beta,-alpha);
+        if(value>tempscore){
+            tempscore=value;
+        }
+        if(tempscore>alpha){
+            alpha=tempscore;
+        }
+        if(tempscore>=beta){
+            break;
+        }
+    }
+    return tempscore;
+}
+vector<State*> State::getSuccessors(){
+    
+}

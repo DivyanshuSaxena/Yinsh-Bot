@@ -41,6 +41,7 @@ class Board{
         pair<int,int> makeInitialMoves(int);
         pair<int,int> blockOpponentRings();
 
+        pair<int, int> checkKRingsInRow();
         bool setMarker(pair<int,int>, int);
         bool selectAndMoveRing(int, int, int, int);
         bool removeMarkers(int, int, int, int);
