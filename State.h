@@ -30,7 +30,10 @@ class State {
         int rowsktwo1, nonFlipRowsktwo1;
         int rowskone2, nonFlipRowskone2;
         int rowsktwo2, nonFlipRowsktwo2;
+        bool kInRow;
+        double heuristic;
 
+        void incrementkRows(int, bool);
         void incrementRows(int, int, bool);
     public:
         State(Board* board);
@@ -39,6 +42,7 @@ class State {
 
         // Heuristics
         void getLinearMarkers();
-        double getEvaluation();
+        double weightedSum();
+        bool getEvaluation();
 };
 #endif /* State_H */

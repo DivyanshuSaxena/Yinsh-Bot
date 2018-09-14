@@ -22,6 +22,19 @@ void State::setWeight(double weight, int feature) {
     }
 }
 
+void State::incrementkRows(int marker, bool flip) {
+    if (marker == 4) {
+        rowsk1++;
+        rowskone1--;
+        rowsktwo1--;
+    } else {
+        rowsk2++;
+        rowskone2--;
+        rowsktwo2--;
+    }
+    kInRow = true;
+}
+
 void State::incrementRows(int count, int marker, bool flip) {
     // Increments all the in-a-row heuristic variables for the State object based on the count and the player marker
     if (count == k-2) {
@@ -49,15 +62,9 @@ void State::incrementRows(int count, int marker, bool flip) {
             }
         }
     } else {
-        if (marker == 4) {
-            rowsk1++;
-            rowskone1--;
-            rowsktwo1--;
-        } else {
-            rowsk2++;
-            rowskone2--;
-            rowsktwo2--;
-        }
+        // Presently, the code should never get into this -> 
+        // k markers checked in getLinearMarkers
+        incrementkRows();
     }
 }
 
@@ -79,7 +86,8 @@ void State::getLinearMarkers() {
                 if (!(prevMarkerVert == player1 || prevMarkerVert == player2) ) goto horizontal;
                 countVert++;
                 flipVert = flipVert || stboard->isFlippable(i, j);
-                if (countVert >= k-2) incrementRows(countVert, prevMarkerVert, flipVert);
+                if (countVert >= k-2 && countVert <= k-1) incrementRows(countVert, prevMarkerVert, flipVert);
+                if (countVert == k) incrementkRows(prevMarkerVert, flipVert);
             } else {
                 if (stboard->config[i][j] == player1 || stboard->config[i][j] == player2) {
                     countVert = 1;
@@ -94,7 +102,8 @@ void State::getLinearMarkers() {
                 if (!(prevMarkerHorz == player1 || prevMarkerHorz == player2) ) continue;
                 countHorz++;
                 flipHorz = flipHorz || stboard->isFlippable(j, i);
-                if (countHorz >= k-2) incrementRows(countHorz, prevMarkerHorz, flipHorz);
+                if (countHorz >= k-2 && countVert <= k-1) incrementRows(countHorz, prevMarkerHorz, flipHorz);
+                if (countHorz == k) incrementkRows(prevMarkerHorz, flipHorz);
             } else {
                 if (stboard->config[j][i] == player1 || stboard->config[j][i] == player2) {
                     countHorz = 1;
@@ -118,7 +127,7 @@ void State::getLinearMarkers() {
                 if (prevMarker != player1 && prevMarker != player2) continue;
                 count++;
                 flip = flip || stboard->isFlippable(j, j-diff);
-                if (count >= k-2) incrementRows(count, prevMarker, flip);
+                if (count >= k-2 && count <= k-1) incrementRows(count, prevMarker, flip);
             } else {
                 if (stboard->config[j][j-diff] == player1 || stboard->config[j][j-diff] == player2) {
                     count = 1;
@@ -129,10 +138,8 @@ void State::getLinearMarkers() {
     }
 }
 
-double State::getEvaluation() {
-    // cout << "Starting Evaluation" << endl; // Debug
-    double h = 0;
-    this->getLinearMarkers();
+double State::weightedSum() {
+    double h;
     // Rows of k-2 markers
     h += rowsktwo1 * weights.at(1);
     h += rowsktwo2 * weights.at(2);
@@ -152,6 +159,15 @@ double State::getEvaluation() {
     // Rows of k markers
     h += rowsk1 * weights.at(9);
     h += rowsk2 * weights.at(10);
-
     return h;
+}
+
+bool State::getEvaluation() {
+    // cout << "Starting Evaluation" << endl; // Debug
+    this->getLinearMarkers();
+    if (kInRow)
+        return false;
+    double h = weightedSum();
+    heuristic = h;
+    return true;
 }
