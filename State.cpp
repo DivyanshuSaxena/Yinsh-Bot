@@ -266,6 +266,7 @@ double State::alphaBeta(int depth, int alpha, int beta, int currPlayer){
 vector<State*> State::getSuccessors(int currPlayer){
     bool isKinRow = this->evaluate();
     vector<State*> tempvec;
+    vector<State*> movedStates;
     if(isKinRow){
         //there are k in row we need to remove them
         //todo - if more than k then there is option
@@ -284,24 +285,45 @@ vector<State*> State::getSuccessors(int currPlayer){
             removedRingState->stboard->updateRingPositions();
             tempvec.push_back(removedRingState);
         }
-        vector<State*> movedStates;
+        // vector<State*> movedStates;
         for(int tempiter=0;tempiter<tempvec.size();tempiter++){
-            // tempvec[i]->stboard->pl
             vector<State*> thismovedStates = tempvec[tempiter]->getStatesForMoves(currPlayer);
+            movedStates.insert(movedStates.end(), thismovedStates.begin(), thismovedStates.end());
         }
 
-    }else{
 
+    }else{
+        movedStates = this->getStatesForMoves(currPlayer);
+    }
+    //final step of checking if k markers made again
+    for(int iterMovedStates=0;iterMovedStates<movedStates.size();iterMovedStates++){
+        isKinRow = movedStates[iterMovedStates]->evaluate();
+        if(isKinRow){
+
+        }else{
+            
+        }
     }
 }
 vector<State*> State::getStatesForMoves(int currPlayer){
+    vector<State*> ansvec;
     vector<pair<int,int>> allRings;
     if(currPlayer==1){
         allRings = this->stboard->p1Rings;
     }else if(currPlayer==2){
         allRings = this->stboard->p2Rings;
     }
-    
+    for(int iterring=0;iterring<allRings.size();iterring++){
+        auto thisring = allRings[iterring];
+        auto possibleMoves = this->stboard->showPossibleMoves(thisring.first,thisring.second);
+        for(int individualmoveiter=0;individualmoveiter<possibleMoves.size();individualmoveiter++){
+            auto thismovefin = possibleMoves[individualmoveiter];
+            State * tempstate = new State(this->stboard);
+            tempstate->stboard->selectAndMoveRing(thisring.first, thisring.second, thismovefin.first,thismovefin.second);
+            ansvec.push_back(tempstate);
+        }
+    }
+    return ansvec;
 }
 
 /*
