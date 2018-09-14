@@ -296,6 +296,11 @@ vector<State*> State::getSuccessors(int currPlayer){
 }
 vector<State*> State::getStatesForMoves(int currPlayer){
     vector<pair<int,int>> allRings;
+    if(currPlayer==1){
+        allRings = this->stboard->p1Rings;
+    }else if(currPlayer==2){
+        allRings = this->stboard->p2Rings;
+    }
     
 }
 
