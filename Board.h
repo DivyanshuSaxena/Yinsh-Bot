@@ -38,8 +38,9 @@ class Board{
         
         // Operate on rings and markers on board
         bool addRing(int, int, int);
-        pair<int,int> makeInitialMoves(int);
+        pair<int,int> occupyCorners();
         pair<int,int> blockOpponentRings();
+        pair<int,int> makeInitialMoves(int);
 
         pair<int, int> checkKRingsInRow();
         bool setMarker(pair<int,int>, int);

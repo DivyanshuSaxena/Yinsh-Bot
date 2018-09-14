@@ -14,12 +14,39 @@ State::State(Board* board) {
             stboard->config[i][j] = board->config[i][j];
         }
     }
+
+    heuristic = -1;
+    kInRow = false;
+    resetFeatures();
+}
+
+void State::resetFeatures() {
+    int rowsk1 = -1, rowsk2 = -1;
+    int rowskone1 = -1, nonFlipRowskone1 = -1;
+    int rowsktwo1 = -1, nonFlipRowsktwo1 = -1;
+    int rowskone2 = -1, nonFlipRowskone2 = -1;
+    int rowsktwo2 = -1, nonFlipRowsktwo2 = -1;
 }
 
 void State::setWeight(double weight, int feature) {
     if (feature < weights.size() && feature > 0) {
         weights.at(feature) = weight;
     }
+}
+
+void State::incrementkRows(int marker, bool flip, int endx, int endy) {
+    if (marker == 4) {
+        rowsk1++;
+        rowskone1--;
+        rowsktwo1--;
+    } else {
+        rowsk2++;
+        rowskone2--;
+        rowsktwo2--;
+    }
+    endkx = endx;
+    endky = endy;
+    kInRow = true;
 }
 
 void State::incrementRows(int count, int marker, bool flip) {
@@ -49,15 +76,9 @@ void State::incrementRows(int count, int marker, bool flip) {
             }
         }
     } else {
-        if (marker == 4) {
-            rowsk1++;
-            rowskone1--;
-            rowsktwo1--;
-        } else {
-            rowsk2++;
-            rowskone2--;
-            rowsktwo2--;
-        }
+        // Presently, the code should never get into this -> 
+        // k markers checked in getLinearMarkers
+        incrementkRows(marker, flip, -1, -1);
     }
 }
 
@@ -79,10 +100,13 @@ void State::getLinearMarkers() {
                 if (!(prevMarkerVert == player1 || prevMarkerVert == player2) ) goto horizontal;
                 countVert++;
                 flipVert = flipVert || stboard->isFlippable(i, j);
-                if (countVert >= k-2) incrementRows(countVert, prevMarkerVert, flipVert);
+                if (countVert >= k-2 && countVert <= k-1) incrementRows(countVert, prevMarkerVert, flipVert);
+                if (countVert == k) incrementkRows(prevMarkerVert, flipVert, i, j);
             } else {
                 if (stboard->config[i][j] == player1 || stboard->config[i][j] == player2) {
                     countVert = 1;
+                    startkx = i;
+                    startky = j; // Set the start indices of streak start
                 } 
                 prevMarkerVert = stboard->config[i][j];
                 flipVert = false;
@@ -94,10 +118,13 @@ void State::getLinearMarkers() {
                 if (!(prevMarkerHorz == player1 || prevMarkerHorz == player2) ) continue;
                 countHorz++;
                 flipHorz = flipHorz || stboard->isFlippable(j, i);
-                if (countHorz >= k-2) incrementRows(countHorz, prevMarkerHorz, flipHorz);
+                if (countHorz >= k-2 && countVert <= k-1) incrementRows(countHorz, prevMarkerHorz, flipHorz);
+                if (countHorz == k) incrementkRows(prevMarkerHorz, flipHorz, j, i);
             } else {
                 if (stboard->config[j][i] == player1 || stboard->config[j][i] == player2) {
                     countHorz = 1;
+                    startkx = j;
+                    startky = i; // Set the start indices of streak start
                 } 
                 prevMarkerHorz = stboard->config[j][i];
                 flipHorz = false;
@@ -106,7 +133,7 @@ void State::getLinearMarkers() {
     }
 
     // Slant Rows for both opponents
-    bool flip;
+    bool flip = false;
     for (int diff = -n; diff <= n; diff++) {
         // Let the slant line be x-y = c, then diff is the iterator for c
         int startj = (diff<=0) ? 0 : diff;
@@ -118,41 +145,42 @@ void State::getLinearMarkers() {
                 if (prevMarker != player1 && prevMarker != player2) continue;
                 count++;
                 flip = flip || stboard->isFlippable(j, j-diff);
-                if (count >= k-2) incrementRows(count, prevMarker, flip);
+                if (count >= k-2 && count <= k-1) incrementRows(count, prevMarker, flip);
+                if (count == k) incrementkRows(prevMarker, flip, j, j-diff);
             } else {
                 if (stboard->config[j][j-diff] == player1 || stboard->config[j][j-diff] == player2) {
                     count = 1;
+                    startkx = j;
+                    startky = j-diff; // Set the start indices of streak start
                 } 
                 prevMarker = stboard->config[j][j-diff];
+                flip = false;
             }
         }
     }
 }
 
-double State::getEvaluation() {
-    // cout << "Starting Evaluation" << endl; // Debug
-    double h = 0;
-    this->getLinearMarkers();
+double State::weightedSum() {
+    double h;
     // Rows of k-2 markers
-    h += rowsktwo1 * weights.at(1);
-    h += rowsktwo2 * weights.at(2);
+    if (rowsktwo1 != -1) h += rowsktwo1 * weights.at(1);
+    if (rowsktwo2 != -1) h += rowsktwo2 * weights.at(2);
 
     // Rows of k-2 non flippable markers
-    h += nonFlipRowsktwo1 * weights.at(3); 
-    h += nonFlipRowsktwo2 * weights.at(4); 
+    if (nonFlipRowsktwo1 != -1) h += nonFlipRowsktwo1 * weights.at(3); 
+    if (nonFlipRowsktwo2 != -1) h += nonFlipRowsktwo2 * weights.at(4); 
     
     // Rows of k-1 markers
-    h += rowskone1 * weights.at(5);
-    h += rowskone2 * weights.at(6);
+    if (rowskone1 != -1) h += rowskone1 * weights.at(5);
+    if (rowskone2 != -1) h += rowskone2 * weights.at(6);
 
     // Rows of k-1 non flippable markers
-    h += nonFlipRowskone1 * weights.at(7);
-    h += nonFlipRowskone2 * weights.at(8);
+    if (nonFlipRowskone1 != -1) h += nonFlipRowskone1 * weights.at(7);
+    if (nonFlipRowskone2 != -1) h += nonFlipRowskone2 * weights.at(8);
 
     // Rows of k markers
-    h += rowsk1 * weights.at(9);
-    h += rowsk2 * weights.at(10);
-
+    if (rowsk1 != -1) h += rowsk1 * weights.at(9);
+    if (rowsk2 != -1) h += rowsk2 * weights.at(10);
     return h;
 }
 
@@ -182,4 +210,24 @@ double State::alphaBeta(int depth, int alpha, int beta){
 }
 vector<State*> State::getSuccessors(){
     
+}
+/*
+ * evaluate() evaluates the current state and checks ->
+ * if there exist any row of k markers, in which case, it returns false
+ * else returns true 
+ */
+bool State::evaluate() {
+    // Assumption - At a time, only a single row of k markers can be present
+    // cout << "Starting Evaluation" << endl; // Debug
+    this->getLinearMarkers();
+    if (kInRow) {
+        return false;
+    }
+    double h = weightedSum();
+    heuristic = h;
+    return true;
+}
+
+double State::getEvaluation() {
+    return heuristic;
 }
