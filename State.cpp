@@ -13,6 +13,7 @@ vector<pair<int,int>> copyVectorOfPairs(vector<pair<int,int>> thisvec){
     }
     return tempring;
 }
+
 State::State(Board* board) {
     // Duplicate the argument board
     stboard = new Board(n,m,k,l);
@@ -119,7 +120,6 @@ void State::getLinearMarkers() {
             if (stboard->config[i][j] == prevMarkerVert) {
                 if (!(prevMarkerVert == player1 || prevMarkerVert == player2) ) goto horizontal;
                 countVert++;
-                cout << "Checking flipability" << endl;
                 flipVert = flipVert || stboard->isFlippable(i, j);
             } else {
                 if (stboard->config[i][j] == player1 || stboard->config[i][j] == player2) {
@@ -133,7 +133,7 @@ void State::getLinearMarkers() {
                 prevMarkerVert = stboard->config[i][j];
                 flipVert = false;
             }
-            cout << "Checked vertical for " << i << " " << j << endl; // Debug
+            // cout << "Checked vertical for " << i << " " << j << endl; // Debug
 
             // Horizontal Rows
             horizontal:
@@ -153,7 +153,7 @@ void State::getLinearMarkers() {
                 prevMarkerHorz = stboard->config[j][i];
                 flipHorz = false;
             }
-            cout << "Checked horizontal for " << j << " " << i << endl; // Debug
+            // cout << "Checked horizontal for " << j << " " << i << endl; // Debug
         }
         
         // Check for the last place
@@ -263,6 +263,7 @@ double State::alphaBeta(int depth, int alpha, int beta, int currPlayer){
     }
     return tempscore;
 }
+
 vector<State*> State::getSuccessors(int currPlayer){
     bool isKinRow = this->evaluate();
     vector<State*> tempvec;
@@ -339,7 +340,6 @@ bool State::evaluate() {
         return false;
     }
     double h = weightedSum();
-    cout << h << endl;
     heuristic = h;
     return true;
 }

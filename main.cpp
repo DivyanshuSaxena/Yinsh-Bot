@@ -67,11 +67,11 @@ int main ( int argc, char** argv )
     board->printhexagonalconfig();
     cout << endl;
 
-    board->setMarker(board->getCoordinates(1, 0 ), 2);
-    board->setMarker(board->getCoordinates(2, 0 ), 2);
-    board->setMarker(board->getCoordinates(3, 0 ), 2);
-    board->addRing(2, 0, 0);
-    board->addRing(1, 2, 3);
+    board->setMarker(make_pair(5, 6 ), 2);
+    board->setMarker(make_pair(5, 7 ), 2);
+    board->setMarker(make_pair(5, 8 ), 2);
+    board->addRing(2, 5, 5);
+    board->addRing(1, 7, 6);
     // board->setMarker(board->getCoordinates(4, 0 ), 2);
     auto adjpoints = board->showPossibleMoves(5,5);
 
@@ -81,10 +81,10 @@ int main ( int argc, char** argv )
     cout << endl;
     
     board->printnormalconfig();
-    board->selectAndMoveRing(0,0,4,0);
+    board->selectAndMoveRing(5,5,5,9);
     cout << "select n move done "<<endl;
     board->printnormalconfig();
-    board->selectAndMoveRing(2,3,3,5);
+    board->selectAndMoveRing(7,6,8,7);
     cout << "select n move done "<<endl;
     board->printnormalconfig();
     

@@ -257,9 +257,6 @@ vector<pair<int,int>> Board::showPossibleMoves(int x, int y){
     auto freeveczeroslope = this->getFreePointsAdjacentToPoint(thisringpair, 0);
     auto skipfreeveczeroslope = this->getPairAfterMarkers(backB7(freeveczeroslope), 0);
     auto freevecminuszeroslope = this->getFreePointsAdjacentToPoint(thisringpair, 180);
-    pair<int,int> debug = backB7(freevecminuszeroslope);
-    cout << debug.first << " " << debug.second << endl;
-    cout << "Pair 1" << endl; // Debug
     auto skipfreevecminuszeroslope = this->getPairAfterMarkers(backB7(freevecminuszeroslope), 180);
     auto freeveconeslope = this->getFreePointsAdjacentToPoint(thisringpair, 45);
     auto skipfreeveconeslope = this->getPairAfterMarkers(backB7(freeveconeslope), 45);
@@ -271,6 +268,7 @@ vector<pair<int,int>> Board::showPossibleMoves(int x, int y){
     myvec.insert(myvec.end(), freevecminuszeroslope.begin(),freevecminuszeroslope.end());
     myvec.insert(myvec.end(), freeveconeslope.begin(),freeveconeslope.end());
     myvec.insert(myvec.end(), freevecminusoneslope.begin(),freevecminusoneslope.end());
+    // cout << "Pair 1" << endl; // Debug
 
     // insert issue #1 case
     if(skipfreevecinfislope.first != -1 && skipfreevecinfislope.second != -1){
@@ -291,7 +289,7 @@ vector<pair<int,int>> Board::showPossibleMoves(int x, int y){
     if(skipfreevecminusoneslope.first != -1 && skipfreevecminusoneslope.second != -1){
         myvec.push_back(skipfreevecminusoneslope);
     }
-    cout << "Pair 2" << endl; // Debug
+    // cout << "Pair 2" << endl; // Debug
 
     auto freepointinfislope = this->getPairAfterMarkers(thisringpair, 90);
     auto freepointminusinfislope = this->getPairAfterMarkers(thisringpair, 270);
@@ -317,7 +315,7 @@ vector<pair<int,int>> Board::showPossibleMoves(int x, int y){
     if(freepointminusoneslope.first != -1 && freepointminusoneslope.second != -1){
         myvec.push_back(freepointminusoneslope);
     }
-    cout << "Returning from showPossibleMoves" << endl; // Debug
+    // cout << "Returning from showPossibleMoves" << endl; // Debug
     return myvec;
 }
 
@@ -325,7 +323,7 @@ vector<pair<int,int>> Board::getFreePointsAdjacentToPoint(pair<int,int> argpair,
     vector<pair<int,int>> myvec;
     int tempi = argpair.first;
     int tempj = argpair.second;
-    cout << "Finding adjacent points to " << tempi << " " << tempj << endl;
+    // cout << "Finding adjacent points to " << tempi << " " << tempj << endl; // Debug
     if(slope==90){
         while(true && tempj<2*n){
             tempj++;
@@ -352,7 +350,6 @@ vector<pair<int,int>> Board::getFreePointsAdjacentToPoint(pair<int,int> argpair,
             if(this->config[tempi][tempj]!=1){
                 break;
             }else{
-                cout << "Pushed " << tempi << " " << tempj << endl; // Debug
                 myvec.push_back(make_pair(tempi,tempj));
             }
         }
@@ -397,8 +394,7 @@ pair<int,int> Board::getPairAfterMarkers(pair<int,int> argpair, int slope){
     int tempi = argpair.first;
     int tempj = argpair.second;
     if(slope==90){
-        // cout << "90" << endl;
-        if(this->config[tempi][tempj+1]>3){
+        if(tempj<2*n && this->config[tempi][tempj+1]>3){
             tempj++;
             while(true && tempj<n*2){
                 tempj++;
@@ -415,7 +411,7 @@ pair<int,int> Board::getPairAfterMarkers(pair<int,int> argpair, int slope){
             return make_pair(-1,-1);
         }
     }else if(slope==270){
-        if(this->config[tempi][tempj-1]>3){
+        if(tempj>0 && this->config[tempi][tempj-1]>3){
             tempj--;
             while(true && tempj>0){
                 tempj--;
@@ -432,7 +428,7 @@ pair<int,int> Board::getPairAfterMarkers(pair<int,int> argpair, int slope){
             return make_pair(-1,-1);
         }
     }else if(slope==0){
-        if(this->config[tempi+1][tempj]>3){
+        if(tempi<2*n && this->config[tempi+1][tempj]>3){
             tempi++;
             while(true && tempi<n*2){
                 tempi++;
@@ -449,7 +445,7 @@ pair<int,int> Board::getPairAfterMarkers(pair<int,int> argpair, int slope){
             return make_pair(-1,-1);
         }
     }else if(slope==180){
-        if(this->config[tempi-1][tempj]>3){
+        if(tempi>0 && this->config[tempi-1][tempj]>3){
             tempi--;
             while(true && tempi>0){
                 tempi--;
@@ -466,7 +462,7 @@ pair<int,int> Board::getPairAfterMarkers(pair<int,int> argpair, int slope){
             return make_pair(-1,-1);
         }
     }else if(slope==45){
-        if(this->config[tempi+1][tempj+1]>3){
+        if(tempi<2*n && tempj<2*n && config[tempi+1][tempj+1]>3){
             tempi++;
             tempj++;
             while(true && tempi<n*2 && tempj<n*2){
@@ -485,7 +481,7 @@ pair<int,int> Board::getPairAfterMarkers(pair<int,int> argpair, int slope){
             return make_pair(-1,-1);
         }
     }else if(slope==225){
-        if(this->config[tempi-1][tempj-1]>3){
+        if(tempi>0 && tempj>0 && config[tempi-1][tempj-1]>3){
             tempi--;
             tempj--;
             while(true && tempi>0 && tempj>0){
@@ -595,21 +591,19 @@ bool Board::removeRing(int xarg, int yarg){
 }
 
 bool Board::isFlippable(int row, int col){
-    cout << "Check flip for " << row << " " << col << endl; // Debug
     if (config[row][col] !=4 && config[row][col] != 5)
         return false;
 
     updateRingPositions();
-    cout << "Updated ring positions" << endl;
     bool retVal = false;
     int len = p1Rings.size() + p2Rings.size();
     for (int i = 0; i < len; i++) {
         // Ring pair available at index i
         pair<int,int> ring = i==p1Rings.size() ? p2Rings.at(i-p1Rings.size()) : p1Rings.at(i);
         int ringx = ring.first, ringy = ring.second;
-        cout << "Check flip with ring: " << ringx << " " << ringy << " "; // Debug
         vector<pair<int,int>> possibleMoves = board->showPossibleMoves(ring.first, ring.second);
-        cout << "moves: " << possibleMoves.size() << endl;
+        // cout << "Check flip with ring: " << ringx << " " << ringy << " "; // Debug
+        // cout << "moves: " << possibleMoves.size() << endl;                // Debug
         for (int k = 0; k < possibleMoves.size(); k++) {
             pair<int,int> move = possibleMoves.at(k);
             int movex = move.first, movey = move.second;
