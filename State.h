@@ -30,19 +30,30 @@ class State {
         int rowsktwo1, nonFlipRowsktwo1;
         int rowskone2, nonFlipRowskone2;
         int rowsktwo2, nonFlipRowsktwo2;
+
+        int startkx, startky;
+        int endkx, endky;
         bool kInRow;
         double heuristic;
 
-        void incrementkRows(int, bool);
+        void incrementkRows(int, bool, int, int);
         void incrementRows(int, int, bool);
+
     public:
         State(Board* board);
         Board* stboard;
         void setWeight(double weight, int feature);
 
+        // Accessor Methods
+        bool isTerminalNode();
+
+        // Operations
+        void resetFeatures();
+
         // Heuristics
         void getLinearMarkers();
         double weightedSum();
-        bool getEvaluation();
+        bool evaluate(); 
+        double getEvaluation();
 };
 #endif /* State_H */
