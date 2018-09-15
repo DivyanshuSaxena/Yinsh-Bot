@@ -55,8 +55,7 @@
 int n, m, k, l;
 vector<double> weights;
 Board* board;
-int player_id;
-int time_limit;
+int player_id, time_limit, depth;
 
 int test();
 int play();
@@ -187,6 +186,7 @@ int play() {
             cout << "P " << movePair.first << " " << movePair.second << endl;
         } else {
             // Check this block
+            currState->alphaBeta(depth, -DBL_MAX, DBL_MAX, player_id);
             currState->getNextMove();
             cout << "move" << endl; // Make appropriate moves here.
         }

@@ -27,6 +27,8 @@ State::State(Board* board) {
     stboard->updateRingPositions();
     heuristic = -DBL_MAX;
     kInRow = false;
+
+    bestMove = -1;
     isSuccessorsUpdated =false;
     resetFeatures();
 }
@@ -254,6 +256,7 @@ double State::alphaBeta(int depth, int alpha, int beta, int currPlayer){
     for(int i=0;i<successsors.size();i++){
         double value = -successsors[i]->alphaBeta(depth-1,-beta,-alpha, 3-currPlayer);
         if(value>tempscore){
+            this->bestMove = i;
             tempscore=value;
         }
         if(tempscore>alpha){

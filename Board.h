@@ -19,6 +19,7 @@ extern int n, m, k, l;
 // l is number of rings one player must remove before other player to win
 
 extern int time_limit;
+extern int depth;
 
 class Board{
     public:

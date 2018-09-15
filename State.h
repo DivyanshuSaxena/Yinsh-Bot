@@ -45,9 +45,11 @@ class State {
         State(Board* board);
         State(State* state);
         Board* stboard;
-        void setWeight(double weight, int feature);
         bool isSuccessorsUpdated;
+        int bestMove; // Index of best successor in successors
         vector<State*> successors;
+        void setWeight(double weight, int feature);
+
         // Accessor Methods
         bool isTerminalNode();
         vector<State*> getSuccessors(int currPlayer);
