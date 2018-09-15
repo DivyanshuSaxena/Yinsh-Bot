@@ -89,8 +89,8 @@ Board::Board(int n0, int m0, int k0, int l0){
 
 pair<int,int> Board::makeInitialMoves(int movenum) {
     pair<int,int> retPair;
-    if (movenum == 1 && config[n][n+1] == 1) {
-        retPair = make_pair(n,n+1);
+    if (movenum == 1 && config[n][n] == 1) {
+        retPair = make_pair(n,n);
     } else if (movenum <= (m+1)/2 || movenum <= (m-6)) {
         pair<int,int> ring = player_id==1 ? p2Rings.back() : p1Rings.back();
         
@@ -164,11 +164,14 @@ pair<int,int> Board::blockOpponentRings() {
 pair<int,int> Board::occupyCorners() {
     int x = 0, y = 0;
     for (x = 1; x <= 9; x+=4) {
+        bool found = false;
         for (y = 1; y <= 9; y+=4) {
             if (abs(x-y) > 5 || (x==5 && y==5)) continue;
             if (config[x][y] != 1) continue; 
+            found=true;
             break;
         }
+        if(found) break;
     }
     return make_pair(x,y);
 }
@@ -193,6 +196,40 @@ void Board::printnormalconfig(){
             cout<< this->config[i][j] << " ";
         }
         cout<< endl;
+    }
+}
+void Board::printBeautifiedconfig(){
+    for(int j=2*n;j>=0;j--){
+        for(int i=0;i<10-j;i++){
+            cout << " ";
+        }
+        for(int i=0;i<2*n+1;i++){
+            if(this->config[i][j]==0){
+                cout<< "  ";
+            }else if(this->config[i][j]==1){
+                cout << "_ ";
+            }else{
+                cout<< this->config[i][j] << " ";
+            }
+            
+        }
+        cout<< endl;
+    }
+}
+void Board::printMoreBeautifiedconfig(){
+    // to write if needed
+    int counter=0;
+    while(counter<=20){
+        if(counter<=5){
+
+        }else if(counter<=10){
+
+        }else if(counter<=15){
+
+        }else{
+
+        }
+        counter++;
     }
 }
 

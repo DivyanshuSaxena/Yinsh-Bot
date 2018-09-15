@@ -60,7 +60,7 @@ class State {
         // Operations
         void resetFeatures();
         void duplicateFeatures(State* state);
-        double alphaBeta(int depth, int alpha, int beta, int currPlayer);
+        double alphaBeta(int depth, double alpha, double beta, int currPlayer);
         pair<pair<int,int>, pair<int,int>> getNextMove(); 
         string parseMove(int, int, int, int, int);
 

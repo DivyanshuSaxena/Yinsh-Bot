@@ -58,10 +58,11 @@ Board* board;
 int player_id, time_limit, depth;
 
 int test();
+int test1();
 int play();
 
 int main(int argc, char** argv) {
-    test();
+    test1();
     // play();
     return 0;
 }
@@ -109,7 +110,32 @@ int test() {
         cout <<endl;
     }
 }
-/*
+
+int test1(){
+    for (int i = 0; i < 11; i++) {
+        weights.push_back(i);
+    }
+
+    board = new Board(5,5,5,3);
+    State* state = new State(board);
+    player_id=2;
+    for(int i=0;i<10;i++){
+        player_id = 3-player_id;
+        state->stboard->makeInitialMoves(i/2+1);
+        // state->stboard->printnormalconfig();
+        // cout <<endl;
+    }
+    cout <<"done "<<endl;
+    // state->stboard->printnormalconfig();
+    state->stboard->printBeautifiedconfig();
+    int temp;
+    temp = state->alphaBeta(2,-DBL_MAX, +DBL_MAX, 1);
+    cout<<"from"<<endl;
+    state->stboard->printBeautifiedconfig();
+    cout << "to"<<endl;
+    state->successors[state->bestMove]->stboard->printBeautifiedconfig();
+}
+
 int parseAndMove(string move) {
     pair<int,int> chosenRing = make_pair(-1,-1);
     pair<int,int> rowStart, rowEnd;
@@ -185,8 +211,7 @@ int parseAndMove(string move) {
         i += 2;
     }
 }
-*/
-/*
+
 int play() {
     string move;
     int movenum = 1;
@@ -215,4 +240,3 @@ int play() {
     }
     return 0;
 }
-*/

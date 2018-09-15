@@ -299,7 +299,7 @@ bool State::isTerminalNode() {
     return retVal;
 }
 
-double State::alphaBeta(int depth, int alpha, int beta, int currPlayer){
+double State::alphaBeta(int depth, double alpha, double beta, int currPlayer){
     if(depth==0 || this->isTerminalNode()){
         return this->getEvaluation();
     }

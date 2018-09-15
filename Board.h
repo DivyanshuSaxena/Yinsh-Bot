@@ -39,7 +39,8 @@ class Board{
         pair<int,int> getPairAfterMarkers(pair<int,int>, int);
         void updateRingPositions();
         void printnormalconfig();
-        
+        void printBeautifiedconfig();
+        void printMoreBeautifiedconfig();
         // Operate on rings and markers on board
         bool addRing(int, int, int);
         pair<int,int> occupyCorners();
