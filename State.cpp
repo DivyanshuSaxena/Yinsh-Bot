@@ -27,6 +27,7 @@ State::State(Board* board) {
     stboard->updateRingPositions();
     heuristic = -DBL_MAX;
     kInRow = false;
+    isSuccessorsUpdated =false;
     resetFeatures();
 }
 
@@ -266,6 +267,9 @@ double State::alphaBeta(int depth, int alpha, int beta, int currPlayer){
 }
 
 vector<State*> State::getSuccessors(int currPlayer){
+    if(this->isSuccessorsUpdated){
+        return this->successors;
+    }
     bool isKinRow = this->evaluate();
     
     vector<State*> tempvec;
@@ -328,6 +332,8 @@ vector<State*> State::getSuccessors(int currPlayer){
             finStatesvec.push_back(thismovedstate);
         }
     }
+    this->isSuccessorsUpdated=true;
+    this->successors = finStatesvec;
     return finStatesvec;
 }
 

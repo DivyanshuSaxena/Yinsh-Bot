@@ -46,7 +46,8 @@ class State {
         State(State* state);
         Board* stboard;
         void setWeight(double weight, int feature);
-
+        bool isSuccessorsUpdated;
+        vector<State*> successors;
         // Accessor Methods
         bool isTerminalNode();
         vector<State*> getSuccessors(int currPlayer);
