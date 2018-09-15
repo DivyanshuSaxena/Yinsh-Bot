@@ -47,6 +47,7 @@ class State {
         Board* stboard;
         bool isSuccessorsUpdated;
         int bestMove; // Index of best successor in successors
+        vector<string> moves;
         vector<State*> successors;
         void setWeight(double weight, int feature);
 
@@ -61,6 +62,7 @@ class State {
         void duplicateFeatures(State* state);
         double alphaBeta(int depth, int alpha, int beta, int currPlayer);
         pair<pair<int,int>, pair<int,int>> getNextMove(); 
+        string parseMove(int, int, int, int, int);
 
         // Heuristics
         void getLinearMarkers();

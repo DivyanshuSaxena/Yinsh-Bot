@@ -14,6 +14,26 @@ vector<pair<int,int>> copyVectorOfPairs(vector<pair<int,int>> thisvec){
     return tempring;
 }
 
+string State::parseMove(int movetype, int x1, int y1, int x2, int y2) {
+    /*
+     * Legend : movetype =>
+     * 1 -> Move ring
+     * 2 -> Remove row
+     * 3 -> Remove ring
+     */
+    string str;
+    pair<int,int> start = stboard->getHexagonalCoordinate(x1, y1);
+    pair<int,int> end = stboard->getHexagonalCoordinate(x2, y2);
+    if (movetype == 1) {
+        str = "S " + start.first + " " + start.second + " M " + end.first + " " + end.second;
+    } else if (movetype == 2) {
+        str = "RS " + start.first + " " + start.second + " RE " + end.first + " " + end.second;
+    } else {
+        str = "X " + start.first + " " + start.second;
+    }
+    return str;
+}
+
 State::State(Board* board) {
     // Duplicate the argument board
     stboard = new Board(n,m,k,l);
@@ -306,30 +326,37 @@ vector<State*> State::getSuccessors(int currPlayer){
     bool isKinRow = this->evaluate();
     cout << "evaluation for the state done "<<isKinRow<<endl;
     cout << "myass "<< true<<endl;
-    vector<State*> tempvec;
+
     vector<State*> movedStates;
     vector<State*> finStatesvec;
-    if(!isKinRow){
+    if(!isKinRow) {
         //there are k in row we need to remove them
+        vector<State*> tempvec; 
+        vector<string> tempmoves;
         cout<<"removing markers case, subproblem 1 "<<endl;
         vector<pair< pair<int,int>, pair<int,int>>> removalCoordinates = this->getPossibleMarkerRemovals();
         for(auto removaliter= removalCoordinates.begin();removaliter<removalCoordinates.end();removaliter++){
             State * changedstate = new State(this->stboard);
-            changedstate->stboard->removeMarkers(removaliter->first.first, removaliter->first.second, removaliter->second.first, removaliter->second.second);
-            //removed markers
+            int startx = removaliter->first.first, starty = removaliter->first.second;
+            int endx = removaliter->second.first, endy = removaliter->second.second;
+            changedstate->stboard->removeMarkers(startx, starty, endx, endy);
+            string tempMove = parseMove(2, startx, starty, endx, endy);
+
+            // removed markers
             vector<pair<int,int>> remrings;
-            if(currPlayer==1){
-                remrings = changedstate->stboard->p1Rings;
-            }else if(currPlayer==2){
-                remrings = changedstate->stboard->p2Rings;
-            }
+            remrings = currPlayer==1 ? changedstate->stboard->p1Rings : changedstate->stboard->p2Rings;
+
             for(int ringsiter=0;ringsiter<remrings.size();ringsiter++){
                 State * removedRingState = new State(changedstate->stboard);
-                removedRingState->stboard->removeRing(remrings[ringsiter].first, remrings[ringsiter].second);
+                int ringx = remrings[ringsiter].first, ringy = remrings[ringsiter].second;
+                removedRingState->stboard->removeRing(ringx, ringy);
                 removedRingState->stboard->updateRingPositions();
+                
                 tempvec.push_back(removedRingState);
+                tempmoves.push_back(tempMove + parseMove(3, ringx, ringy, -1, -1));
             }
         }
+        
         // vector<State*> movedStates;
          cout <<"removed markers and rings, subproblem 1 done, jumping to subproblem 2"<<endl;
         for(int tempiter=0;tempiter<tempvec.size();tempiter++){
