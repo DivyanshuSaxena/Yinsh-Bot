@@ -275,11 +275,11 @@ vector<State*> State::getSuccessors(int currPlayer){
     }
     bool isKinRow = this->evaluate();
     
-    vector<State*> tempvec;
     vector<State*> movedStates;
     vector<State*> finStatesvec;
-    if(isKinRow){
+    if(!isKinRow) {
         //there are k in row we need to remove them
+        vector<State*> tempvec; 
         vector<pair< pair<int,int>, pair<int,int>>> removalCoordinates = this->getPossibleMarkerRemovals();
         for(auto removaliter= removalCoordinates.begin();removaliter<removalCoordinates.end();removaliter++){
             State * changedstate = new State(this->stboard);
@@ -305,7 +305,7 @@ vector<State*> State::getSuccessors(int currPlayer){
         }
 
 
-    }else{
+    } else {
         movedStates = this->getStatesForMoves(currPlayer);
     }
     //final step of checking if k markers made again

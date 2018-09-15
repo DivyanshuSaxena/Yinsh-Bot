@@ -47,6 +47,7 @@ class State {
         Board* stboard;
         bool isSuccessorsUpdated;
         int bestMove; // Index of best successor in successors
+        vector<string> moves;
         vector<State*> successors;
         void setWeight(double weight, int feature);
 
