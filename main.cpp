@@ -100,6 +100,14 @@ int test() {
     cout << state->evaluate() << endl;
     cout << state->getEvaluation() << endl;
     auto tempsuccessors = state->getSuccessors(2);
+    cout << "size of successors is "<<tempsuccessors.size()<<endl;
+    cout<< "initial state"<<endl;
+    state->stboard->printnormalconfig();
+    cout<<"answers are "<<endl;
+    for(int i=0;i<tempsuccessors.size();i++){
+        tempsuccessors[i]->stboard->printnormalconfig();
+        cout <<endl;
+    }
 }
 /*
 int parseAndMove(string move) {
