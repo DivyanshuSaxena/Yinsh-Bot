@@ -49,6 +49,7 @@ void State::resetFeatures() {
     int rowskone2 = -1, nonFlipRowskone2 = -1;
     int rowsktwo2 = -1, nonFlipRowsktwo2 = -1;
 }
+
 void State::duplicateFeatures(State* state){
 
 }
@@ -309,6 +310,7 @@ vector<State*> State::getSuccessors(int currPlayer){
         }
     }
 }
+
 vector<State*> State::getStatesForMoves(int currPlayer){
     vector<State*> ansvec;
     vector<pair<int,int>> allRings;
@@ -350,6 +352,7 @@ bool State::evaluate() {
 double State::getEvaluation() {
     return heuristic;
 }
+
 vector<pair< pair<int,int>, pair<int,int>>> State::getPossibleMarkerRemovals(){
     vector<pair< pair<int,int>, pair<int,int>>> ansvec;
     int distance = max(abs(this->startkx-this->endkx),abs(this->endkx-this->endky));

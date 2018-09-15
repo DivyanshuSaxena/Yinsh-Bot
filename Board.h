@@ -17,6 +17,8 @@ extern int n, m, k, l;
 // k is number of markers in line each player has to create to remove k markers
 // l is number of rings one player must remove before other player to win
 
+extern int time_limit;
+
 class Board{
     public:
         int ** config;
