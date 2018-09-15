@@ -109,6 +109,7 @@ int parseAndMove(string move) {
         switch (ch)
         {
             case 'P':
+            {
                 i += 2;
                 int hex = move.at(i);
                 i += 2;
@@ -116,16 +117,20 @@ int parseAndMove(string move) {
                 pair<int,int> ring = board->getCoordinates(hex, pos);
                 board->addRing(player_id, ring.first, ring.second);
                 break;
+            }
         
             case 'S':
+            {
                 i += 2;
                 int hex = move.at(i);
                 i += 2;
                 int pos = move.at(i+2);
                 pair<int,int> chosenRing = board->getCoordinates(hex, pos);
                 break;
+            }
 
             case 'M':
+            {
                 i += 2;
                 int hex = move.at(i);
                 i += 2;
@@ -133,8 +138,10 @@ int parseAndMove(string move) {
                 pair<int,int> newPos = board->getCoordinates(hex,pos);
                 board->selectAndMoveRing(chosenRing.first, chosenRing.second, newPos.first, newPos.second);
                 break;
+            }
 
             case 'R':
+            {
                 i++;
                 if (move.at(i) == 'S') {
                     i += 2;
@@ -150,8 +157,10 @@ int parseAndMove(string move) {
                     rowEnd = board->getCoordinates(hex, pos);
                     board->removeMarkers(rowStart.first, rowStart.second, rowEnd.first, rowEnd.second);
                 }
+            }
 
             case 'X':
+            {
                 i += 2;
                 int hex = move.at(i);
                 i += 2;
@@ -159,6 +168,7 @@ int parseAndMove(string move) {
                 pair<int,int> ring = board->getCoordinates(hex, pos);
                 board->removeRing(ring.first, ring.second);
                 break;
+            }
 
             default:
                 break;
@@ -186,8 +196,8 @@ int play() {
             cout << "P " << movePair.first << " " << movePair.second << endl;
         } else {
             // Check this block
-            currState->alphaBeta(depth, -DBL_MAX, DBL_MAX, player_id);
-            currState->getNextMove();
+            currState->alphaBeta(depth, -INT16_MAX, INT16_MAX, player_id);
+            // currState->getNextMove();
             cout << "move" << endl; // Make appropriate moves here.
         }
         cin >> move;
