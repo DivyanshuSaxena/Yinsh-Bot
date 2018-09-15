@@ -133,6 +133,7 @@ pair<int,int> Board::makeInitialMoves(int movenum) {
 
 pair<int,int> Board::blockOpponentRings() {
     // Make move so as to block possible rows of opponent rings
+    // Refine this function
     pair<int,int> ringi = player_id==1 ? p2Rings.back() : p1Rings.back();
     pair<int,int> retPair = make_pair(-1,-1);
     for (int j = 0; j < m; j++) {
@@ -162,10 +163,10 @@ pair<int,int> Board::blockOpponentRings() {
 
 pair<int,int> Board::occupyCorners() {
     int x = 0, y = 0;
-    for (x = 0; x <= 10; x+=5) {
-        for (y = 0; y <= 10; y+=5) {
+    for (x = 1; x <= 9; x+=4) {
+        for (y = 1; y <= 9; y+=4) {
             if (abs(x-y) > 5 || (x==5 && y==5)) continue;
-            if (config[x][y] != 1) continue;
+            if (config[x][y] != 1) continue; 
             break;
         }
     }
