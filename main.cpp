@@ -58,28 +58,13 @@ Board* board;
 int player_id;
 int time_limit;
 
-int main(int argc, char** argv) {
-    test();
-    // string move;
-    // // Get input from server about game specifications
-    // cin >> player_id >> n >> time_limit;
+int test();
+int play();
 
-    // if(player_id == 2) {
-    //     // Get other player's move
-    //     cin>>move; 
-        
-    //     while(true) {
-    //         cout<<"P 1 0"<<endl;
-    //         cin>>move;
-    //     }
-    // }   
-    // else if(player_id == 1) {
-    //     while(true) {
-    //         cout<<"P 0 0"<<endl;
-    //         cin>>move; 
-    //     }
-    // }
-    // return 0;
+int main(int argc, char** argv) {
+    // test();
+    play();
+    return 0;
 }
 
 int test() {
@@ -115,4 +100,98 @@ int test() {
     State* state = new State(board);
     cout << state->evaluate() << endl;
     cout << state->getEvaluation() << endl;
+}
+
+int parseAndMove(string move) {
+    pair<int,int> chosenRing = make_pair(-1,-1);
+    pair<int,int> rowStart, rowEnd;
+    for (unsigned i = 0; i < move.length(); i++) {
+        char ch = move.at(i);
+        switch (ch)
+        {
+            case 'P':
+                i += 2;
+                int hex = move.at(i);
+                i += 2;
+                int pos = move.at(i+2);
+                pair<int,int> ring = board->getCoordinates(hex, pos);
+                board->addRing(player_id, ring.first, ring.second);
+                break;
+        
+            case 'S':
+                i += 2;
+                int hex = move.at(i);
+                i += 2;
+                int pos = move.at(i+2);
+                pair<int,int> chosenRing = board->getCoordinates(hex, pos);
+                break;
+
+            case 'M':
+                i += 2;
+                int hex = move.at(i);
+                i += 2;
+                int pos = move.at(i+2);
+                pair<int,int> newPos = board->getCoordinates(hex,pos);
+                board->selectAndMoveRing(chosenRing.first, chosenRing.second, newPos.first, newPos.second);
+                break;
+
+            case 'R':
+                i++;
+                if (move.at(i) == 'S') {
+                    i += 2;
+                    int hex = move.at(i);
+                    i += 2;
+                    int pos = move.at(i+2);
+                    rowStart = board->getCoordinates(hex, pos);
+                } else {
+                    i += 2;
+                    int hex = move.at(i);
+                    i += 2;
+                    int pos = move.at(i+2);
+                    rowEnd = board->getCoordinates(hex, pos);
+                    board->removeMarkers(rowStart.first, rowStart.second, rowEnd.first, rowEnd.second);
+                }
+
+            case 'X':
+                i += 2;
+                int hex = move.at(i);
+                i += 2;
+                int pos = move.at(i+2);
+                pair<int,int> ring = board->getCoordinates(hex, pos);
+                board->removeRing(ring.first, ring.second);
+                break;
+
+            default:
+                break;
+        }
+        i += 2;
+    }
+}
+
+int play() {
+    string move;
+    int movenum = 1;
+    // Get input from server about game specifications
+    cin >> player_id >> n >> time_limit;
+
+    if(player_id == 2) {
+        // Get other player's move
+        cin >> move; 
+        parseAndMove(move);
+    }   
+    
+    while(true) {
+        State* currState = new State(board);
+        if (movenum <= m) {
+            pair<int,int> movePair = board->makeInitialMoves(movenum);
+            cout << "P " << movePair.first << " " << movePair.second << endl;
+        } else {
+            // Check this block
+            currState->getNextMove();
+            cout << "move" << endl; // Make appropriate moves here.
+        }
+        cin >> move;
+        parseAndMove(move);
+    }
+    return 0;
 }
