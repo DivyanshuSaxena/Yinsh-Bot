@@ -230,7 +230,6 @@ pair <int,int> Board::getCoordinates(int hexagon, int position){
         switch(domainpos)
         {
             case 0:
-                // if()
                 return make_pair(n+rempos, n+hexagon);
             case 1:
                 return make_pair(n+hexagon, n+hexagon-rempos);
