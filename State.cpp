@@ -293,8 +293,8 @@ vector<State*> State::getSuccessors(int currPlayer){
         }
         // vector<State*> movedStates;
         for(int tempiter=0;tempiter<tempvec.size();tempiter++){
-            vector<State*> thismovedStates = tempvec[tempiter]->getStatesForMoves(currPlayer);
-            movedStates.insert(movedStates.end(), thismovedStates.begin(), thismovedStates.end());
+            vector<State*> tempthismovedStates = tempvec[tempiter]->getStatesForMoves(currPlayer);
+            movedStates.insert(movedStates.end(), tempthismovedStates.begin(), tempthismovedStates.end());
         }
 
 
