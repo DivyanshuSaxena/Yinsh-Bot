@@ -56,9 +56,33 @@ int n, m, k, l;
 vector<double> weights;
 Board* board;
 int player_id;
+int time_limit;
 
-int main ( int argc, char** argv )
-{
+int main(int argc, char** argv) {
+    test();
+    // string move;
+    // // Get input from server about game specifications
+    // cin >> player_id >> n >> time_limit;
+
+    // if(player_id == 2) {
+    //     // Get other player's move
+    //     cin>>move; 
+        
+    //     while(true) {
+    //         cout<<"P 1 0"<<endl;
+    //         cin>>move;
+    //     }
+    // }   
+    // else if(player_id == 1) {
+    //     while(true) {
+    //         cout<<"P 0 0"<<endl;
+    //         cin>>move; 
+    //     }
+    // }
+    // return 0;
+}
+
+int test() {
     for (int i = 0; i < 11; i++) {
         weights.push_back(i);
     }
