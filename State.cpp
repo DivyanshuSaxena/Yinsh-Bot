@@ -323,6 +323,7 @@ double State::alphaBeta(int depth, int alpha, int beta, int currPlayer){
 
 vector<State*> State::getSuccessors(int currPlayer){
     if(this->isSuccessorsUpdated){
+        cout<<"returning get successor"<<endl;
         return this->successors;
     }
     bool isKinRow = this->evaluate();
@@ -417,6 +418,7 @@ vector<State*> State::getSuccessors(int currPlayer){
     }
     this->isSuccessorsUpdated=true;
     this->successors = finStatesvec;
+    cout<<"returning get successor"<<endl;
     return finStatesvec;
 }
 
