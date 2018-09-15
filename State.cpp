@@ -274,12 +274,14 @@ vector<State*> State::getSuccessors(int currPlayer){
         return this->successors;
     }
     bool isKinRow = this->evaluate();
-    
+    cout << "evaluation for the state done "<<isKinRow<<endl;
+    cout << "myass "<< true<<endl;
     vector<State*> tempvec;
     vector<State*> movedStates;
     vector<State*> finStatesvec;
-    if(isKinRow){
+    if(!isKinRow){
         //there are k in row we need to remove them
+        cout<<"removing markers case, subproblem 1 "<<endl;
         vector<pair< pair<int,int>, pair<int,int>>> removalCoordinates = this->getPossibleMarkerRemovals();
         for(auto removaliter= removalCoordinates.begin();removaliter<removalCoordinates.end();removaliter++){
             State * changedstate = new State(this->stboard);
@@ -299,6 +301,7 @@ vector<State*> State::getSuccessors(int currPlayer){
             }
         }
         // vector<State*> movedStates;
+         cout <<"removed markers and rings, subproblem 1 done, jumping to subproblem 2"<<endl;
         for(int tempiter=0;tempiter<tempvec.size();tempiter++){
             vector<State*> tempthismovedStates = tempvec[tempiter]->getStatesForMoves(currPlayer);
             movedStates.insert(movedStates.end(), tempthismovedStates.begin(), tempthismovedStates.end());
@@ -306,18 +309,35 @@ vector<State*> State::getSuccessors(int currPlayer){
 
 
     }else{
+        cout << "skipped subproblem 1, calculating subproblem 2"<<endl;
         movedStates = this->getStatesForMoves(currPlayer);
     }
     //final step of checking if k markers made again
+    cout << "subproblem 2 is done, now lets move to subproblem 3 if there or not "<<endl;
+    cout << "number of movedstates "<< movedStates.size()<<endl;
+    cout << "they are "<<endl;
+    for(int iterMovedStates=0;iterMovedStates<movedStates.size();iterMovedStates++){
+        movedStates[iterMovedStates]->stboard->printnormalconfig();
+        cout <<endl;
+    }
     for(int iterMovedStates=0;iterMovedStates<movedStates.size();iterMovedStates++){
         State * thismovedstate = movedStates[iterMovedStates];
+        cout << "thismovedstate is "<<endl;
+        thismovedstate->stboard->printnormalconfig();
         isKinRow = thismovedstate->evaluate();
-        if(isKinRow){
+        if(!isKinRow){
+            cout << "execute subproblem 3 as it is necessary"<<endl;
             vector<pair< pair<int,int>, pair<int,int>>> removalCoordinates = thismovedstate->getPossibleMarkerRemovals();
+            cout << "removalcoordinates freq is "<< removalCoordinates.size()<<endl;
+            //remove trashcount
+            int trashcount =1;
             for(auto removaliter= removalCoordinates.begin();removaliter<removalCoordinates.end();removaliter++){
+                cout << "iterating on removalcoordinates number "<< trashcount<<endl;
                 State * changedstate = new State(thismovedstate->stboard);
                 changedstate->stboard->removeMarkers(removaliter->first.first, removaliter->first.second, removaliter->second.first, removaliter->second.second);
                 //removed markers
+                cout << "removed rings state is "<<endl;
+                changedstate->stboard->printnormalconfig();
                 vector<pair<int,int>> remrings;
                 if(currPlayer==1){
                     remrings = changedstate->stboard->p1Rings;
@@ -330,6 +350,7 @@ vector<State*> State::getSuccessors(int currPlayer){
                     removedRingState->stboard->updateRingPositions();
                     finStatesvec.push_back(removedRingState);
                 }
+                trashcount++;
             }
         }else{
             finStatesvec.push_back(thismovedstate);
@@ -384,6 +405,7 @@ double State::getEvaluation() {
 
 vector<pair< pair<int,int>, pair<int,int>>> State::getPossibleMarkerRemovals(){
     vector<pair< pair<int,int>, pair<int,int>>> ansvec;
+    cout << "marker coordinates are "<< this->startkx << " " <<this->startky<< " " << this->endkx<< " " <<this->endky<< " "<< endl;
     int distance = max(abs(this->startkx-this->endkx),abs(this->endkx-this->endky));
     if(distance==k){
         ansvec.push_back(make_pair(make_pair(this->startkx,this->startky),make_pair(this->endkx, this->endky)));

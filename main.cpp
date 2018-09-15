@@ -61,8 +61,8 @@ int test();
 int play();
 
 int main(int argc, char** argv) {
-    // test();
-    play();
+    test();
+    // play();
     return 0;
 }
 
@@ -99,8 +99,9 @@ int test() {
     State* state = new State(board);
     cout << state->evaluate() << endl;
     cout << state->getEvaluation() << endl;
+    auto tempsuccessors = state->getSuccessors(2);
 }
-
+/*
 int parseAndMove(string move) {
     pair<int,int> chosenRing = make_pair(-1,-1);
     pair<int,int> rowStart, rowEnd;
@@ -166,7 +167,8 @@ int parseAndMove(string move) {
         i += 2;
     }
 }
-
+*/
+/*
 int play() {
     string move;
     int movenum = 1;
@@ -195,3 +197,4 @@ int play() {
     }
     return 0;
 }
+*/
