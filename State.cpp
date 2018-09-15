@@ -269,6 +269,7 @@ vector<State*> State::getSuccessors(int currPlayer){
     
     vector<State*> tempvec;
     vector<State*> movedStates;
+    vector<State*> finStatesvec;
     if(isKinRow){
         //there are k in row we need to remove them
         vector<pair< pair<int,int>, pair<int,int>>> removalCoordinates = this->getPossibleMarkerRemovals();
@@ -301,13 +302,32 @@ vector<State*> State::getSuccessors(int currPlayer){
     }
     //final step of checking if k markers made again
     for(int iterMovedStates=0;iterMovedStates<movedStates.size();iterMovedStates++){
-        isKinRow = movedStates[iterMovedStates]->evaluate();
+        State * thismovedstate = movedStates[iterMovedStates];
+        isKinRow = thismovedstate->evaluate();
         if(isKinRow){
-
+            vector<pair< pair<int,int>, pair<int,int>>> removalCoordinates = thismovedstate->getPossibleMarkerRemovals();
+            for(auto removaliter= removalCoordinates.begin();removaliter<removalCoordinates.end();removaliter++){
+                State * changedstate = new State(thismovedstate->stboard);
+                changedstate->stboard->removeMarkers(removaliter->first.first, removaliter->first.second, removaliter->second.first, removaliter->second.second);
+                //removed markers
+                vector<pair<int,int>> remrings;
+                if(currPlayer==1){
+                    remrings = changedstate->stboard->p1Rings;
+                }else if(currPlayer==2){
+                    remrings = changedstate->stboard->p2Rings;
+                }
+                for(int ringsiter=0;ringsiter<remrings.size();ringsiter++){
+                    State * removedRingState = new State(changedstate->stboard);
+                    removedRingState->stboard->removeRing(remrings[ringsiter].first, remrings[ringsiter].second);
+                    removedRingState->stboard->updateRingPositions();
+                    finStatesvec.push_back(removedRingState);
+                }
+            }
         }else{
-            
+            finStatesvec.push_back(thismovedstate);
         }
     }
+    return finStatesvec;
 }
 vector<State*> State::getStatesForMoves(int currPlayer){
     vector<State*> ansvec;
