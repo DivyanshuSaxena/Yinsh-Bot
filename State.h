@@ -61,7 +61,7 @@ class State {
         void resetFeatures();
         void duplicateFeatures(State* state);
         double alphaBeta(int depth, double alpha, double beta, int currPlayer);
-        pair<pair<int,int>, pair<int,int>> getNextMove(); 
+        void makeMove(); 
         string parseMove(int, int, int, int, int);
 
         // Heuristics
