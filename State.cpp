@@ -69,6 +69,7 @@ void State::incrementkRows(int marker, bool flip, int endx, int endy) {
     } else {
         rowsk2++;
     }
+    // cout << "Found streak ending at " << endx << " " << endy << endl;
     endkx = endx;
     endky = endy;
     kInRow = true;
@@ -119,6 +120,8 @@ void State::getLinearMarkers() {
         // Variables to check if the current streak is non-flippable or not
         bool flipVert = false, flipHorz = false; 
         int j = startj+1;
+        int startkxVert = 0, startkyVert = 0;
+        int startkxHorz = 0, startkyHorz = 0;
         for (j = startj+1; j < completej; j++) {
             // Vertical Rows
             if (stboard->config[i][j] == prevMarkerVert) {
@@ -129,10 +132,15 @@ void State::getLinearMarkers() {
                 if (stboard->config[i][j] == player1 || stboard->config[i][j] == player2) {
                     if (countVert >= k-2 && countVert <= k-1) 
                         incrementRows(countVert, prevMarkerVert, flipVert);
-                    if (countVert >= k) incrementkRows(prevMarkerVert, flipVert, i, j);
+                    if (countVert >= k) {
+                        incrementkRows(prevMarkerVert, flipVert, i, j);
+                        startkx = startkxVert;
+                        startky = startkyVert;
+                    }
                     countVert = 1;
-                    startkx = i;
-                    startky = j; // Set the start indices of streak start
+                    startkxVert = i;
+                    startkyVert = j; // Set the start indices of streak start
+                    // cout << "Start streak at " << i << " " << j << endl; // Debug
                 } 
                 prevMarkerVert = stboard->config[i][j];
                 flipVert = false;
@@ -149,10 +157,15 @@ void State::getLinearMarkers() {
                 if (stboard->config[j][i] == player1 || stboard->config[j][i] == player2) {
                     if (countHorz >= k-2 && countVert <= k-1) 
                         incrementRows(countHorz, prevMarkerHorz, flipHorz);
-                    if (countHorz >= k) incrementkRows(prevMarkerHorz, flipHorz, j, i);
+                    if (countHorz >= k) {
+                        incrementkRows(prevMarkerHorz, flipHorz, j, i);
+                        startkx = startkxHorz;
+                        startky = startkyHorz;
+                    }
                     countHorz = 1;
-                    startkx = j;
-                    startky = i; // Set the start indices of streak start
+                    startkxHorz = j;
+                    startkyHorz = i; // Set the start indices of streak start
+                    // cout << "Start streak at " << j << " " << i << endl; // Debug
                 } 
                 prevMarkerHorz = stboard->config[j][i];
                 flipHorz = false;
@@ -163,15 +176,24 @@ void State::getLinearMarkers() {
         // Check for the last place
         if (countVert >= k-2 && countVert <= k-1) 
             incrementRows(countVert, prevMarkerVert, flipVert);
-        if (countVert >= k) incrementkRows(prevMarkerVert, flipVert, i, j);
+        if (countVert >= k) {
+            incrementkRows(prevMarkerVert, flipVert, i, j-1);
+            startkx = startkxVert;
+            startky = startkyVert;
+        }
 
         if (countHorz >= k-2 && countVert <= k-1) 
             incrementRows(countHorz, prevMarkerHorz, flipHorz);
-        if (countHorz >= k) incrementkRows(prevMarkerHorz, flipHorz, j, i);
+        if (countHorz >= k) {
+            incrementkRows(prevMarkerHorz, flipHorz, j-1, i);
+            startkx = startkxHorz;
+            startky = startkyHorz;
+        }
     }
 
     // Slant Rows for both opponents
     bool flip = false;
+    int startkxSlant = 0, startkySlant = 0;
     for (int diff = -n; diff <= n; diff++) {
         // Let the slant line be x-y = c, then diff is the iterator for c
         int startj = (diff<=0) ? 0 : diff;
@@ -188,10 +210,14 @@ void State::getLinearMarkers() {
                 if (stboard->config[j][j-diff] == player1 || stboard->config[j][j-diff] == player2) {
                     if (count >= k-2 && count <= k-1) 
                         incrementRows(count, prevMarker, flip);
-                    if (count > k) incrementkRows(prevMarker, flip, j, j-diff);
+                    if (count > k) {
+                        incrementkRows(prevMarker, flip, j, j-diff);
+                        startkx = startkxSlant;
+                        startky = startkySlant;
+                    } 
                     count = 1;
-                    startkx = j;
-                    startky = j-diff; // Set the start indices of streak start
+                    startkxSlant = j;
+                    startkySlant = j-diff; // Set the start indices of streak start
                 } 
                 prevMarker = stboard->config[j][j-diff];
                 flip = false;
@@ -199,7 +225,11 @@ void State::getLinearMarkers() {
         }
         if (count >= k-2 && count <= k-1) 
             incrementRows(count, prevMarker, flip);
-        if (count > k) incrementkRows(prevMarker, flip, j, j-diff);
+        if (count > k) {
+            incrementkRows(prevMarker, flip, j, j-diff);
+            startkx = startkxSlant;
+            startky = startkySlant;
+        }
     }
 }
 
@@ -406,7 +436,7 @@ double State::getEvaluation() {
 vector<pair< pair<int,int>, pair<int,int>>> State::getPossibleMarkerRemovals(){
     vector<pair< pair<int,int>, pair<int,int>>> ansvec;
     cout << "marker coordinates are "<< this->startkx << " " <<this->startky<< " " << this->endkx<< " " <<this->endky<< " "<< endl;
-    int distance = max(abs(this->startkx-this->endkx),abs(this->endkx-this->endky));
+    int distance = max(abs(this->startkx-this->endkx)+1,abs(this->endkx-this->endky)+1);
     if(distance==k){
         ansvec.push_back(make_pair(make_pair(this->startkx,this->startky),make_pair(this->endkx, this->endky)));
     }else{
