@@ -231,9 +231,9 @@ int play() {
             cout << "P " << movePair.first << " " << movePair.second << endl;
         } else {
             // Check this block
-            currState->alphaBeta(depth, -INT16_MAX, INT16_MAX, player_id);
-            // currState->getNextMove();
-            cout << "move" << endl; // Make appropriate moves here.
+            currState->alphaBeta(depth, -DBL_MAX, DBL_MAX, player_id);
+            cout << currState->moves.at(currState->bestMove) << endl; // Make appropriate moves here.
+            currState->makeMove();
         }
         cin >> move;
         parseAndMove(move);

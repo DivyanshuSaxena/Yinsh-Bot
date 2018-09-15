@@ -279,6 +279,27 @@ double State::weightedSum() {
     return h;
 }
 
+/*
+ * evaluate() evaluates the current state and checks ->
+ * if there exist any row of k markers, in which case, it returns false
+ * else returns true 
+ */
+bool State::evaluate() {
+    // Assumption - At a time, only a single row of k markers can be present
+    cout << "Starting Evaluation" << endl; // Debug
+    this->getLinearMarkers();
+    if (kInRow) {
+        return false;
+    }
+    double h = weightedSum();
+    heuristic = h;
+    return true;
+}
+
+double State::getEvaluation() {
+    return heuristic;
+}
+
 bool State::isTerminalNode() {
     // Assumption -> It shall never happen that 
     // one player has no available moves while the other player has
@@ -457,27 +478,6 @@ pair<vector<State*>, vector<string>> State::getStatesForMoves(int currPlayer, st
     return make_pair(ansvec,ansmoves);
 }
 
-/*
- * evaluate() evaluates the current state and checks ->
- * if there exist any row of k markers, in which case, it returns false
- * else returns true 
- */
-bool State::evaluate() {
-    // Assumption - At a time, only a single row of k markers can be present
-    cout << "Starting Evaluation" << endl; // Debug
-    this->getLinearMarkers();
-    if (kInRow) {
-        return false;
-    }
-    double h = weightedSum();
-    heuristic = h;
-    return true;
-}
-
-double State::getEvaluation() {
-    return heuristic;
-}
-
 vector<pair< pair<int,int>, pair<int,int>>> State::getPossibleMarkerRemovals(){
     vector<pair< pair<int,int>, pair<int,int>>> ansvec;
     cout << "marker coordinates are "<< this->startkx << " " <<this->startky<< " " << this->endkx<< " " <<this->endky<< " "<< endl;
@@ -490,4 +490,9 @@ vector<pair< pair<int,int>, pair<int,int>>> State::getPossibleMarkerRemovals(){
         ansvec.push_back(make_pair(make_pair(this->endkx-k*dirvec.first, this->endky-k*dirvec.second),make_pair(this->endkx, this->endky)));
     }
     return ansvec;
+}
+
+void State::makeMove() {
+    State* nextState = this->successors.at(bestMove);
+    board = nextState->stboard;
 }
