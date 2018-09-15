@@ -639,7 +639,7 @@ bool Board::isFlippable(int row, int col){
     int len = p1Rings.size() + p2Rings.size();
     for (int i = 0; i < len; i++) {
         // Ring pair available at index i
-        pair<int,int> ring = i==p1Rings.size() ? p2Rings.at(i-p1Rings.size()) : p1Rings.at(i);
+        pair<int,int> ring = i>=p1Rings.size() ? p2Rings.at(i-p1Rings.size()) : p1Rings.at(i);
         int ringx = ring.first, ringy = ring.second;
         vector<pair<int,int>> possibleMoves = board->showPossibleMoves(ring.first, ring.second);
         // cout << "Check flip with ring: " << ringx << " " << ringy << " "; // Debug

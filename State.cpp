@@ -300,8 +300,14 @@ bool State::isTerminalNode() {
 }
 
 double State::alphaBeta(int depth, double alpha, double beta, int currPlayer){
+    
     if(depth==0 || this->isTerminalNode()){
         return this->getEvaluation();
+    }else{
+        cout << "executing alphabeta at depth "<<depth << " alpha is "<<alpha << " beta is "<< beta << " player is "<<currPlayer<<endl;
+        cout << "state is "<<endl;
+        this->stboard->printBeautifiedconfig();
+        cout <<endl;
     }
     double tempscore = -DBL_MAX;
     vector<State *> successsors = this->getSuccessors(currPlayer);
@@ -318,6 +324,10 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer){
             break;
         }
     }
+    cout << "returning alphabeta at depth "<<depth << " alpha is "<<alpha << " beta is "<< beta << " player is "<<currPlayer<<endl;
+    cout << "state is "<<endl;
+    this->stboard->printBeautifiedconfig();
+    cout <<endl;
     return tempscore;
 }
 
@@ -327,8 +337,8 @@ vector<State*> State::getSuccessors(int currPlayer){
         return this->successors;
     }
     bool isKinRow = this->evaluate();
-    cout << "evaluation for the state done "<<isKinRow<<endl;
-    cout << "myass "<< true<<endl;
+    // cout << "evaluation for the state done "<<isKinRow<<endl;
+    // cout << "myass "<< true<<endl;
 
     vector<State*> movedStates, finStatesvec;
     vector<string> movedMoves, finStatesMoves;
@@ -379,20 +389,21 @@ vector<State*> State::getSuccessors(int currPlayer){
 
     // Final step of checking if k markers made again
     // Debug
-    cout << "subproblem 2 is done, now lets move to subproblem 3 if there or not "<<endl;
-    cout << "number of movedstates "<< movedStates.size()<<endl;
-    cout << "they are "<<endl;
-    for(int iterMovedStates=0; iterMovedStates<movedStates.size(); iterMovedStates++){
-        movedStates[iterMovedStates]->stboard->printnormalconfig();
-        cout <<endl;
-    } // End debug
+    cout << "subproblem 2 is done, now lets move to subproblem 3 if there or not, it will be checked "<< movedStates.size()<< " times"<<endl;
+    // cout << "number of movedstates "<< movedStates.size()<<endl;
+    // cout << "they are "<<endl;
+    // for(int iterMovedStates=0; iterMovedStates<movedStates.size(); iterMovedStates++){
+    //     movedStates[iterMovedStates]->stboard->printnormalconfig();
+    //     cout <<endl;
+    // } // End debug
 
     for(int iterMovedStates=0; iterMovedStates<movedStates.size(); iterMovedStates++){
         State * thismovedstate = movedStates[iterMovedStates];
         string appendMove = movedMoves[iterMovedStates];
-        cout << "thismovedstate is "<<endl;
-        thismovedstate->stboard->printnormalconfig(); // Debug
+        // cout << "thismovedstate is "<<endl;
+        // thismovedstate->stboard->printnormalconfig(); // Debug
         isKinRow = thismovedstate->evaluate();
+        // cout<<"debug"<<endl;
         /* 
          * For Debug -> Take care to change code in subproblem 1 as well
          */
@@ -410,8 +421,8 @@ vector<State*> State::getSuccessors(int currPlayer){
                 changedstate->stboard->removeMarkers(startx, starty, endx, endy);
                 string tempmove = parseMove(1, startx, starty, endx, endy);
                 // removed markers
-                cout << "removed rings state is "<<endl;
-                changedstate->stboard->printnormalconfig(); // Debug
+                // cout << "removed rings state is "<<endl;
+                // changedstate->stboard->printnormalconfig(); // Debug
 
                 vector<pair<int,int>> remrings = currPlayer==1 ? changedstate->stboard->p1Rings : changedstate->stboard->p2Rings;
                 for(int ringsiter=0; ringsiter < remrings.size(); ringsiter++){
@@ -425,8 +436,10 @@ vector<State*> State::getSuccessors(int currPlayer){
                 trashcount++;
             }
         } else {
+            // cout << "skipped subproblem three as not true"<<endl;
             finStatesvec.push_back(thismovedstate);
             finStatesMoves.push_back(appendMove);
+            // cout << "pushed"<<endl;
         }
     }
     
@@ -464,12 +477,12 @@ pair<vector<State*>, vector<string>> State::getStatesForMoves(int currPlayer, st
  */
 bool State::evaluate() {
     // Assumption - At a time, only a single row of k markers can be present
-    cout << "Starting Evaluation" << endl; // Debug
+    // cout << "Starting Evaluation" << endl; // Debug
     this->getLinearMarkers();
     if (kInRow) {
         return false;
     }
-    double h = weightedSum();
+    double h = weightedSum(); 
     heuristic = h;
     return true;
 }

@@ -129,11 +129,14 @@ int test1(){
     // state->stboard->printnormalconfig();
     state->stboard->printBeautifiedconfig();
     int temp;
-    temp = state->alphaBeta(2,-DBL_MAX, +DBL_MAX, 1);
+    temp = state->alphaBeta(3,-DBL_MAX, +DBL_MAX, 1);
     cout<<"from"<<endl;
     state->stboard->printBeautifiedconfig();
     cout << "to"<<endl;
     state->successors[state->bestMove]->stboard->printBeautifiedconfig();
+    for(int i=0;i<state->successors.size();i++){
+        cout << "eval for all children is "<< state->successors[i]->getEvaluation()<<endl;
+    }
 }
 
 int parseAndMove(string move) {
