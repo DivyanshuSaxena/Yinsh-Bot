@@ -574,8 +574,8 @@ bool Board::selectAndMoveRing(int ringx, int ringy, int finringx, int finringy){
 }
 
 bool Board::removeMarkers(int startx, int starty, int finx, int finy){
-    auto inipair = this->getCoordinates(startx, starty);
-    auto destpair= this->getCoordinates(finx, finy);
+    auto inipair = make_pair(startx, starty);
+    auto destpair= make_pair(finx, finy);
     cout << "inipair is "<<inipair.first << " "<<inipair.second<<endl;
     cout << "destpair is "<<destpair.first << " "<<destpair.second<<endl;
     auto dirvec = getDirectionVector(inipair, destpair);
