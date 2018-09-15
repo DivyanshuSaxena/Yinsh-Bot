@@ -62,6 +62,7 @@ class State {
         void duplicateFeatures(State* state);
         double alphaBeta(int depth, int alpha, int beta, int currPlayer);
         pair<pair<int,int>, pair<int,int>> getNextMove(); 
+        string parseMove(int, int, int, int, int);
 
         // Heuristics
         void getLinearMarkers();
