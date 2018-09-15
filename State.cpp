@@ -24,12 +24,14 @@ string State::parseMove(int movetype, int x1, int y1, int x2, int y2) {
     string str;
     pair<int,int> start = stboard->getHexagonalCoordinate(x1, y1);
     pair<int,int> end = stboard->getHexagonalCoordinate(x2, y2);
+    string startx = to_string(start.first), starty = to_string(start.second);
+    string endx = to_string(end.first), endy = to_string(end.second);
     if (movetype == 1) {
-        str = "S " + start.first + " " + start.second + " M " + end.first + " " + end.second;
+        str = "S " + startx + " " + starty + " M " + endx + " " + endy;
     } else if (movetype == 2) {
-        str = "RS " + start.first + " " + start.second + " RE " + end.first + " " + end.second;
+        str = "RS " + startx + " " + starty + " RE " + endx + " " + endy;
     } else {
-        str = "X " + start.first + " " + start.second;
+        str = "X " + startx + " " + starty;
     }
     return str;
 }
@@ -327,11 +329,13 @@ vector<State*> State::getSuccessors(int currPlayer){
     bool isKinRow = this->evaluate();
     cout << "evaluation for the state done "<<isKinRow<<endl;
     cout << "myass "<< true<<endl;
-    vector<State*> tempvec;
+
     vector<State*> movedStates;
     vector<State*> finStatesvec;
-    if(!isKinRow){
+    if(!isKinRow) {
         //there are k in row we need to remove them
+        vector<State*> tempvec; 
+        vector<string> tempmoves;
         cout<<"removing markers case, subproblem 1 "<<endl;
         vector<pair< pair<int,int>, pair<int,int>>> removalCoordinates = this->getPossibleMarkerRemovals();
         for(auto removaliter= removalCoordinates.begin();removaliter<removalCoordinates.end();removaliter++){
