@@ -54,7 +54,7 @@ class State {
         // Accessor Methods
         bool isTerminalNode();
         vector<State*> getSuccessors(int currPlayer);
-        vector<State*> getStatesForMoves(int currPlayer);
+        pair<vector<State*>, vector<string>> getStatesForMoves(int currPlayer, string);
         vector<pair< pair<int,int>, pair<int,int>>> getPossibleMarkerRemovals();
 
         // Operations

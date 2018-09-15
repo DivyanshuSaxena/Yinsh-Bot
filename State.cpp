@@ -330,8 +330,9 @@ vector<State*> State::getSuccessors(int currPlayer){
     cout << "evaluation for the state done "<<isKinRow<<endl;
     cout << "myass "<< true<<endl;
 
-    vector<State*> movedStates;
-    vector<State*> finStatesvec;
+    vector<State*> movedStates, finStatesvec;
+    vector<string> movedMoves, finStatesMoves;
+
     if(!isKinRow) {
         //there are k in row we need to remove them
         vector<State*> tempvec; 
@@ -339,15 +340,16 @@ vector<State*> State::getSuccessors(int currPlayer){
         cout<<"removing markers case, subproblem 1 "<<endl;
         vector<pair< pair<int,int>, pair<int,int>>> removalCoordinates = this->getPossibleMarkerRemovals();
         for(auto removaliter= removalCoordinates.begin();removaliter<removalCoordinates.end();removaliter++){
+            /* 
+            * For Debug -> Take care to change code in subproblem 3 as well
+            */
             State * changedstate = new State(this->stboard);
             int startx = removaliter->first.first, starty = removaliter->first.second;
             int endx = removaliter->second.first, endy = removaliter->second.second;
             changedstate->stboard->removeMarkers(startx, starty, endx, endy);
             string tempMove = parseMove(2, startx, starty, endx, endy);
-
             // removed markers
-            vector<pair<int,int>> remrings;
-            remrings = currPlayer==1 ? changedstate->stboard->p1Rings : changedstate->stboard->p2Rings;
+            vector<pair<int,int>> remrings = currPlayer==1 ? changedstate->stboard->p1Rings : changedstate->stboard->p2Rings;
 
             for(int ringsiter=0;ringsiter<remrings.size();ringsiter++){
                 State * removedRingState = new State(changedstate->stboard);
@@ -356,91 +358,103 @@ vector<State*> State::getSuccessors(int currPlayer){
                 removedRingState->stboard->updateRingPositions();
                 
                 tempvec.push_back(removedRingState);
-                tempmoves.push_back(tempMove + parseMove(3, ringx, ringy, -1, -1));
+                tempmoves.push_back(tempMove + " " + parseMove(3, ringx, ringy, -1, -1));
             }
         }
         
-        // vector<State*> movedStates;
-         cout <<"removed markers and rings, subproblem 1 done, jumping to subproblem 2"<<endl;
+        cout <<"removed markers and rings, subproblem 1 done, jumping to subproblem 2"<<endl;
         for(int tempiter=0;tempiter<tempvec.size();tempiter++){
-            vector<State*> tempthismovedStates = tempvec[tempiter]->getStatesForMoves(currPlayer);
-            movedStates.insert(movedStates.end(), tempthismovedStates.begin(), tempthismovedStates.end());
+            auto movePair = tempvec[tempiter]->getStatesForMoves(currPlayer, tempmoves[tempiter]);
+            vector<State*> tempthisMovedStates = movePair.first;
+            vector<string> tempthisMoves = movePair.second;
+            movedStates.insert(movedStates.end(), tempthisMovedStates.begin(), tempthisMovedStates.end());
+            movedMoves.insert(movedMoves.end(), tempthisMoves.begin(), tempthisMoves.end());
         }
-
-
-    }else{
+    } else {
         cout << "skipped subproblem 1, calculating subproblem 2"<<endl;
-        movedStates = this->getStatesForMoves(currPlayer);
+        auto movePair = this->getStatesForMoves(currPlayer, "\0");
+        movedStates = movePair.first;
+        movedMoves = movePair.second;
     }
-    //final step of checking if k markers made again
+
+    // Final step of checking if k markers made again
+    // Debug
     cout << "subproblem 2 is done, now lets move to subproblem 3 if there or not "<<endl;
     cout << "number of movedstates "<< movedStates.size()<<endl;
     cout << "they are "<<endl;
-    for(int iterMovedStates=0;iterMovedStates<movedStates.size();iterMovedStates++){
+    for(int iterMovedStates=0; iterMovedStates<movedStates.size(); iterMovedStates++){
         movedStates[iterMovedStates]->stboard->printnormalconfig();
         cout <<endl;
-    }
-    for(int iterMovedStates=0;iterMovedStates<movedStates.size();iterMovedStates++){
+    } // End debug
+
+    for(int iterMovedStates=0; iterMovedStates<movedStates.size(); iterMovedStates++){
         State * thismovedstate = movedStates[iterMovedStates];
+        string appendMove = movedMoves[iterMovedStates];
         cout << "thismovedstate is "<<endl;
-        thismovedstate->stboard->printnormalconfig();
+        thismovedstate->stboard->printnormalconfig(); // Debug
         isKinRow = thismovedstate->evaluate();
+        /* 
+         * For Debug -> Take care to change code in subproblem 1 as well
+         */
         if(!isKinRow){
             cout << "execute subproblem 3 as it is necessary"<<endl;
             vector<pair< pair<int,int>, pair<int,int>>> removalCoordinates = thismovedstate->getPossibleMarkerRemovals();
             cout << "removalcoordinates freq is "<< removalCoordinates.size()<<endl;
-            //remove trashcount
+            // remove trashcount
             int trashcount =1;
             for(auto removaliter= removalCoordinates.begin();removaliter<removalCoordinates.end();removaliter++){
                 cout << "iterating on removalcoordinates number "<< trashcount<<endl;
                 State * changedstate = new State(thismovedstate->stboard);
-                changedstate->stboard->removeMarkers(removaliter->first.first, removaliter->first.second, removaliter->second.first, removaliter->second.second);
-                //removed markers
+                int startx = removaliter->first.first, starty = removaliter->first.second;
+                int endx = removaliter->second.first, endy = removaliter->second.second;
+                changedstate->stboard->removeMarkers(startx, starty, endx, endy);
+                string tempmove = parseMove(1, startx, starty, endx, endy);
+                // removed markers
                 cout << "removed rings state is "<<endl;
-                changedstate->stboard->printnormalconfig();
-                vector<pair<int,int>> remrings;
-                if(currPlayer==1){
-                    remrings = changedstate->stboard->p1Rings;
-                }else if(currPlayer==2){
-                    remrings = changedstate->stboard->p2Rings;
-                }
-                for(int ringsiter=0;ringsiter<remrings.size();ringsiter++){
+                changedstate->stboard->printnormalconfig(); // Debug
+
+                vector<pair<int,int>> remrings = currPlayer==1 ? changedstate->stboard->p1Rings : changedstate->stboard->p2Rings;
+                for(int ringsiter=0; ringsiter < remrings.size(); ringsiter++){
                     State * removedRingState = new State(changedstate->stboard);
-                    removedRingState->stboard->removeRing(remrings[ringsiter].first, remrings[ringsiter].second);
-                    removedRingState->stboard->updateRingPositions();
+                    int ringx = remrings[ringsiter].first, ringy = remrings[ringsiter].second;
+                    removedRingState->stboard->removeRing(ringx, ringy);
+                    removedRingState->stboard->updateRingPositions();                    
                     finStatesvec.push_back(removedRingState);
+                    finStatesMoves.push_back(appendMove + " " + tempmove + " " + parseMove(3, ringx, ringy, -1, -1));
                 }
                 trashcount++;
             }
-        }else{
+        } else {
             finStatesvec.push_back(thismovedstate);
+            finStatesMoves.push_back(appendMove);
         }
     }
-    this->isSuccessorsUpdated=true;
+    
+    this->isSuccessorsUpdated = true;
     this->successors = finStatesvec;
     cout<<"returning get successor"<<endl;
     return finStatesvec;
 }
 
-vector<State*> State::getStatesForMoves(int currPlayer){
+pair<vector<State*>, vector<string>> State::getStatesForMoves(int currPlayer, string appendMove){
     vector<State*> ansvec;
-    vector<pair<int,int>> allRings;
-    if(currPlayer==1){
-        allRings = this->stboard->p1Rings;
-    }else if(currPlayer==2){
-        allRings = this->stboard->p2Rings;
-    }
-    for(int iterring=0;iterring<allRings.size();iterring++){
+    vector<string> ansmoves;
+    vector<pair<int,int>> allRings = currPlayer==1 ? stboard->p1Rings : stboard->p2Rings; 
+    
+    for(int iterring=0; iterring<allRings.size(); iterring++){
         auto thisring = allRings[iterring];
         auto possibleMoves = this->stboard->showPossibleMoves(thisring.first,thisring.second);
-        for(int individualmoveiter=0;individualmoveiter<possibleMoves.size();individualmoveiter++){
+        for(int individualmoveiter=0; individualmoveiter<possibleMoves.size(); individualmoveiter++){
             auto thismovefin = possibleMoves[individualmoveiter];
             State * tempstate = new State(this->stboard);
-            tempstate->stboard->selectAndMoveRing(thisring.first, thisring.second, thismovefin.first,thismovefin.second);
+            tempstate->stboard->selectAndMoveRing(thisring.first, thisring.second, thismovefin.first, thismovefin.second);
+            string move = parseMove(1, thisring.first, thisring.second, thismovefin.first, thismovefin.second);
+
             ansvec.push_back(tempstate);
+            ansmoves.push_back(appendMove + " " + move);
         }
     }
-    return ansvec;
+    return make_pair(ansvec,ansmoves);
 }
 
 /*
