@@ -39,4 +39,5 @@ main
 tryme
 tryme.cpp
 board.txt
+!coordihelper.log
 

@@ -735,10 +735,17 @@ void Board::printhexagonalconfig(){
             pair<int,int> temphex;
             if(this->config[i][j]==0){
                 // temphex = make_pair(-1,-1);
-                outfile << "x" << " , "<< "x" << " | ";
+                outfile << " x" << " , "<< " x" << " | ";
             }else{
-                temphex = this->getHexagonalCoordinate(i-n,j-n);
-                outfile << temphex.first << " , "<< temphex.second << " | ";
+                temphex = this->getHexagonalCoordinate(i,j);
+                if(temphex.first<10){
+                    outfile<< " ";
+                }
+                outfile << temphex.first<< " , ";
+                if(temphex.second<10){
+                    outfile<< " ";
+                }
+                outfile << temphex.second << " | ";
             }
             // outfile << temphex.first << " , "<< temphex.second << " | ";
         }

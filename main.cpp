@@ -64,6 +64,7 @@ int player_id, time_limit, max_depth;
 int test();
 int test1();
 int test2();
+int boardhelper();
 int play();
 TimeHelper * timeHelper;
 int main(int argc, char** argv) {
@@ -80,8 +81,9 @@ int main(int argc, char** argv) {
     }
 
     // test1();
-    // play();
-    test2();
+    play();
+    // test2();
+    // boardhelper();
     return 0;
 }
 
@@ -183,6 +185,12 @@ int test2(){
     state->successors[state->bestMove]->stboard->printnormalconfigShaved();
     state->successors[state->bestMove]->stboard->printBeautifiedconfigShaved();
 }
+
+int boardhelper(){
+    board=new Board(5,5,5,3);
+    board->printhexagonalconfig();
+}
+
 void parseAndMove(string move) {
     vector<string> components;
     string word = "";
