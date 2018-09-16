@@ -159,100 +159,107 @@ int test1(){
     // }
 }
 
-int parseAndMove(string move) {
+void parseAndMove(string move) {
+    vector<string> components;
+    string word = "";
+    for (int i = 0; i < move.length(); i++) {
+        char ch = move.at(i);
+        if (ch == ' ') {
+            components.push_back(word);
+            // cout << word << endl;
+            word = "";
+        } else {
+            word = word + ch;
+        }
+    }
+    components.push_back(word);
+
     pair<int,int> chosenRing = make_pair(-1,-1);
     pair<int,int> rowStart, rowEnd;
-    for (unsigned i = 0; i < move.length(); i++) {
-        char ch = move.at(i);
-        switch (ch)
-        {
-            case 'P':
-            {
-                i += 2;
-                int hex = move.at(i);
-                i += 2;
-                int pos = move.at(i+2);
-                pair<int,int> ring = board->getCoordinates(hex, pos);
-                board->addRing(player_id, ring.first, ring.second);
-                break;
-            }
-        
-            case 'S':
-            {
-                i += 2;
-                int hex = move.at(i);
-                i += 2;
-                int pos = move.at(i+2);
-                pair<int,int> chosenRing = board->getCoordinates(hex, pos);
-                break;
-            }
-
-            case 'M':
-            {
-                i += 2;
-                int hex = move.at(i);
-                i += 2;
-                int pos = move.at(i+2);
-                pair<int,int> newPos = board->getCoordinates(hex,pos);
-                board->selectAndMoveRing(chosenRing.first, chosenRing.second, newPos.first, newPos.second);
-                break;
-            }
-
-            case 'R':
-            {
-                i++;
-                if (move.at(i) == 'S') {
-                    i += 2;
-                    int hex = move.at(i);
-                    i += 2;
-                    int pos = move.at(i+2);
-                    rowStart = board->getCoordinates(hex, pos);
-                } else {
-                    i += 2;
-                    int hex = move.at(i);
-                    i += 2;
-                    int pos = move.at(i+2);
-                    rowEnd = board->getCoordinates(hex, pos);
-                    board->removeMarkers(rowStart.first, rowStart.second, rowEnd.first, rowEnd.second);
-                }
-            }
-
-            case 'X':
-            {
-                i += 2;
-                int hex = move.at(i);
-                i += 2;
-                int pos = move.at(i+2);
-                pair<int,int> ring = board->getCoordinates(hex, pos);
-                board->removeRing(ring.first, ring.second);
-                break;
-            }
-
-            default:
-                break;
+    for (int i = 0; i < components.size(); ) {
+        string s = components.at(i++);
+        if (s == "P") {
+            int hex = stoi(components.at(i++));
+            int pos = stoi(components.at(i++));
+            pair<int,int> ring = board->getCoordinates(hex, pos);
+            board->addRing(3-player_id, ring.first, ring.second);
+        } else if (s == "S") {
+            int hex = stoi(components.at(i++));
+            int pos = stoi(components.at(i++));
+            chosenRing = board->getCoordinates(hex, pos);
+        } else if (s == "M") {
+            int hex = stoi(components.at(i++));
+            int pos = stoi(components.at(i++));
+            pair<int,int> newPos = board->getCoordinates(hex,pos);
+            board->selectAndMoveRing(chosenRing.first, chosenRing.second, newPos.first, newPos.second);
+        } else if (s == "RS") {
+            int hex = stoi(components.at(i++));
+            int pos = stoi(components.at(i++));
+            rowStart = board->getCoordinates(hex, pos);            
+        } else if (s == "RE") {
+            int hex = stoi(components.at(i++));
+            int pos = stoi(components.at(i++));
+            rowEnd = board->getCoordinates(hex, pos);
+            board->removeMarkers(rowStart.first, rowStart.second, rowEnd.first, rowEnd.second);
+        } else if (s == "X") {
+            int hex = stoi(components.at(i++));
+            int pos = stoi(components.at(i++));
+            pair<int,int> ring = board->getCoordinates(hex, pos);
+            board->removeRing(ring.first, ring.second);
         }
-        i += 2;
     }
+    // cout << "Made move" << endl;
 }
 
 int play() {
-    
-    string move;
-    int movenum = 1;
     // Get input from server about game specifications
-    cin >> player_id >> n >> time_limit;
+    string basics;
+    getline(cin, basics);
+    string word = "";
+    int input = 0;
+    for (int i = 0; i < basics.length(); i++) {
+        char ch = basics.at(i);
+        if (ch == ' ') {
+            switch (input)
+            {
+                case 0:
+                    player_id = stoi(word);
+                    input++;
+                    word = "";
+                    break;
+
+                case 1:
+                    n = stoi(word);
+                    input++;
+                    word = "";
+                    break;
+
+                default:
+                    break;
+            }
+        } else {
+            word = word + to_string(ch-48);
+        }
+    }
+    time_limit = stoi(word);
+    
     timeHelper->setMaxAllowedTime(time_limit);
     maxDepth=3;
+
+    string move;
+    int movenum = 1;
+    board = new Board(n,5,5,3);
+
     if(player_id == 2) {
         // Get other player's move
-        cin >> move; 
+        getline(cin, move); 
         parseAndMove(move);
-    }   
-    
+    }
     while(true) {
         timeHelper->setClockISpecific();
         timeHelper->setMaxAllowedTimeSpecific(3);
         State* currState = new State(board);
+        // outfile << movenum << endl;           
         if (movenum <= m) {
             pair<int,int> movePair = board->makeInitialMoves(movenum);
             cout << "P " << movePair.first << " " << movePair.second << endl;
@@ -263,9 +270,12 @@ int play() {
             cout << currState->moves.at(currState->bestMove) << endl; // Make appropriate moves here.
             currState->makeMove();
         }
-        cin >> move;
+        outfile << "Moved self move" << endl;
+        getline(cin, move);
         parseAndMove(move);
         timeHelper->updateElapsedTimePersonal();
+        outfile << "Opponent move done" << endl;
+        movenum++;
     }
     return 0;
 }
