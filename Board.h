@@ -20,6 +20,7 @@ extern int n, m, k, l;
 
 extern int time_limit;
 extern int depth;
+extern ofstream outfile;
 
 class Board{
     public:

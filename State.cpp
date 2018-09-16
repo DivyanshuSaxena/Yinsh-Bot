@@ -73,10 +73,48 @@ void State::resetFeatures() {
     int rowsktwo1 = -1, nonFlipRowsktwo1 = -1;
     int rowskone2 = -1, nonFlipRowskone2 = -1;
     int rowsktwo2 = -1, nonFlipRowsktwo2 = -1;
+    int blockDoF1 = -1, blockDoF2 = -1;
 }
 
 void State::duplicateFeatures(State* state){
 
+}
+
+void State::getBlockedRings() {
+    int p1len = stboard->p1Rings.size();
+    int p2len = stboard->p2Rings.size();
+    for (int i = 0; i < p1len+p2len; i++) {
+        // Ring pair available at index i
+        pair<int,int> ring = i>=p1len ? stboard->p2Rings.at(i-p1len) : stboard->p1Rings.at(i);
+        int ringx = ring.first, ringy = ring.second;
+        // outfile << "Ring: " << ringx << " " << ringy << endl; // Debug
+        int blockdof = 0;
+        for (int dir = 0; dir < 9; dir++) {
+            if (dir==2 || dir==4 || dir==6) continue;
+            int xchange = dir/3 - 1;
+            int ychange = dir%3 - 1;
+            bool limitx = (ringx+xchange >= 0) && (ringx+xchange <= 2*n);
+            bool limity = (ringy+ychange >= 0) && (ringy+ychange <= 2*n);
+            bool moveAvailable = false, movePossible = false;
+            for (int x=ringx+xchange, y=ringy+ychange; limitx && limity; x+=xchange, y+=ychange) {
+                movePossible = true;
+                if (stboard->config[x][y] == 0) break;
+                if (stboard->config[x][y] == 1) {
+                    moveAvailable = true;
+                    break;
+                }
+                if (stboard->config[x][y]==2 || stboard->config[x][y]==2) break;
+                limitx = (x+xchange >= 0) && (x+xchange <= 2*n);
+                limity = (y+ychange >= 0) && (y+ychange <= 2*n);
+            }
+            if (movePossible && !moveAvailable) {
+                blockdof++;
+            }
+        }
+        // outfile << "For ring at " << ringx << " " << ringy << " blocked directions are: " << blockdof << endl; // Debug
+        if (i<p1len) this->blockDoF1 += blockdof;
+        else this->blockDoF2 += blockdof;
+    }
 }
 
 void State::setWeight(double weight, int feature) {
@@ -91,7 +129,7 @@ void State::incrementkRows(int marker, bool flip, int endx, int endy) {
     } else {
         rowsk2++;
     }
-    // cout << "Found streak ending at " << endx << " " << endy << endl;
+    // outfile << "Found streak ending at " << endx << " " << endy << endl;
     endkx = endx;
     endky = endy;
     kInRow = true;
@@ -123,7 +161,7 @@ void State::incrementRows(int count, int marker, bool flip) {
     } else {
         // Presently, the code should never get into this -> 
         // k markers checked in getLinearMarkers
-        cout << "Unreachable piece of code reached" << endl;
+        outfile << "Unreachable piece of code reached" << endl;
         incrementkRows(marker, flip, -1, -1);
     }
 }
@@ -162,12 +200,12 @@ void State::getLinearMarkers() {
                     countVert = 1;
                     startkxVert = i;
                     startkyVert = j; // Set the start indices of streak start
-                    // cout << "Start streak at " << i << " " << j << endl; // Debug
+                    // outfile << "Start streak at " << i << " " << j << endl; // Debug
                 } 
                 prevMarkerVert = stboard->config[i][j];
                 flipVert = false;
             }
-            // cout << "Checked vertical for " << i << " " << j << endl; // Debug
+            // outfile << "Checked vertical for " << i << " " << j << endl; // Debug
 
             // Horizontal Rows
             horizontal:
@@ -187,12 +225,12 @@ void State::getLinearMarkers() {
                     countHorz = 1;
                     startkxHorz = j;
                     startkyHorz = i; // Set the start indices of streak start
-                    // cout << "Start streak at " << j << " " << i << endl; // Debug
+                    // outfile << "Start streak at " << j << " " << i << endl; // Debug
                 } 
                 prevMarkerHorz = stboard->config[j][i];
                 flipHorz = false;
             }
-            // cout << "Checked horizontal for " << j << " " << i << endl; // Debug
+            // outfile << "Checked horizontal for " << j << " " << i << endl; // Debug
         }
         
         // Check for the last place
@@ -276,6 +314,10 @@ double State::weightedSum() {
     // Rows of k markers
     if (rowsk1 != -1) h += rowsk1 * weights.at(9);
     if (rowsk2 != -1) h += rowsk2 * weights.at(10);
+
+    // Blocked rings
+    if (blockDoF1 != -1) h += blockDoF1 * weights.at(11);
+    if (blockDoF2 != -1) h += blockDoF2 * weights.at(12);
     return h;
 }
 
@@ -286,11 +328,13 @@ double State::weightedSum() {
  */
 bool State::evaluate() {
     // Assumption - At a time, only a single row of k markers can be present
-    // cout << "Starting Evaluation" << endl; // Debug
+    // outfile << "Starting Evaluation" << endl; // Debug
+    stboard->updateRingPositions();
     this->getLinearMarkers();
     if (kInRow) {
         return false;
     }
+    this->getBlockedRings();
     double h = weightedSum();
     heuristic = h;
     return true;
@@ -325,10 +369,10 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer){
     if(depth==0 || this->isTerminalNode()){
         return this->getEvaluation();
     }else{
-        cout << "executing alphabeta at depth "<<depth << " alpha is "<<alpha << " beta is "<< beta << " player is "<<currPlayer<<endl;
-        cout << "state is "<<endl;
+        outfile << "executing alphabeta at depth "<<depth << " alpha is "<<alpha << " beta is "<< beta << " player is "<<currPlayer<<endl;
+        outfile << "state is "<<endl;
         this->stboard->printBeautifiedconfig();
-        cout <<endl;
+        outfile <<endl;
     }
     double tempscore = -DBL_MAX;
     vector<State *> successsors = this->getSuccessors(currPlayer);
@@ -345,21 +389,21 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer){
             break;
         }
     }
-    cout << "returning alphabeta at depth "<<depth << " alpha is "<<alpha << " beta is "<< beta << " player is "<<currPlayer<<endl;
-    cout << "state is "<<endl;
+    outfile << "returning alphabeta at depth "<<depth << " alpha is "<<alpha << " beta is "<< beta << " player is "<<currPlayer<<endl;
+    outfile << "state is "<<endl;
     this->stboard->printBeautifiedconfig();
-    cout <<endl;
+    outfile <<endl;
     return tempscore;
 }
 
 vector<State*> State::getSuccessors(int currPlayer){
     if(this->isSuccessorsUpdated){
-        cout<<"returning get successor"<<endl;
+        outfile<<"returning get successor"<<endl;
         return this->successors;
     }
     bool isKinRow = this->evaluate();
-    // cout << "evaluation for the state done "<<isKinRow<<endl;
-    // cout << "myass "<< true<<endl;
+    // outfile << "evaluation for the state done "<<isKinRow<<endl;
+    // outfile << "myass "<< true<<endl;
 
     vector<State*> movedStates, finStatesvec;
     vector<string> movedMoves, finStatesMoves;
@@ -368,7 +412,7 @@ vector<State*> State::getSuccessors(int currPlayer){
         //there are k in row we need to remove them
         vector<State*> tempvec; 
         vector<string> tempmoves;
-        cout<<"removing markers case, subproblem 1 "<<endl;
+        outfile<<"removing markers case, subproblem 1 "<<endl;
         vector<pair< pair<int,int>, pair<int,int>>> removalCoordinates = this->getPossibleMarkerRemovals();
         for(auto removaliter= removalCoordinates.begin();removaliter<removalCoordinates.end();removaliter++){
             /* 
@@ -393,7 +437,7 @@ vector<State*> State::getSuccessors(int currPlayer){
             }
         }
         
-        cout <<"removed markers and rings, subproblem 1 done, jumping to subproblem 2"<<endl;
+        outfile <<"removed markers and rings, subproblem 1 done, jumping to subproblem 2"<<endl;
         for(int tempiter=0;tempiter<tempvec.size();tempiter++){
             auto movePair = tempvec[tempiter]->getStatesForMoves(currPlayer, tempmoves[tempiter]);
             vector<State*> tempthisMovedStates = movePair.first;
@@ -402,7 +446,7 @@ vector<State*> State::getSuccessors(int currPlayer){
             movedMoves.insert(movedMoves.end(), tempthisMoves.begin(), tempthisMoves.end());
         }
     } else {
-        cout << "skipped subproblem 1, calculating subproblem 2"<<endl;
+        outfile << "skipped subproblem 1, calculating subproblem 2"<<endl;
         auto movePair = this->getStatesForMoves(currPlayer, "\0");
         movedStates = movePair.first;
         movedMoves = movePair.second;
@@ -410,39 +454,39 @@ vector<State*> State::getSuccessors(int currPlayer){
 
     // Final step of checking if k markers made again
     // Debug
-    cout << "subproblem 2 is done, now lets move to subproblem 3 if there or not, it will be checked "<< movedStates.size()<< " times"<<endl;
-    // cout << "number of movedstates "<< movedStates.size()<<endl;
-    // cout << "they are "<<endl;
+    outfile << "subproblem 2 is done, now lets move to subproblem 3 if there or not, it will be checked "<< movedStates.size()<< " times"<<endl;
+    // outfile << "number of movedstates "<< movedStates.size()<<endl;
+    // outfile << "they are "<<endl;
     // for(int iterMovedStates=0; iterMovedStates<movedStates.size(); iterMovedStates++){
     //     movedStates[iterMovedStates]->stboard->printnormalconfig();
-    //     cout <<endl;
+    //     outfile <<endl;
     // } // End debug
 
     for(int iterMovedStates=0; iterMovedStates<movedStates.size(); iterMovedStates++){
         State * thismovedstate = movedStates[iterMovedStates];
         string appendMove = movedMoves[iterMovedStates];
-        // cout << "thismovedstate is "<<endl;
+        // outfile << "thismovedstate is "<<endl;
         // thismovedstate->stboard->printnormalconfig(); // Debug
         isKinRow = thismovedstate->evaluate();
-        // cout<<"debug"<<endl;
+        // outfile<<"debug"<<endl;
         /* 
          * For Debug -> Take care to change code in subproblem 1 as well
          */
         if(!isKinRow){
-            cout << "execute subproblem 3 as it is necessary"<<endl;
+            outfile << "execute subproblem 3 as it is necessary"<<endl;
             vector<pair< pair<int,int>, pair<int,int>>> removalCoordinates = thismovedstate->getPossibleMarkerRemovals();
-            cout << "removalcoordinates freq is "<< removalCoordinates.size()<<endl;
+            outfile << "removalcoordinates freq is "<< removalCoordinates.size()<<endl;
             // remove trashcount
             int trashcount =1;
             for(auto removaliter= removalCoordinates.begin();removaliter<removalCoordinates.end();removaliter++){
-                cout << "iterating on removalcoordinates number "<< trashcount<<endl;
+                outfile << "iterating on removalcoordinates number "<< trashcount<<endl;
                 State * changedstate = new State(thismovedstate->stboard);
                 int startx = removaliter->first.first, starty = removaliter->first.second;
                 int endx = removaliter->second.first, endy = removaliter->second.second;
                 changedstate->stboard->removeMarkers(startx, starty, endx, endy);
                 string tempmove = parseMove(1, startx, starty, endx, endy);
                 // removed markers
-                // cout << "removed rings state is "<<endl;
+                // outfile << "removed rings state is "<<endl;
                 // changedstate->stboard->printnormalconfig(); // Debug
 
                 vector<pair<int,int>> remrings = currPlayer==1 ? changedstate->stboard->p1Rings : changedstate->stboard->p2Rings;
@@ -457,16 +501,16 @@ vector<State*> State::getSuccessors(int currPlayer){
                 trashcount++;
             }
         } else {
-            // cout << "skipped subproblem three as not true"<<endl;
+            // outfile << "skipped subproblem three as not true"<<endl;
             finStatesvec.push_back(thismovedstate);
             finStatesMoves.push_back(appendMove);
-            // cout << "pushed"<<endl;
+            // outfile << "pushed"<<endl;
         }
     }
     
     this->isSuccessorsUpdated = true;
     this->successors = finStatesvec;
-    cout<<"returning get successor"<<endl;
+    outfile<<"returning get successor"<<endl;
     return finStatesvec;
 }
 
@@ -493,7 +537,7 @@ pair<vector<State*>, vector<string>> State::getStatesForMoves(int currPlayer, st
 
 vector<pair< pair<int,int>, pair<int,int>>> State::getPossibleMarkerRemovals(){
     vector<pair< pair<int,int>, pair<int,int>>> ansvec;
-    cout << "marker coordinates are "<< this->startkx << " " <<this->startky<< " " << this->endkx<< " " <<this->endky<< " "<< endl;
+    outfile << "marker coordinates are "<< this->startkx << " " <<this->startky<< " " << this->endkx<< " " <<this->endky<< " "<< endl;
     int distance = max(abs(this->startkx-this->endkx)+1,abs(this->endkx-this->endky)+1);
     if(distance==k){
         ansvec.push_back(make_pair(make_pair(this->startkx,this->startky),make_pair(this->endkx, this->endky)));

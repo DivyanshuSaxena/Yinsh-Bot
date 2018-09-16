@@ -32,7 +32,7 @@ Probable list of features:
 3. Number of rows that are not flippable in the next move :heavy_check_mark:
 4. Number of opponent rows that are not flippable in the next move [Both self and opponent] :heavy_check_mark:
 5. A ring sharing a row of opponent markers 
-6. Number of blocked self rings
+6. Number of blocked self rings (and opponent rings) :heavy_check_mark:
 7. Corner Occupancy
 
 ## Weights of Features
@@ -51,3 +51,6 @@ The teacher bot shall be the winner bot from the previous game and the student b
 - [x] Remove k markers + remove specific ring + select ring + move ring + remove k markers + remove specific ring  
 - [ ] Complete get successor function
 - [x] More than k in row then we have a choice as to what to remove
+
+### Improvements
+- [] isFlippable calls updateRingPosition(). Can the calls be reduced?

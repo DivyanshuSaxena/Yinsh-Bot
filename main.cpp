@@ -53,7 +53,9 @@
 #include "State.h"
 
 int n, m, k, l;
+ofstream outfile;
 vector<double> weights;
+
 Board* board;
 int player_id, time_limit, depth;
 
@@ -62,19 +64,23 @@ int test1();
 int play();
 
 int main(int argc, char** argv) {
+    // Initialize streams
+    outfile.open("console.log");
+
+    // Initialize weights
+    for (int i = 0; i <= 12; i++) {
+        weights.push_back(i);
+    }
+
     test1();
     // play();
     return 0;
 }
 
 int test() {
-    for (int i = 0; i < 11; i++) {
-        weights.push_back(i);
-    }
-
     board = new Board(5,5,5,3);
     board->printhexagonalconfig();
-    cout << endl;
+    outfile << endl;
 
     board->setMarker(make_pair(5, 6 ), 2);
     board->setMarker(make_pair(5, 7 ), 2);
@@ -85,37 +91,33 @@ int test() {
     auto adjpoints = board->showPossibleMoves(5,5);
 
     for(int i=0;i<adjpoints.size();i++){
-        cout << adjpoints[i].first << " , " << adjpoints[i].second << " | ";
+        outfile << adjpoints[i].first << " , " << adjpoints[i].second << " | ";
     }
-    cout << endl;
+    outfile << endl;
     
     board->printnormalconfig();
     board->selectAndMoveRing(5,5,5,9);
-    cout << "select n move done "<<endl;
+    outfile << "select n move done "<<endl;
     board->printnormalconfig();
     board->selectAndMoveRing(7,6,8,7);
-    cout << "select n move done "<<endl;
+    outfile << "select n move done "<<endl;
     board->printnormalconfig();
     
     State* state = new State(board);
-    cout << state->evaluate() << endl;
-    cout << state->getEvaluation() << endl;
+    outfile << state->evaluate() << endl;
+    outfile << state->getEvaluation() << endl;
     auto tempsuccessors = state->getSuccessors(2);
-    cout << "size of successors is "<<tempsuccessors.size()<<endl;
-    cout<< "initial state"<<endl;
+    outfile << "size of successors is "<<tempsuccessors.size()<<endl;
+    outfile<< "initial state"<<endl;
     state->stboard->printnormalconfig();
-    cout<<"answers are "<<endl;
+    outfile<<"answers are "<<endl;
     for(int i=0;i<tempsuccessors.size();i++){
         tempsuccessors[i]->stboard->printnormalconfig();
-        cout <<endl;
+        outfile <<endl;
     }
 }
 
 int test1(){
-    for (int i = 0; i < 11; i++) {
-        weights.push_back(i);
-    }
-
     board = new Board(5,5,5,3);
     State* state = new State(board);
     player_id=2;
@@ -123,19 +125,19 @@ int test1(){
         player_id = 3-player_id;
         state->stboard->makeInitialMoves(i/2+1);
         // state->stboard->printnormalconfig();
-        // cout <<endl;
+        // outfile <<endl;
     }
-    cout <<"done "<<endl;
+    outfile <<"done "<<endl;
     // state->stboard->printnormalconfig();
     state->stboard->printBeautifiedconfig();
     int temp;
-    temp = state->alphaBeta(4,-DBL_MAX, +DBL_MAX, 1);
-    cout<<"from"<<endl;
+    temp = state->alphaBeta(3,-DBL_MAX, +DBL_MAX, 1);
+    outfile<<"from"<<endl;
     state->stboard->printBeautifiedconfig();
-    cout << "to"<<endl;
+    outfile << "to"<<endl;
     state->successors[state->bestMove]->stboard->printBeautifiedconfig();
     for(int i=0;i<state->successors.size();i++){
-        cout << "eval for all children is "<< state->successors[i]->getEvaluation()<<endl;
+        outfile << "eval for all children is "<< state->successors[i]->getEvaluation()<<endl;
     }
     // int templayer =2;
     // state->evaluate();

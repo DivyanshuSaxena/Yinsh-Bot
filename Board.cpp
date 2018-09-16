@@ -122,12 +122,12 @@ pair<int,int> Board::makeInitialMoves(int movenum) {
     } else retPair = blockOpponentRings();
 
     if (retPair.first < 0 || retPair.second < 0) {
-        cout << "Could not find a valid move for next ring, occupy corners" << endl; // Debug
+        outfile << "Could not find a valid move for next ring, occupy corners" << endl; // Debug
         retPair = occupyCorners();
     }
 
     bool check = addRing(player_id, retPair.first, retPair.second);
-    if (!check) cout << "Some error in adding ring" << endl; // Debug
+    if (!check) outfile << "Some error in adding ring" << endl; // Debug
     return retPair;
 }
 
@@ -193,27 +193,27 @@ void Board::updateRingPositions(){
 void Board::printnormalconfig(){
     for(int j=2*n;j>=0;j--){
         for(int i=0;i<2*n+1;i++){
-            cout<< this->config[i][j] << " ";
+            outfile<< this->config[i][j] << " ";
         }
-        cout<< endl;
+        outfile<< endl;
     }
 }
 void Board::printBeautifiedconfig(){
     for(int j=2*n;j>=0;j--){
         for(int i=0;i<10-j;i++){
-            cout << " ";
+            outfile << " ";
         }
         for(int i=0;i<2*n+1;i++){
             if(this->config[i][j]==0){
-                cout<< "  ";
+                outfile<< "  ";
             }else if(this->config[i][j]==1){
-                cout << "_ ";
+                outfile << "_ ";
             }else{
-                cout<< this->config[i][j] << " ";
+                outfile<< this->config[i][j] << " ";
             }
             
         }
-        cout<< endl;
+        outfile<< endl;
     }
 }
 void Board::printMoreBeautifiedconfig(){
@@ -305,7 +305,7 @@ vector<pair<int,int>> Board::showPossibleMoves(int x, int y){
     myvec.insert(myvec.end(), freevecminuszeroslope.begin(),freevecminuszeroslope.end());
     myvec.insert(myvec.end(), freeveconeslope.begin(),freeveconeslope.end());
     myvec.insert(myvec.end(), freevecminusoneslope.begin(),freevecminusoneslope.end());
-    // cout << "Pair 1" << endl; // Debug
+    // outfile << "Pair 1" << endl; // Debug
 
     // insert issue #1 case
     if(skipfreevecinfislope.first != -1 && skipfreevecinfislope.second != -1){
@@ -326,7 +326,7 @@ vector<pair<int,int>> Board::showPossibleMoves(int x, int y){
     if(skipfreevecminusoneslope.first != -1 && skipfreevecminusoneslope.second != -1){
         myvec.push_back(skipfreevecminusoneslope);
     }
-    // cout << "Pair 2" << endl; // Debug
+    // outfile << "Pair 2" << endl; // Debug
 
     auto freepointinfislope = this->getPairAfterMarkers(thisringpair, 90);
     auto freepointminusinfislope = this->getPairAfterMarkers(thisringpair, 270);
@@ -352,7 +352,7 @@ vector<pair<int,int>> Board::showPossibleMoves(int x, int y){
     if(freepointminusoneslope.first != -1 && freepointminusoneslope.second != -1){
         myvec.push_back(freepointminusoneslope);
     }
-    // cout << "Returning from showPossibleMoves" << endl; // Debug
+    // outfile << "Returning from showPossibleMoves" << endl; // Debug
     return myvec;
 }
 
@@ -360,15 +360,15 @@ vector<pair<int,int>> Board::getFreePointsAdjacentToPoint(pair<int,int> argpair,
     vector<pair<int,int>> myvec;
     int tempi = argpair.first;
     int tempj = argpair.second;
-    // cout << "Finding adjacent points to " << tempi << " " << tempj << endl; // Debug
+    // outfile << "Finding adjacent points to " << tempi << " " << tempj << endl; // Debug
     if(slope==90){
         while(true && tempj<2*n){
             tempj++;
-            // cout << "tempi is "<<tempi<< " tempj is "<< tempj<<endl;
+            // outfile << "tempi is "<<tempi<< " tempj is "<< tempj<<endl;
             if(this->config[tempi][tempj]!=1){
                 break;
             }else{
-                // cout<< "lets push " << myvec.size()<<endl;
+                // outfile<< "lets push " << myvec.size()<<endl;
                 myvec.push_back(make_pair(tempi,tempj));
             }
         }
@@ -420,7 +420,7 @@ vector<pair<int,int>> Board::getFreePointsAdjacentToPoint(pair<int,int> argpair,
             }
         }
     }
-    // cout << "finvec size is "<< myvec.size()<<endl;
+    // outfile << "finvec size is "<< myvec.size()<<endl;
     return myvec;
 }
 
@@ -557,7 +557,7 @@ bool Board::selectAndMoveRing(int ringx, int ringy, int finringx, int finringy){
     auto inipair = make_pair(ringx, ringy);
     auto destpair= make_pair(finringx, finringy);
     auto dirvec = getDirectionVector(inipair, destpair);
-    // cout << "dirvec is "<< dirvec.first<< " "<<dirvec.second<<endl;
+    // outfile << "dirvec is "<< dirvec.first<< " "<<dirvec.second<<endl;
     int ringnum = this->config[inipair.first][inipair.second];
     int ringmarker = ringnum+2;
     // betweenMarkersThere is the contigous case
@@ -568,7 +568,7 @@ bool Board::selectAndMoveRing(int ringx, int ringy, int finringx, int finringy){
         betweenMarkersThere = false;
     }
     if(betweenMarkersThere){
-        // cout<< "between markers true "<<endl;
+        // outfile<< "between markers true "<<endl;
         this->config[inipair.first][inipair.second] = ringmarker;
         int tempi = inipair.first+dirvec.first;
         int tempj = inipair.second+dirvec.second;
@@ -612,10 +612,10 @@ bool Board::selectAndMoveRing(int ringx, int ringy, int finringx, int finringy){
 bool Board::removeMarkers(int startx, int starty, int finx, int finy){
     auto inipair = make_pair(startx, starty);
     auto destpair= make_pair(finx, finy);
-    cout << "inipair is "<<inipair.first << " "<<inipair.second<<endl;
-    cout << "destpair is "<<destpair.first << " "<<destpair.second<<endl;
+    outfile << "inipair is "<<inipair.first << " "<<inipair.second<<endl;
+    outfile << "destpair is "<<destpair.first << " "<<destpair.second<<endl;
     auto dirvec = getDirectionVector(inipair, destpair);
-    cout << "dirvec is "<<dirvec.first << " "<<dirvec.second<<endl;
+    outfile << "dirvec is "<<dirvec.first << " "<<dirvec.second<<endl;
     for(int i=0;i< k;i++){
         this->config[inipair.first + i*dirvec.first][inipair.second + i*dirvec.second] = 1;
     }
@@ -634,7 +634,7 @@ bool Board::isFlippable(int row, int col){
     if (config[row][col] !=4 && config[row][col] != 5)
         return false;
 
-    updateRingPositions();
+    // updateRingPositions(); ALready called at start of evaluation
     bool retVal = false;
     int len = p1Rings.size() + p2Rings.size();
     for (int i = 0; i < len; i++) {
@@ -642,8 +642,8 @@ bool Board::isFlippable(int row, int col){
         pair<int,int> ring = i>=p1Rings.size() ? p2Rings.at(i-p1Rings.size()) : p1Rings.at(i);
         int ringx = ring.first, ringy = ring.second;
         vector<pair<int,int>> possibleMoves = board->showPossibleMoves(ring.first, ring.second);
-        // cout << "Check flip with ring: " << ringx << " " << ringy << " "; // Debug
-        // cout << "moves: " << possibleMoves.size() << endl;                // Debug
+        // outfile << "Check flip with ring: " << ringx << " " << ringy << " "; // Debug
+        // outfile << "moves: " << possibleMoves.size() << endl;                // Debug
         for (int k = 0; k < possibleMoves.size(); k++) {
             pair<int,int> move = possibleMoves.at(k);
             int movex = move.first, movey = move.second;
@@ -685,17 +685,17 @@ pair<int, int> Board::getHexagonalCoordinate(int xarg, int yarg){
 void Board::printhexagonalconfig(){
     for(int j=2*n;j>=0;j--){
         for(int i=0;i<2*n+1;i++){
-            // cout<< this->config[i][j] << " ";
+            // outfile<< this->config[i][j] << " ";
             pair<int,int> temphex;
             if(this->config[i][j]==0){
                 // temphex = make_pair(-1,-1);
-                cout << "x" << " , "<< "x" << " | ";
+                outfile << "x" << " , "<< "x" << " | ";
             }else{
                 temphex = this->getHexagonalCoordinate(i-n,j-n);
-                cout << temphex.first << " , "<< temphex.second << " | ";
+                outfile << temphex.first << " , "<< temphex.second << " | ";
             }
-            // cout << temphex.first << " , "<< temphex.second << " | ";
+            // outfile << temphex.first << " , "<< temphex.second << " | ";
         }
-        cout<< endl;
+        outfile<< endl;
     }
 }

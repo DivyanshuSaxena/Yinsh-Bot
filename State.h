@@ -32,6 +32,7 @@ class State {
         int rowsktwo1, nonFlipRowsktwo1;
         int rowskone2, nonFlipRowskone2;
         int rowsktwo2, nonFlipRowsktwo2;
+        int blockDoF1, blockDoF2;
 
         int startkx, startky;
         int endkx, endky;
@@ -66,6 +67,7 @@ class State {
 
         // Heuristics
         void getLinearMarkers();
+        void getBlockedRings();
         double weightedSum();
         bool evaluate(); 
         double getEvaluation();
