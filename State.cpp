@@ -73,6 +73,7 @@ void State::resetFeatures() {
     int rowsktwo1 = -1, nonFlipRowsktwo1 = -1;
     int rowskone2 = -1, nonFlipRowskone2 = -1;
     int rowsktwo2 = -1, nonFlipRowsktwo2 = -1;
+    int blockDoF1 = -1, blockDoF2 = -1;
 }
 
 void State::duplicateFeatures(State* state){
@@ -86,29 +87,33 @@ void State::getBlockedRings() {
         // Ring pair available at index i
         pair<int,int> ring = i>=p1len ? stboard->p2Rings.at(i-p1len) : stboard->p1Rings.at(i);
         int ringx = ring.first, ringy = ring.second;
-        int blockDOF = 0;
+        // cout << "Ring: " << ringx << " " << ringy << endl; // Debug
+        int blockdof = 0;
         for (int dir = 0; dir < 9; dir++) {
             if (dir==2 || dir==4 || dir==6) continue;
             int xchange = dir/3 - 1;
             int ychange = dir%3 - 1;
             bool limitx = (ringx+xchange >= 0) && (ringx+xchange <= 2*n);
             bool limity = (ringy+ychange >= 0) && (ringy+ychange <= 2*n);
-            bool moveAvailable = false;
+            bool moveAvailable = false, movePossible = false;
             for (int x=ringx+xchange, y=ringy+ychange; limitx && limity; x+=xchange, y+=ychange) {
+                movePossible = true;
                 if (stboard->config[x][y] == 0) break;
                 if (stboard->config[x][y] == 1) {
                     moveAvailable = true;
                     break;
                 }
                 if (stboard->config[x][y]==2 || stboard->config[x][y]==2) break;
-                limitx = (x >= 0) && (x <= 2*n);
-                limity = (y >= 0) && (y <= 2*n);
+                limitx = (x+xchange >= 0) && (x+xchange <= 2*n);
+                limity = (y+ychange >= 0) && (y+ychange <= 2*n);
             }
-            if (!moveAvailable) {
-                blockDOF++;
+            if (movePossible && !moveAvailable) {
+                blockdof++;
             }
         }
-        cout << "For ring at " << ringx << " " << ringy << " blocked directions are: " << blockDOF << endl; // Debug
+        // cout << "For ring at " << ringx << " " << ringy << " blocked directions are: " << blockdof << endl; // Debug
+        if (i<p1len) this->blockDoF1 += blockdof;
+        else this->blockDoF2 += blockdof;
     }
 }
 
@@ -309,6 +314,10 @@ double State::weightedSum() {
     // Rows of k markers
     if (rowsk1 != -1) h += rowsk1 * weights.at(9);
     if (rowsk2 != -1) h += rowsk2 * weights.at(10);
+
+    // Blocked rings
+    if (blockDoF1 != -1) h += blockDoF1 * weights.at(11);
+    if (blockDoF2 != -1) h += blockDoF2 * weights.at(12);
     return h;
 }
 
@@ -325,6 +334,7 @@ bool State::evaluate() {
     if (kInRow) {
         return false;
     }
+    this->getBlockedRings();
     double h = weightedSum();
     heuristic = h;
     return true;

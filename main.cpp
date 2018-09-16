@@ -62,16 +62,17 @@ int test1();
 int play();
 
 int main(int argc, char** argv) {
+    // Initialize weights
+    for (int i = 0; i <= 12; i++) {
+        weights.push_back(i);
+    }
+
     test1();
     // play();
     return 0;
 }
 
 int test() {
-    for (int i = 0; i < 11; i++) {
-        weights.push_back(i);
-    }
-
     board = new Board(5,5,5,3);
     board->printhexagonalconfig();
     cout << endl;
@@ -112,10 +113,6 @@ int test() {
 }
 
 int test1(){
-    for (int i = 0; i < 11; i++) {
-        weights.push_back(i);
-    }
-
     board = new Board(5,5,5,3);
     State* state = new State(board);
     player_id=2;
