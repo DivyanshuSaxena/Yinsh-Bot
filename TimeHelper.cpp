@@ -4,12 +4,12 @@ TimeHelper::TimeHelper(){
     this->setClocki();
 }
 bool TimeHelper::outOfTime(){
-    if(elapsedTimePersonal>=maxAllowedTimeSpecific){
-        return true;
-    }
-    if(time(NULL)-clockISpecific>=maxAllowedTimeSpecific){
-        return true;
-    }
+    // if(elapsedTimePersonal>=maxAllowedTimeSpecific){
+    //     return true;
+    // }
+    // if(time(NULL)-clockISpecific>=maxAllowedTimeSpecific){
+    //     return true;
+    // }
     return false;
 }
 bool TimeHelper::setClocki(){

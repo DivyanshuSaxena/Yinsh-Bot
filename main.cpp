@@ -58,7 +58,7 @@ ofstream outfile;
 vector<double> weights;
 
 Board* board;
-int player_id, time_limit, depth, maxDepth;
+int player_id, time_limit, max_depth;
 
 int test();
 int test1();
@@ -69,7 +69,6 @@ int main(int argc, char** argv) {
     timeHelper = new TimeHelper();
 
     // Initialize streams
-    
     outfile.open("console.log");
 
     // Initialize weights
@@ -244,7 +243,7 @@ int play() {
     time_limit = stoi(word);
     
     timeHelper->setMaxAllowedTime(time_limit);
-    maxDepth=3;
+    max_depth = 2;
 
     string move;
     int movenum = 1;
@@ -266,7 +265,8 @@ int play() {
         } else {
             // Check this block
             // currState->alphaBeta(depth, -DBL_MAX, DBL_MAX, player_id);
-            currState->iterativeDeepening(maxDepth, player_id);
+            outfile << "Starting ID" << endl;
+            currState->iterativeDeepening(max_depth, player_id);
             cout << currState->moves.at(currState->bestMove) << endl; // Make appropriate moves here.
             currState->makeMove();
         }
