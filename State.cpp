@@ -129,7 +129,7 @@ void State::incrementkRows(int marker, bool flip, int endx, int endy) {
     } else {
         rowsk2++;
     }
-    // outfile << "Found streak ending at " << endx << " " << endy << endl;
+    outfile << "~~~~~~~~~~~~~~~~~~~~~~~~Found streak ending at " << endx << " " << endy << endl;
     endkx = endx;
     endky = endy;
     kInRow = true;
@@ -166,6 +166,16 @@ void State::incrementRows(int count, int marker, bool flip) {
     }
 }
 
+void State::checkCount(int count, int prevMarker, bool flip, int startx, int starty, int endx, int endy) {
+    if (count >= k-2 && count <= k-1) 
+        incrementRows(count, prevMarker, flip);
+    if (count >= k) {
+        incrementkRows(prevMarker, flip, endx, endy);
+        startkx = startx;
+        startky = starty;
+    }
+}
+
 void State::getLinearMarkers() {
     int player1 = 4;
     int player2 = 5;
@@ -180,8 +190,8 @@ void State::getLinearMarkers() {
         // Variables to check if the current streak is non-flippable or not
         bool flipVert = false, flipHorz = false; 
         int j = startj+1;
-        int startkxVert = 0, startkyVert = 0;
-        int startkxHorz = 0, startkyHorz = 0;
+        int startkxVert = i, startkyVert = startj;
+        int startkxHorz = startj, startkyHorz = i;
         for (j = startj+1; j < completej; j++) {
             // Vertical Rows
             if (stboard->config[i][j] == prevMarkerVert) {
@@ -189,15 +199,9 @@ void State::getLinearMarkers() {
                 countVert++;
                 flipVert = flipVert || stboard->isFlippable(i, j);
             } else {
-                if (stboard->config[i][j] == player1 || stboard->config[i][j] == player2) {
-                    if (countVert >= k-2 && countVert <= k-1) 
-                        incrementRows(countVert, prevMarkerVert, flipVert);
-                    if (countVert >= k) {
-                        outfile << "Start streak (Vert) at " << startkx << " " << startky << endl; // Debug
-                        incrementkRows(prevMarkerVert, flipVert, i, j);
-                        startkx = startkxVert;
-                        startky = startkyVert;
-                    }
+                // if (stboard->config[i][j] == player1 || stboard->config[i][j] == player2) {
+                if (countVert > 0) {
+                    checkCount(countVert, prevMarkerVert, flipVert, startkxVert, startkyVert, i, j-1);
                     countVert = 1;
                     startkxVert = i;
                     startkyVert = j; // Set the start indices of streak start
@@ -215,15 +219,9 @@ void State::getLinearMarkers() {
                 countHorz++;
                 flipHorz = flipHorz || stboard->isFlippable(j, i);
             } else {
-                if (stboard->config[j][i] == player1 || stboard->config[j][i] == player2) {
-                    if (countHorz >= k-2 && countVert <= k-1) 
-                        incrementRows(countHorz, prevMarkerHorz, flipHorz);
-                    if (countHorz >= k) {
-                        outfile << "Start streak (Horz) at " << startkx << " " << startky << endl; // Debug
-                        incrementkRows(prevMarkerHorz, flipHorz, j, i);
-                        startkx = startkxHorz;
-                        startky = startkyHorz;
-                    }
+                // if (stboard->config[j][i] == player1 || stboard->config[j][i] == player2) {
+                if (countHorz > 0) {
+                    checkCount(countHorz, prevMarkerHorz, flipHorz, startkxHorz, startkyHorz, j-1, i);
                     countHorz = 1;
                     startkxHorz = j;
                     startkyHorz = i; // Set the start indices of streak start
@@ -235,21 +233,8 @@ void State::getLinearMarkers() {
         }
         
         // Check for the last place
-        if (countVert >= k-2 && countVert <= k-1) 
-            incrementRows(countVert, prevMarkerVert, flipVert);
-        if (countVert >= k) {
-            incrementkRows(prevMarkerVert, flipVert, i, j-1);
-            startkx = startkxVert;
-            startky = startkyVert;
-        }
-
-        if (countHorz >= k-2 && countVert <= k-1) 
-            incrementRows(countHorz, prevMarkerHorz, flipHorz);
-        if (countHorz >= k) {
-            incrementkRows(prevMarkerHorz, flipHorz, j-1, i);
-            startkx = startkxHorz;
-            startky = startkyHorz;
-        }
+        checkCount(countVert, prevMarkerVert, flipVert, startkxVert, startkyVert, i, j-1);
+        checkCount(countHorz, prevMarkerHorz, flipHorz, startkxHorz, startkyHorz, j-1, i);
     }
 
     // Slant Rows for both opponents
@@ -268,15 +253,9 @@ void State::getLinearMarkers() {
                 count++;
                 flip = flip || stboard->isFlippable(j, j-diff);
             } else {
-                if (stboard->config[j][j-diff] == player1 || stboard->config[j][j-diff] == player2) {
-                    if (count >= k-2 && count <= k-1) 
-                        incrementRows(count, prevMarker, flip);
-                    if (count > k) {
-                        outfile << "Start streak (Slant) at " << startkx << " " << startky << endl; // Debug
-                        incrementkRows(prevMarker, flip, j, j-diff);
-                        startkx = startkxSlant;
-                        startky = startkySlant;
-                    } 
+                // if (stboard->config[j][j-diff] == player1 || stboard->config[j][j-diff] == player2) {
+                if (count > 0) {
+                    checkCount(count, prevMarker, flip, startkxSlant, startkySlant, j-1, j-1-diff);
                     count = 1;
                     startkxSlant = j;
                     startkySlant = j-diff; // Set the start indices of streak start
@@ -285,13 +264,7 @@ void State::getLinearMarkers() {
                 flip = false;
             }
         }
-        if (count >= k-2 && count <= k-1) 
-            incrementRows(count, prevMarker, flip);
-        if (count > k) {
-            incrementkRows(prevMarker, flip, j, j-diff);
-            startkx = startkxSlant;
-            startky = startkySlant;
-        }
+        checkCount(count, prevMarker, flip, startkxSlant, startkySlant, j-1, j-1-diff);
     }
 }
 
@@ -330,7 +303,7 @@ double State::weightedSum() {
  */
 bool State::evaluate() {
     // Assumption - At a time, only a single row of k markers can be present
-    // outfile << "Starting Evaluation" << endl; // Debug
+    outfile << "Starting Evaluation" << endl; // Debug
     stboard->updateRingPositions();
     this->getLinearMarkers();
     if (kInRow) {
@@ -368,6 +341,8 @@ bool State::isTerminalNode() {
 
 double State::iterativeDeepening(int max_depth, int playerId){
     double val;
+    outfile.close();
+    outfile.open("console.log");
     // outfile << "ID starting for depth " << max_depth << endl;
     for(int distance = 1; distance < max_depth && !timeHelper->outOfTime(); distance++) {
         outfile << "ID evaluating for depth " << distance << endl;
