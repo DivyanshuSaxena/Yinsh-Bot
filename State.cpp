@@ -377,7 +377,6 @@ double State::iterativeDeepening(int max_depth, int playerId){
 
 double State::alphaBeta(int depth, double alpha, double beta, int currPlayer){
     if(depth==0 || this->isTerminalNode()){
-        outfile << depth << " " << this->isTerminalNode() << endl;
         return this->getEvaluation();
     }
     outfile << "executing alphabeta at depth "<<depth << " alpha is "<<alpha << " beta is "<< beta << " player is "<<currPlayer<<endl;
