@@ -75,11 +75,6 @@ int main(int argc, char** argv) {
     outfile.open("console.log");
     outfileShaved.open("consoleshaved.log");
 
-    // Initialize weights
-    for (int i = 0; i <= 12; i++) {
-        weights.push_back(i);
-    }
-
     // test1();
     play();
     // test2();
@@ -281,6 +276,18 @@ int play() {
     string move;
     int movenum = 1;
     board = new Board(n,5,5,3);
+
+    // Initialize weights
+    weights.push_back(0);
+    for (int i = 1; i <= 6; i++) {
+        if (player_id == 1) {
+            weights.push_back(i);
+            weights.push_back(-i);
+        } else {
+            weights.push_back(-i);
+            weights.push_back(i);
+        }
+    }
 
     if(player_id == 2) {
         // Get other player's move

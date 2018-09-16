@@ -42,6 +42,7 @@ class State {
 
         void incrementkRows(int, bool, int, int);
         void incrementRows(int, int, bool);
+        void checkCount(int, int, bool, int, int, int, int);
 
     public:
         State(Board* board);
