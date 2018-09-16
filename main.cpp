@@ -139,6 +139,19 @@ int test1(){
     for(int i=0;i<state->successors.size();i++){
         outfile << "eval for all children is "<< state->successors[i]->getEvaluation()<<endl;
     }
+    // int templayer =2;
+    // state->evaluate();
+    // while(true){
+    //     int temp;
+    //     temp = state->alphaBeta(2,-DBL_MAX, +DBL_MAX, 3-templayer);
+    //     cout<<"from"<<endl;
+    //     state->stboard->printBeautifiedconfig();
+    //     cout << "to"<<endl;
+    //     state->successors[state->bestMove]->stboard->printBeautifiedconfig();
+    //     state = state->successors[state->bestMove];
+    //     // state->evaluate();
+    //     // state = null;
+    // }
 }
 
 void parseAndMove(string move) {
