@@ -122,7 +122,7 @@ pair<int,int> Board::makeInitialMoves(int movenum) {
             }
         }
     } else {
-        cout << "INITIAL MOVE: block" << endl;
+        outfile << "INITIAL MOVE: block" << endl;
         retPair = blockOpponentRings();
     }
 

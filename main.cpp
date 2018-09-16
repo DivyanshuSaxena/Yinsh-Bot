@@ -235,17 +235,22 @@ int play() {
     }
     while(true) {
         State* currState = new State(board);
+        // outfile << movenum << endl;           
         if (movenum <= m) {
             pair<int,int> movePair = board->makeInitialMoves(movenum);
             cout << "P " << movePair.first << " " << movePair.second << endl;
         } else {
             // Check this block
+            outfile << "Starting Alpha beta" << endl;
             currState->alphaBeta(depth, -DBL_MAX, DBL_MAX, player_id);
             cout << currState->moves.at(currState->bestMove) << endl; // Make appropriate moves here.
             currState->makeMove();
         }
+        outfile << "Moved self move" << endl;
         getline(cin, move);
         parseAndMove(move);
+        outfile << "Opponent move done" << endl;
+        movenum++;
     }
     return 0;
 }
