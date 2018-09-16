@@ -22,6 +22,7 @@ extern int n, m, k, l;
 extern int time_limit;
 extern int max_depth;
 extern ofstream outfile;
+extern ofstream outfileShaved;
 extern TimeHelper * timeHelper;
 
 class Board{
@@ -42,7 +43,9 @@ class Board{
         pair<int,int> getPairAfterMarkers(pair<int,int>, int);
         void updateRingPositions();
         void printnormalconfig();
+        void printnormalconfigShaved();
         void printBeautifiedconfig();
+        void printBeautifiedconfigShaved();
         void printMoreBeautifiedconfig();
         // Operate on rings and markers on board
         bool addRing(int, int, int);
@@ -59,6 +62,7 @@ class Board{
         pair<int, int> getHexagonalCoordinate(int, int);
         void printhexagonalconfig();
         pair<int,int> getDirectionVector(pair<int,int> inipoint, pair<int,int> finpoint);
+        void createBoardFromFile(string);
 };
 
 extern Board* board;

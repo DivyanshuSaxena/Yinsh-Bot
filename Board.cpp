@@ -212,6 +212,21 @@ void Board::printnormalconfig(){
         outfile<< endl;
     }
 }
+void Board::printnormalconfigShaved(){
+    for(int j=2*n;j>=0;j--){
+        for(int i=0;i<2*n+1;i++){
+            if (this->config[i][j] == 0) {
+                outfileShaved << "  ";
+                continue;
+            } else if (this->config[i][j] == 1) {
+                outfileShaved << "_ ";
+                continue;
+            }
+            outfileShaved<< this->config[i][j] << " ";
+        }
+        outfileShaved<< endl;
+    }
+}
 void Board::printBeautifiedconfig(){
     for(int j=2*n;j>=0;j--){
         for(int i=0;i<10-j;i++){
@@ -228,6 +243,24 @@ void Board::printBeautifiedconfig(){
             
         }
         outfile<< endl;
+    }
+}
+void Board::printBeautifiedconfigShaved(){
+    for(int j=2*n;j>=0;j--){
+        for(int i=0;i<10-j;i++){
+            outfileShaved << " ";
+        }
+        for(int i=0;i<2*n+1;i++){
+            if(this->config[i][j]==0){
+                outfileShaved<< "  ";
+            }else if(this->config[i][j]==1){
+                outfileShaved << "_ ";
+            }else{
+                outfileShaved<< this->config[i][j] << " ";
+            }
+            
+        }
+        outfileShaved<< endl;
     }
 }
 void Board::printMoreBeautifiedconfig(){
@@ -710,5 +743,33 @@ void Board::printhexagonalconfig(){
             // outfile << temphex.first << " , "<< temphex.second << " | ";
         }
         outfile<< endl;
+    }
+}
+void Board::createBoardFromFile(string filename){
+    // n=5;
+    // m=5;
+    // k=5;
+    // l=3;
+    fstream inFile(filename.c_str() );
+    if (!inFile) {
+        cerr << "Cannot open file.\n";
+        return;
+    }
+    for(int j=2*n;j>=0;j--){
+        for(int i=0;i<2*n+1;i++){
+            // inFile >> this->config[i][j];
+            char ch;
+            inFile.get(ch);
+            if(ch==' '){
+                this->config[i][j]=0;
+            }else if(ch == '_'){
+                this->config[i][j]=1;
+            }else{
+                this->config[i][j] = ch-'0';
+            }
+            inFile.get(ch);
+        }
+        char nline;
+        inFile.get(nline);
     }
 }
