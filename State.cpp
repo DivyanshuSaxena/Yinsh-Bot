@@ -193,6 +193,7 @@ void State::getLinearMarkers() {
                     if (countVert >= k-2 && countVert <= k-1) 
                         incrementRows(countVert, prevMarkerVert, flipVert);
                     if (countVert >= k) {
+                        outfile << "Start streak (Vert) at " << startkx << " " << startky << endl; // Debug
                         incrementkRows(prevMarkerVert, flipVert, i, j);
                         startkx = startkxVert;
                         startky = startkyVert;
@@ -218,6 +219,7 @@ void State::getLinearMarkers() {
                     if (countHorz >= k-2 && countVert <= k-1) 
                         incrementRows(countHorz, prevMarkerHorz, flipHorz);
                     if (countHorz >= k) {
+                        outfile << "Start streak (Horz) at " << startkx << " " << startky << endl; // Debug
                         incrementkRows(prevMarkerHorz, flipHorz, j, i);
                         startkx = startkxHorz;
                         startky = startkyHorz;
@@ -225,7 +227,6 @@ void State::getLinearMarkers() {
                     countHorz = 1;
                     startkxHorz = j;
                     startkyHorz = i; // Set the start indices of streak start
-                    // outfile << "Start streak at " << j << " " << i << endl; // Debug
                 } 
                 prevMarkerHorz = stboard->config[j][i];
                 flipHorz = false;
@@ -271,6 +272,7 @@ void State::getLinearMarkers() {
                     if (count >= k-2 && count <= k-1) 
                         incrementRows(count, prevMarker, flip);
                     if (count > k) {
+                        outfile << "Start streak (Slant) at " << startkx << " " << startky << endl; // Debug
                         incrementkRows(prevMarker, flip, j, j-diff);
                         startkx = startkxSlant;
                         startky = startkySlant;
@@ -371,7 +373,9 @@ double State::iterativeDeepening(int max_depth, int playerId){
         outfile << "ID evaluating for depth " << distance << endl;
         val = this->alphaBeta(distance,-DBL_MAX, DBL_MAX, playerId);
     }
-    outfile << "ID Done for this move, found successor at " << this->bestMove << endl;
+    outfile << "ID Done for this move, found successor at: " << this->bestMove << endl;
+    this->successors.at(bestMove)->stboard->printnormalconfig();
+    outfile << endl; // Debug
     return val;
 }
 
