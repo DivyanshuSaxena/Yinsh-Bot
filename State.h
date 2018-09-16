@@ -12,7 +12,7 @@
 #include <cfloat>
 #include <limits>
 #include "Board.h"
-#include "Time.h"
+#include "TimeHelper.h"
 using namespace std;
 
 extern vector<double> weights;

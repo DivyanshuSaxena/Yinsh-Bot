@@ -48,10 +48,9 @@
  *
  * +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  */
-
+#include "TimeHelper.h"
 #include "Board.h"
 #include "State.h"
-#include "Time.h"
 #include <ctime>
 
 int n, m, k, l;
@@ -64,10 +63,13 @@ int player_id, time_limit, depth, maxDepth;
 int test();
 int test1();
 int play();
-
+TimeHelper * timeHelper;
 int main(int argc, char** argv) {
+    std::srand ( unsigned ( std::time(0) ) );
+    timeHelper = new TimeHelper();
+
     // Initialize streams
-    Time::setClocki();
+    
     outfile.open("console.log");
 
     // Initialize weights
@@ -75,8 +77,8 @@ int main(int argc, char** argv) {
         weights.push_back(i);
     }
 
-    test1();
-    // play();
+    // test1();
+    play();
     return 0;
 }
 
@@ -239,7 +241,8 @@ int play() {
     int movenum = 1;
     // Get input from server about game specifications
     cin >> player_id >> n >> time_limit;
-    Time::setMaxAllowedTime(time_limit);
+    timeHelper->setMaxAllowedTime(time_limit);
+    maxDepth=3;
     if(player_id == 2) {
         // Get other player's move
         cin >> move; 
@@ -247,22 +250,22 @@ int play() {
     }   
     
     while(true) {
-        Time::setClockISpecific();
-        Time::setMaxAllowedTimeSpecific(3);
+        timeHelper->setClockISpecific();
+        timeHelper->setMaxAllowedTimeSpecific(3);
         State* currState = new State(board);
         if (movenum <= m) {
             pair<int,int> movePair = board->makeInitialMoves(movenum);
             cout << "P " << movePair.first << " " << movePair.second << endl;
         } else {
             // Check this block
-            currState->alphaBeta(depth, -DBL_MAX, DBL_MAX, player_id);
+            // currState->alphaBeta(depth, -DBL_MAX, DBL_MAX, player_id);
             currState->iterativeDeepening(maxDepth, player_id);
             cout << currState->moves.at(currState->bestMove) << endl; // Make appropriate moves here.
             currState->makeMove();
         }
         cin >> move;
         parseAndMove(move);
-        Time::updateElapsedTimePersonal();
+        timeHelper->updateElapsedTimePersonal();
     }
     return 0;
 }

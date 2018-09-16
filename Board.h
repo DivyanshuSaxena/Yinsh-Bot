@@ -10,6 +10,7 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include "TimeHelper.h"
 using namespace std;
 
 extern int n, m, k, l;  
@@ -21,6 +22,7 @@ extern int n, m, k, l;
 extern int time_limit;
 extern int depth;
 extern ofstream outfile;
+extern TimeHelper * timeHelper;
 
 class Board{
     public:

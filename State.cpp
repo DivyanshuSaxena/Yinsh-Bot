@@ -366,7 +366,7 @@ bool State::isTerminalNode() {
 
 double State::iterativeDeepening(int maxDepth, int playerId){
     double val;
-    for(int distance = 1; distance < maxDepth && !Time::outOfTime(); distance++) {
+    for(int distance = 1; distance < maxDepth && !timeHelper->outOfTime(); distance++) {
         val = this->alphaBeta(distance,-DBL_MAX, DBL_MAX, playerId);
     }
     return val;
@@ -383,7 +383,7 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer){
     }
     double tempscore = -DBL_MAX;
     vector<State *> successsors = this->getSuccessors(currPlayer);
-    for(int i=0;i<successsors.size() && !Time::outOfTime();i++){
+    for(int i=0;i<successsors.size() && !timeHelper->outOfTime();i++){
         double value = -successsors[i]->alphaBeta(depth-1,-beta,-alpha, 3-currPlayer);
         if(value>tempscore){
             this->bestMove = i;
@@ -405,8 +405,9 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer){
 
 vector<State*> State::getSuccessors(int currPlayer){
     if(this->isSuccessorsUpdated){
-        if(!this->bestMove==-1){
+        if(this->bestMove>0 ){
             iter_swap(this->successors.begin(),this->successors.begin()+this->bestMove );
+            iter_swap(this->moves.begin(), this->moves.begin()+this->bestMove);
             this->bestMove=0;
         }
         outfile<<"returning get successor"<<endl;

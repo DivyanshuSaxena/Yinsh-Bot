@@ -1,6 +1,9 @@
-#include "Time.h"
+#include "TimeHelper.h"
 
-bool Time::outOfTime(){
+TimeHelper::TimeHelper(){
+    this->setClocki();
+}
+bool TimeHelper::outOfTime(){
     if(elapsedTimePersonal>=maxAllowedTimeSpecific){
         return true;
     }
@@ -9,18 +12,18 @@ bool Time::outOfTime(){
     }
     return false;
 }
-bool Time::setClocki(){
+bool TimeHelper::setClocki(){
     clocki=time(NULL);
 }
-bool Time::setMaxAllowedTime(int argtime){
+bool TimeHelper::setMaxAllowedTime(int argtime){
     maxAllowedTime=argtime;
 }
-bool Time::setClockISpecific(){
+bool TimeHelper::setClockISpecific(){
     clockISpecific = time(NULL);
 }
-bool Time::setMaxAllowedTimeSpecific(float argtime){
+bool TimeHelper::setMaxAllowedTimeSpecific(float argtime){
     maxAllowedTimeSpecific=argtime;
 }
-bool Time::updateElapsedTimePersonal(){
+bool TimeHelper::updateElapsedTimePersonal(){
     elapsedTimePersonal += time(NULL)-clockISpecific;
 }
