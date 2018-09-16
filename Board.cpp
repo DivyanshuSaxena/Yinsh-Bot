@@ -634,7 +634,7 @@ bool Board::isFlippable(int row, int col){
     if (config[row][col] !=4 && config[row][col] != 5)
         return false;
 
-    updateRingPositions();
+    // updateRingPositions(); ALready called at start of evaluation
     bool retVal = false;
     int len = p1Rings.size() + p2Rings.size();
     for (int i = 0; i < len; i++) {

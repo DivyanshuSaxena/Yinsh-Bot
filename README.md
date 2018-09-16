@@ -51,3 +51,6 @@ The teacher bot shall be the winner bot from the previous game and the student b
 - [x] Remove k markers + remove specific ring + select ring + move ring + remove k markers + remove specific ring  
 - [ ] Complete get successor function
 - [x] More than k in row then we have a choice as to what to remove
+
+### Improvements
+- [] isFlippable calls updateRingPosition(). Can the calls be reduced?

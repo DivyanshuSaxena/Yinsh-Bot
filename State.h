@@ -66,6 +66,7 @@ class State {
 
         // Heuristics
         void getLinearMarkers();
+        void getBlockedRings();
         double weightedSum();
         bool evaluate(); 
         double getEvaluation();

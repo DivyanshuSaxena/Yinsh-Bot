@@ -79,6 +79,39 @@ void State::duplicateFeatures(State* state){
 
 }
 
+void State::getBlockedRings() {
+    int p1len = stboard->p1Rings.size();
+    int p2len = stboard->p2Rings.size();
+    for (int i = 0; i < p1len+p2len; i++) {
+        // Ring pair available at index i
+        pair<int,int> ring = i>=p1len ? stboard->p2Rings.at(i-p1len) : stboard->p1Rings.at(i);
+        int ringx = ring.first, ringy = ring.second;
+        int blockDOF = 0;
+        for (int dir = 0; dir < 9; dir++) {
+            if (dir==2 || dir==4 || dir==6) continue;
+            int xchange = dir/3 - 1;
+            int ychange = dir%3 - 1;
+            bool limitx = (ringx+xchange >= 0) && (ringx+xchange <= 2*n);
+            bool limity = (ringy+ychange >= 0) && (ringy+ychange <= 2*n);
+            bool moveAvailable = false;
+            for (int x=ringx+xchange, y=ringy+ychange; limitx && limity; x+=xchange, y+=ychange) {
+                if (stboard->config[x][y] == 0) break;
+                if (stboard->config[x][y] == 1) {
+                    moveAvailable = true;
+                    break;
+                }
+                if (stboard->config[x][y]==2 || stboard->config[x][y]==2) break;
+                limitx = (x >= 0) && (x <= 2*n);
+                limity = (y >= 0) && (y <= 2*n);
+            }
+            if (!moveAvailable) {
+                blockDOF++;
+            }
+        }
+        cout << "For ring at " << ringx << " " << ringy << " blocked directions are: " << blockDOF << endl; // Debug
+    }
+}
+
 void State::setWeight(double weight, int feature) {
     if (feature < weights.size() && feature > 0) {
         weights.at(feature) = weight;
@@ -287,6 +320,7 @@ double State::weightedSum() {
 bool State::evaluate() {
     // Assumption - At a time, only a single row of k markers can be present
     // cout << "Starting Evaluation" << endl; // Debug
+    stboard->updateRingPositions();
     this->getLinearMarkers();
     if (kInRow) {
         return false;
