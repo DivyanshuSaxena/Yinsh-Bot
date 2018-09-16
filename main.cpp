@@ -51,13 +51,15 @@
 
 #include "Board.h"
 #include "State.h"
+#include "Time.h"
+#include <ctime>
 
 int n, m, k, l;
 ofstream outfile;
 vector<double> weights;
 
 Board* board;
-int player_id, time_limit, depth;
+int player_id, time_limit, depth, maxDepth;
 
 int test();
 int test1();
@@ -65,6 +67,7 @@ int play();
 
 int main(int argc, char** argv) {
     // Initialize streams
+    Time::setClocki();
     outfile.open("console.log");
 
     // Initialize weights
@@ -231,11 +234,12 @@ int parseAndMove(string move) {
 }
 
 int play() {
+    
     string move;
     int movenum = 1;
     // Get input from server about game specifications
     cin >> player_id >> n >> time_limit;
-
+    Time::setMaxAllowedTime(time_limit);
     if(player_id == 2) {
         // Get other player's move
         cin >> move; 
@@ -243,6 +247,8 @@ int play() {
     }   
     
     while(true) {
+        Time::setClockISpecific();
+        Time::setMaxAllowedTimeSpecific(3);
         State* currState = new State(board);
         if (movenum <= m) {
             pair<int,int> movePair = board->makeInitialMoves(movenum);
@@ -250,11 +256,13 @@ int play() {
         } else {
             // Check this block
             currState->alphaBeta(depth, -DBL_MAX, DBL_MAX, player_id);
+            currState->iterativeDeepening(maxDepth, player_id);
             cout << currState->moves.at(currState->bestMove) << endl; // Make appropriate moves here.
             currState->makeMove();
         }
         cin >> move;
         parseAndMove(move);
+        Time::updateElapsedTimePersonal();
     }
     return 0;
 }
