@@ -200,6 +200,13 @@ void Board::updateRingPositions(){
 void Board::printnormalconfig(){
     for(int j=2*n;j>=0;j--){
         for(int i=0;i<2*n+1;i++){
+            if (this->config[i][j] == 0) {
+                outfile << "  ";
+                continue;
+            } else if (this->config[i][j] == 1) {
+                outfile << "_ ";
+                continue;
+            }
             outfile<< this->config[i][j] << " ";
         }
         outfile<< endl;

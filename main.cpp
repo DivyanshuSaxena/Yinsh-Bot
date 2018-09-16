@@ -133,13 +133,13 @@ int test1(){
     }
     outfile <<"done "<<endl;
     // state->stboard->printnormalconfig();
-    state->stboard->printBeautifiedconfig();
+    state->stboard->printnormalconfig();
     int temp;
     temp = state->alphaBeta(3,-DBL_MAX, +DBL_MAX, 1);
     outfile<<"from"<<endl;
-    state->stboard->printBeautifiedconfig();
+    state->stboard->printnormalconfig();
     outfile << "to"<<endl;
-    state->successors[state->bestMove]->stboard->printBeautifiedconfig();
+    state->successors[state->bestMove]->stboard->printnormalconfig();
     for(int i=0;i<state->successors.size();i++){
         outfile << "eval for all children is "<< state->successors[i]->getEvaluation()<<endl;
     }
@@ -149,9 +149,9 @@ int test1(){
     //     int temp;
     //     temp = state->alphaBeta(2,-DBL_MAX, +DBL_MAX, 3-templayer);
     //     cout<<"from"<<endl;
-    //     state->stboard->printBeautifiedconfig();
+    //     state->stboard->printnormalconfig();
     //     cout << "to"<<endl;
-    //     state->successors[state->bestMove]->stboard->printBeautifiedconfig();
+    //     state->successors[state->bestMove]->stboard->printnormalconfig();
     //     state = state->successors[state->bestMove];
     //     // state->evaluate();
     //     // state = null;
@@ -267,6 +267,7 @@ int play() {
             // currState->alphaBeta(depth, -DBL_MAX, DBL_MAX, player_id);
             outfile << "Starting ID" << endl;
             currState->iterativeDeepening(max_depth, player_id);
+            outfile << "Best Move at: " << currState->bestMove << endl; // Debug
             cout << currState->moves.at(currState->bestMove) << endl; // Make appropriate moves here.
             currState->makeMove();
         }

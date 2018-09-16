@@ -382,8 +382,8 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer){
     }
     outfile << "executing alphabeta at depth "<<depth << " alpha is "<<alpha << " beta is "<< beta << " player is "<<currPlayer<<endl;
     outfile << "state is "<<endl;
-    this->stboard->printBeautifiedconfig();
-    outfile <<endl;
+    this->stboard->printnormalconfig();
+    outfile << endl;
 
     double tempscore = -DBL_MAX;
     vector<State *> successsors = this->getSuccessors(currPlayer);
@@ -403,7 +403,7 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer){
     }
     outfile << "returning alphabeta at depth "<<depth << " alpha is "<<alpha << " beta is "<< beta << " player is "<<currPlayer<<endl;
     outfile << "state is "<<endl;
-    this->stboard->printBeautifiedconfig();
+    this->stboard->printnormalconfig();
     outfile <<endl;
     return tempscore;
 }
@@ -470,14 +470,7 @@ vector<State*> State::getSuccessors(int currPlayer){
     }
 
     // Final step of checking if k markers made again
-    // Debug
-    outfile << "subproblem 2 is done, now lets move to subproblem 3 if there or not, it will be checked "<< movedStates.size()<< " times"<<endl;
-    // outfile << "number of movedstates "<< movedStates.size()<<endl;
-    // outfile << "they are "<<endl;
-    // for(int iterMovedStates=0; iterMovedStates<movedStates.size(); iterMovedStates++){
-    //     movedStates[iterMovedStates]->stboard->printnormalconfig();
-    //     outfile <<endl;
-    // } // End debug
+    outfile << "subproblem 2 is done, now lets move to subproblem 3 if there or not, it will be checked "<< movedStates.size()<< " times"<<endl; // Debug
 
     for(int iterMovedStates=0; iterMovedStates<movedStates.size(); iterMovedStates++){
         State * thismovedstate = movedStates[iterMovedStates];
@@ -501,7 +494,7 @@ vector<State*> State::getSuccessors(int currPlayer){
                 int startx = removaliter->first.first, starty = removaliter->first.second;
                 int endx = removaliter->second.first, endy = removaliter->second.second;
                 changedstate->stboard->removeMarkers(startx, starty, endx, endy);
-                string tempmove = parseMove(1, startx, starty, endx, endy);
+                string tempmove = parseMove(2, startx, starty, endx, endy);
                 // removed markers
                 // outfile << "removed rings state is "<<endl;
                 // changedstate->stboard->printnormalconfig(); // Debug
@@ -527,6 +520,7 @@ vector<State*> State::getSuccessors(int currPlayer){
     
     this->isSuccessorsUpdated = true;
     this->successors = finStatesvec;
+    this->moves = finStatesMoves;
     outfile<<"returning get successor"<<endl;
     return finStatesvec;
 }
