@@ -90,8 +90,10 @@ Board::Board(int n0, int m0, int k0, int l0){
 pair<int,int> Board::makeInitialMoves(int movenum) {
     pair<int,int> retPair;
     if (movenum == 1 && config[n][n] == 1) {
+        outfile << "INITIAL MOVE: centre" << endl;
         retPair = make_pair(n,n);
     } else if (movenum <= (m+1)/2 || movenum <= (m-6)) {
+        outfile << "INITIAL MOVE: rhombus" << endl;
         pair<int,int> ring = player_id==1 ? p2Rings.back() : p1Rings.back();
         
         bool madeMove = false;
@@ -119,7 +121,10 @@ pair<int,int> Board::makeInitialMoves(int movenum) {
                 madeMove = true;
             }
         }
-    } else retPair = blockOpponentRings();
+    } else {
+        cout << "INITIAL MOVE: block" << endl;
+        retPair = blockOpponentRings();
+    }
 
     if (retPair.first < 0 || retPair.second < 0) {
         outfile << "Could not find a valid move for next ring, occupy corners" << endl; // Debug
@@ -128,7 +133,9 @@ pair<int,int> Board::makeInitialMoves(int movenum) {
 
     bool check = addRing(player_id, retPair.first, retPair.second);
     if (!check) outfile << "Some error in adding ring" << endl; // Debug
-    return retPair;
+    outfile << "Init move: " << retPair.first << " " << retPair.second << endl; 
+    pair<int,int> hexRetPair = board->getHexagonalCoordinate(retPair.first, retPair.second);
+    return hexRetPair;
 }
 
 pair<int,int> Board::blockOpponentRings() {
@@ -656,9 +663,8 @@ bool Board::isFlippable(int row, int col){
     return retVal;
 }
 
-pair<int, int> Board::getHexagonalCoordinate(int xarg, int yarg){
-    // xarg
-    // give xarg and yarg in 0,0 coordinates
+pair<int, int> Board::getHexagonalCoordinate(int x, int y){
+    int xarg = x-5, yarg = y-5;
     if(xarg==0 && yarg==0){
         return make_pair(0,0);
     }else if(xarg>=0 && yarg>0){
