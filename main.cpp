@@ -77,8 +77,8 @@ int main(int argc, char** argv) {
     outfileShaved.open("consoleshaved.log");
 
     // test1();
-    // play();
-    test2();
+    play();
+    // test2();
     // boardhelper();
     return 0;
 }
@@ -110,7 +110,7 @@ int test() {
     board->printnormalconfig();
     
     State* state = new State(board, 1);
-    outfile << state->evaluate() << endl;
+    outfile << state->getEvaluation() << endl;
     outfile << state->getEvaluation() << endl;
     auto tempsuccessors = state->getSuccessors(2);
     outfile << "size of successors is "<<tempsuccessors.size()<<endl;
@@ -146,7 +146,7 @@ int test1(){
         outfile << "eval for all children is "<< state->successors[i]->getEvaluation()<<endl;
     }
     // int templayer =2;
-    // state->evaluate();
+    // state->getEvaluation();
     // while(true){
     //     int temp;
     //     temp = state->alphaBeta(2,-DBL_MAX, +DBL_MAX, 3-templayer);
@@ -155,7 +155,7 @@ int test1(){
     //     cout << "to"<<endl;
     //     state->successors[state->bestMove]->stboard->printnormalconfig();
     //     state = state->successors[state->bestMove];
-    //     // state->evaluate();
+    //     // state->getEvaluation();
     //     // state = null;
     // }
 }
@@ -184,7 +184,6 @@ int test2(){
     state->stboard->printnormalconfigShaved();
     state->stboard->printBeautifiedconfigShaved();
     // DEBUG_EVAL = true;
-    // state->evaluate();
     // outfile << state->getEvaluation() << endl;
     DEBUG_EVAL = false;
     temp = state->iterativeDeepening(2,2);
@@ -286,7 +285,7 @@ int play() {
     time_limit = stoi(word);
     
     timeHelper->setMaxAllowedTime(time_limit);
-    max_depth = 3;
+    max_depth = 2;
 
     string move;
     int movenum = 1;

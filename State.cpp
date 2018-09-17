@@ -355,7 +355,7 @@ double State::weightedSum() {
 }
 
 /*
- * evaluate() evaluates the current state and checks ->
+ * getEvaluation() evaluates the current state and checks ->
  * if there exist any row of k markers, in which case, it returns false
  * else returns true 
  */
@@ -377,8 +377,9 @@ bool State::evaluate() {
 double State::getEvaluation() {
     if (heuristic == -DBL_MAX) {
         bool check = this->evaluate();
-        if (!check) outfile << "WARNING: Invalid state evaluated" << endl;
+        // if (!check) outfile << "WARNING: Invalid state evaluated" << endl; // getEvaluation() being called everywhere
     }
+    // outfile << "Evaluation done: " << heuristic << endl; 
     return heuristic;
 }
 
@@ -407,7 +408,7 @@ double State::iterativeDeepening(int max_depth, int playerId){
     outfile.close();
     outfile.open("console.log");
     // outfile << "ID starting for depth " << max_depth << endl;
-    for(int distance = 1; distance < max_depth && !timeHelper->outOfTime(); distance++) {
+    for(int distance = 1; distance <= max_depth && !timeHelper->outOfTime(); distance++) {
         outfile << "ID evaluating for depth " << distance << endl;
         val = this->alphaBeta(distance,-DBL_MAX, DBL_MAX, playerId);
     }
@@ -431,21 +432,21 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer){
     vector<State *> successsors = this->getSuccessors(currPlayer);
     for(int i = 0; i < successsors.size() && !timeHelper->outOfTime(); i++){
         double value = -successsors[i]->alphaBeta(depth-1,-beta,-alpha, 3-currPlayer);
-        outfile << value << endl;
-        if(value>tempscore){
-            successors.at(i)->evaluate();
+        outfile << value ;
+        if(value>tempscore) {
             outfile << "    Better -> " << successors.at(i)->getEvaluation() << endl;
-            successors.at(i)->stboard->printnormalconfig();
-            outfile << endl;
+            // successors.at(i)->stboard->printnormalconfig();
+            // outfile << endl;
             this->bestMove = i;
             tempscore=value;
         }
-        if(tempscore>alpha){
+        if(tempscore>alpha) {
             alpha=tempscore;
         }
-        if(tempscore>=beta){
+        if(tempscore>=beta) {
             break;
         }
+        outfile << endl;
     }
     outfile << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
     // outfile << "returning alphabeta at depth "<<depth << " alpha is "<<alpha << " beta is "<< beta << " player is "<<currPlayer<< " ";
@@ -465,14 +466,16 @@ vector<State*> State::getSuccessors(int currPlayer){
         outfile<<"returning get successor"<<endl;
         return this->successors;
     }
-    bool isKinRow = this->evaluate();
+    this->getEvaluation();
+    bool isKinRow = this->kInRow;
+    // bool isKinRow = this->evaluate();
     // outfile << "evaluation for the state done "<<isKinRow<<endl;
     // outfile << "myass "<< true<<endl;
 
     vector<State*> movedStates, finStatesvec;
     vector<string> movedMoves, finStatesMoves;
 
-    if(!isKinRow) {
+    if(isKinRow) {
         //there are k in row we need to remove them
         vector<State*> tempvec; 
         vector<string> tempmoves;
@@ -522,14 +525,14 @@ vector<State*> State::getSuccessors(int currPlayer){
     for(int iterMovedStates=0; iterMovedStates<movedStates.size(); iterMovedStates++){
         State * thismovedstate = movedStates[iterMovedStates];
         string appendMove = movedMoves[iterMovedStates];
-        // outfile << "thismovedstate is "<<endl;
-        // thismovedstate->stboard->printnormalconfig(); // Debug
-        isKinRow = thismovedstate->evaluate();
-        // outfile<<"debug"<<endl;
+
+        thismovedstate->getEvaluation();
+        bool isKinRow = thismovedstate->kInRow;
+        // bool isKinRow = thismovedstate->evaluate();
         /* 
          * For Debug -> Take care to change code in subproblem 1 as well
          */
-        if(!isKinRow){
+        if(isKinRow){
             outfile << "execute subproblem 3 as it is necessary"<<endl;
             vector<pair< pair<int,int>, pair<int,int>>> removalCoordinates = thismovedstate->getPossibleMarkerRemovals();
             outfile << "removalcoordinates freq is "<< removalCoordinates.size()<<endl;
