@@ -324,7 +324,7 @@ int play() {
             currState->iterativeDeepening(max_depth, player_id);
             outfile << "Best Move at: " << currState->bestMove << endl; // Debug
             cout << currState->moves.at(currState->bestMove) << endl; // Make appropriate moves here.
-            outfileShaved<< "I did "<< currState->moves.at(currState->bestMove)  << "which means "<< endl;
+            outfileShaved<< "I did "<< currState->moves.at(currState->bestMove)  << " which means "<< endl;
             currState->successors[currState->bestMove]->stboard->printnormalconfigShaved();
             currState->successors[currState->bestMove]->stboard->printBeautifiedconfigShaved();
             currState->makeMove();
