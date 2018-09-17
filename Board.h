@@ -24,8 +24,11 @@ extern int max_depth;
 extern ofstream outfile;
 extern ofstream outfileShaved;
 extern TimeHelper * timeHelper;
+
+// Hyper Parameters
 extern bool DEBUG_EVAL;
 extern bool NON_FLIP;
+extern bool WRITE_FILE;
 
 class Board{
     public:

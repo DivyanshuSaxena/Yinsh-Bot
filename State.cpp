@@ -151,10 +151,10 @@ void State::incrementkRows(int marker, bool flip, int endx, int endy) {
         if (DEBUG_EVAL) outfile << "Found k for 2, rowsk2: " << rowsk2 << endl;
     }
     if (marker-playerToMove == 3) {
-        outfile << "Found streak end: " << endx << " " << endy << " for player " << playerToMove << " in state " << endl;
+        if (WRITE_FILE) outfile << "Found streak end: " << endx << " " << endy << " for player " << playerToMove << " in state " << endl;
         if (DEBUG_EVAL) {
             this->stboard->printnormalconfig();
-            outfile << endl;
+            if (WRITE_FILE) outfile << endl;
         }
         endkx = endx;
         endky = endy;
@@ -188,7 +188,7 @@ void State::incrementRows(int count, int marker, bool flip) {
     } else {
         // Presently, the code should never get into this -> 
         // k markers checked in getLinearMarkers
-        outfile << "Unreachable piece of code reached" << endl;
+        if (WRITE_FILE) outfile << "Unreachable piece of code reached" << endl;
         incrementkRows(marker, flip, -1, -1);
     }
 }
@@ -198,9 +198,9 @@ void State::checkCount(int count, int prevMarker, bool flip, int startx, int sta
         incrementRows(count, prevMarker, flip);
     if (count >= k) {
         incrementkRows(prevMarker, flip, endx, endy);
-        outfile << "Found streak starting at: " << startx << " " << starty << endl;
+        if (WRITE_FILE) outfile << "Found streak starting at: " << startx << " " << starty << endl;
         if (prevMarker-playerToMove == 3) {
-            outfile << "For same player" << endl;
+            // outfile << "For same player" << endl;
             startkx = startx;
             startky = starty;
         }
@@ -214,7 +214,7 @@ void State::getLinearMarkers() {
     // Vertical and Horizontal Rows for both opponents
     for (int i = 0; i <= 2*n; i++) {
         int startj = i>n ? (i-n) : 0;
-        int completej = i<=n ? (n+i) : 2*n+1;
+        int completej = i<=n ? (n+i) : 2*n;
         int prevMarkerVert = stboard->config[i][startj];
         int prevMarkerHorz = stboard->config[startj][i];
         int countVert = 1, countHorz = 1;
@@ -236,7 +236,7 @@ void State::getLinearMarkers() {
                 } 
                 startkxVert = i;
                 startkyVert = j; // Set the start indices of streak start
-                // if (DEBUG_EVAL) outfile << "Start streak (Vert) at " << i << " " << j << endl; // Debug
+                if (DEBUG_EVAL) outfile << "Start streak (Vert) at " << i << " " << j << endl; // Debug
                 countVert = 1;
                 prevMarkerVert = stboard->config[i][j];
                 flipVert = false;
@@ -255,7 +255,7 @@ void State::getLinearMarkers() {
                 } 
                 startkxHorz = j;
                 startkyHorz = i; // Set the start indices of streak start
-                // if (DEBUG_EVAL) outfile << "Start streak (Horz) at " << j << " " << i << endl; // Debug
+                if (DEBUG_EVAL) outfile << "Start streak (Horz) at " << j << " " << i << endl; // Debug
                 countHorz = 1;
                 prevMarkerHorz = stboard->config[j][i];
                 flipHorz = false;
@@ -264,8 +264,12 @@ void State::getLinearMarkers() {
         }
         
         // Check for the last place
-        checkCount(countVert, prevMarkerVert, flipVert, startkxVert, startkyVert, i, j-1);
-        checkCount(countHorz, prevMarkerHorz, flipHorz, startkxHorz, startkyHorz, j-1, i);
+        if (countVert >= k) {
+            checkCount(countVert, prevMarkerVert, flipVert, startkxVert, startkyVert, i, j-1);
+        }
+        if (countHorz >= k) {
+            checkCount(countHorz, prevMarkerHorz, flipHorz, startkxHorz, startkyHorz, j-1, i);
+        }
     }
 
     // Slant Rows for both opponents
@@ -291,13 +295,15 @@ void State::getLinearMarkers() {
                 }
                 startkxSlant = j;
                 startkySlant = j-diff; // Set the start indices of streak start
-                // if (DEBUG_EVAL) outfile << "Streak start (Slant) at " << j << " " << (j-diff) << endl;
+                if (DEBUG_EVAL) outfile << "Streak start (Slant) at " << j << " " << (j-diff) << endl;
                 count = 1;
                 prevMarker = stboard->config[j][j-diff];
                 flip = false;
             }
         }
-        checkCount(count, prevMarker, flip, startkxSlant, startkySlant, j-1, j-1-diff);
+        if (count >= k-2) {
+            checkCount(count, prevMarker, flip, startkxSlant, startkySlant, j-1, j-1-diff);
+        }
     }
 }
 
@@ -418,10 +424,12 @@ bool State::isTerminalNode() {
         this->getBlockedRings();
         retVal = rings1Blocked || rings2Blocked;
     }
-    outfile << "~~~~~~~~~~~Found Terminal Node~~~~~~~~~~~~" << endl;
-    this->stboard->printnormalconfig();
-    outfile << endl;
-    outfile << "   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   " << endl;
+    if (retVal) {
+        if (WRITE_FILE) outfile << "~~~~~~~~~~~Found Terminal Node~~~~~~~~~~~~" << endl;
+        this->stboard->printnormalconfig();
+        if (WRITE_FILE) outfile << endl;
+        if (WRITE_FILE) outfile << "   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   " << endl;
+    }
     return retVal;
 }
 
@@ -431,12 +439,12 @@ double State::iterativeDeepening(int max_depth, int playerId){
     outfile.open("console.log");
     // outfile << "ID starting for depth " << max_depth << endl;
     for(int distance = 1; distance <= max_depth && !timeHelper->outOfTime(); distance++) {
-        outfile << "ID evaluating for depth " << distance << endl;
+        if (WRITE_FILE) outfile << "ID evaluating for depth " << distance << endl;
         val = this->alphaBeta(distance,-DBL_MAX, DBL_MAX, playerId, 1);
     }
-    outfile << "ID Done for this move, found successor at: " << this->bestMove << endl;
+    if (WRITE_FILE) outfile << "ID Done for this move, found successor at: " << this->bestMove << endl;
     this->successors.at(bestMove)->stboard->printnormalconfig();
-    outfile << endl; // Debug
+    if (WRITE_FILE) outfile << endl; // Debug
     return val;
 }
 
@@ -447,19 +455,19 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
     if (this->isTerminalNode()) {
         return evSign * this->getEvaluation();
     }    
-    outfile << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
-    outfile << "executing alphabeta at depth "<<depth << " alpha is "<<alpha << " beta is "<< beta << " player is "<<currPlayer<< " ";
-    outfile << "state is "<<endl;
+    if (WRITE_FILE) outfile << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
+    if (WRITE_FILE) outfile << "executing alphabeta at depth "<<depth << " alpha is "<<alpha << " beta is "<< beta << " player is "<<currPlayer<< " ";
+    if (WRITE_FILE) outfile << "state is "<<endl;
     this->stboard->printnormalconfig();
-    outfile << endl;
+    if (WRITE_FILE) outfile << endl;
 
     double tempscore = -DBL_MAX;
     vector<State *> successsors = this->getSuccessors(currPlayer);
     for(int i = 0; i < successsors.size() && !timeHelper->outOfTime(); i++){
         double value = -successsors[i]->alphaBeta(depth-1,-beta,-alpha, 3-currPlayer, -evSign);
-        outfile << value ;
+        if (WRITE_FILE) outfile << value ;
         if(value>tempscore) {
-            outfile << "    Better -> " << successors.at(i)->getEvaluation() << endl;
+            if (WRITE_FILE) outfile << "    Better -> " << successors.at(i)->getEvaluation() << endl;
             this->bestMove = i;
             tempscore=value;
         }
@@ -469,9 +477,9 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
         if(tempscore >= beta) {
             break;
         }
-        outfile << endl;
+        if (WRITE_FILE) outfile << endl;
     }
-    outfile << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
+    if (WRITE_FILE) outfile << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
     return tempscore;
 }
 
@@ -524,7 +532,7 @@ vector<State*> State::getSuccessors(int currPlayer){
         }
         vector<pair<int,int>> rings = currPlayer == 1 ? this->stboard->p1Rings : this->stboard->p2Rings;
         if (rings.size() != m-l+1) {
-            outfile <<"removed markers and rings, subproblem 1 done, jumping to subproblem 2"<<endl;
+            if (WRITE_FILE) outfile <<"removed markers and rings, subproblem 1 done, jumping to subproblem 2"<<endl;
             for(int tempiter=0;tempiter<tempvec.size();tempiter++){
                 auto movePair = tempvec[tempiter]->getStatesForMoves(currPlayer, tempmoves[tempiter]);
                 vector<State*> tempthisMovedStates = movePair.first;
@@ -544,14 +552,14 @@ vector<State*> State::getSuccessors(int currPlayer){
             return movedStates;
         }
     } else {
-        outfile << "skipped subproblem 1, calculating subproblem 2"<<endl;
+        if (WRITE_FILE) outfile << "skipped subproblem 1, calculating subproblem 2"<<endl;
         auto movePair = this->getStatesForMoves(currPlayer, "\0");
         movedStates = movePair.first;
         movedMoves = movePair.second;
     }
 
     // Final step of checking if k markers made again
-    outfile << "subproblem 2 is done, now lets move to subproblem 3 if there or not, it will be checked "<< movedStates.size()<< " times"<<endl; // Debug
+    if (WRITE_FILE) outfile << "subproblem 2 is done, now lets move to subproblem 3 if there or not, it will be checked "<< movedStates.size()<< " times"<<endl; // Debug
 
     for(int iterMovedStates=0; iterMovedStates<movedStates.size(); iterMovedStates++){
         State * thismovedstate = movedStates[iterMovedStates];
@@ -564,13 +572,13 @@ vector<State*> State::getSuccessors(int currPlayer){
          * For Debug -> Take care to change code in subproblem 1 as well
          */
         if(isKinRow){
-            outfile << "execute subproblem 3 as it is necessary"<<endl;
+            if (WRITE_FILE) outfile << "execute subproblem 3 as it is necessary"<<endl;
             vector<pair< pair<int,int>, pair<int,int>>> removalCoordinates = thismovedstate->getPossibleMarkerRemovals();
-            outfile << "removalcoordinates freq is "<< removalCoordinates.size()<<endl;
+            if (WRITE_FILE) outfile << "removalcoordinates freq is "<< removalCoordinates.size()<<endl;
             // remove trashcount
             int trashcount =1;
             for(auto removaliter= removalCoordinates.begin();removaliter<removalCoordinates.end();removaliter++){
-                outfile << "iterating on removalcoordinates number "<< trashcount<<endl;
+                if (WRITE_FILE) outfile << "iterating on removalcoordinates number "<< trashcount<<endl;
                 State * changedstate = new State(thismovedstate->stboard, playerToMove);
                 int startx = removaliter->first.first, starty = removaliter->first.second;
                 int endx = removaliter->second.first, endy = removaliter->second.second;
@@ -630,7 +638,7 @@ pair<vector<State*>, vector<string>> State::getStatesForMoves(int currPlayer, st
 
 vector<pair< pair<int,int>, pair<int,int>>> State::getPossibleMarkerRemovals(){
     vector<pair< pair<int,int>, pair<int,int>>> ansvec;
-    outfile << "marker coordinates are "<< this->startkx << " " <<this->startky<< " " << this->endkx<< " " <<this->endky<< " "<< endl;
+    if (WRITE_FILE) outfile << "marker coordinates are "<< this->startkx << " " <<this->startky<< " " << this->endkx<< " " <<this->endky<< " "<< endl;
     int distance = max( abs(this->startkx-this->endkx)+1, abs(this->startky-this->endky)+1);
     if(distance==k){
         ansvec.push_back(make_pair(make_pair(this->startkx,this->startky),make_pair(this->endkx, this->endky)));

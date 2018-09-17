@@ -59,6 +59,7 @@ ofstream outfileShaved;
 vector<double> weights;
 bool DEBUG_EVAL;
 bool NON_FLIP;
+bool WRITE_FILE;
 
 Board* board;
 int player_id, time_limit, max_depth;
@@ -78,7 +79,6 @@ int main(int argc, char** argv) {
     outfile.open("console.log");
     outfileShaved.open("consoleshaved.log");
 
-    // test1();
     play();
     // test2();
     // boardhelper();
@@ -127,7 +127,7 @@ int test() {
 
 void setWeights() {
     // Initialize weights
-    int w[] = {0,2,4,10,12,50,4,70};
+    int w[] = {0,2,4,10,12,30,4,70};
     weights.push_back(0);
     for (int i = 1; i <= 7; i++) {
         if (player_id == 2) {
@@ -148,8 +148,8 @@ int test2(){
     board->printnormalconfigShaved();
     board->printBeautifiedconfigShaved();
     outfileShaved<<"lets do search"<<endl;
-    player_id = 1;
-    State * state = new State(board, 1);
+    player_id = 2;
+    State * state = new State(board, 2);
     int temp;
     timeHelper->setMaxAllowedTime(150);
     timeHelper->setClockISpecific();
@@ -160,7 +160,9 @@ int test2(){
     // DEBUG_EVAL = true;
     // outfile << state->getEvaluation() << endl;
     DEBUG_EVAL = false;
-    temp = state->iterativeDeepening(1,1);
+    NON_FLIP = true;
+    max_depth = 3;
+    temp = state->iterativeDeepening(3,2);
     outfile << "Best Move at: " << state->bestMove << endl; // Debug
     cout << state->moves.at(state->bestMove) << endl; // Make appropriate moves here.
     outfileShaved<< "I, player"<< state->playerToMove <<" did "<< state->moves.at(state->bestMove) << endl;
@@ -258,9 +260,11 @@ int play() {
     }
     time_limit = stoi(word);
     
-    NON_FLIP = false;
+    NON_FLIP = true;
+    DEBUG_EVAL = false;
+    WRITE_FILE = false;
     timeHelper->setMaxAllowedTime(time_limit);
-    max_depth = 4;
+    max_depth = 3;
 
     string move;
     int movenum = 1;
