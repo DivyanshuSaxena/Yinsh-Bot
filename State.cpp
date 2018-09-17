@@ -532,7 +532,8 @@ pair<vector<State*>, vector<string>> State::getStatesForMoves(int currPlayer, st
 vector<pair< pair<int,int>, pair<int,int>>> State::getPossibleMarkerRemovals(){
     vector<pair< pair<int,int>, pair<int,int>>> ansvec;
     outfile << "marker coordinates are "<< this->startkx << " " <<this->startky<< " " << this->endkx<< " " <<this->endky<< " "<< endl;
-    int distance = max(abs(this->startkx-this->endkx)+1,abs(this->endkx-this->endky)+1);
+    int distance = max( abs(this->startkx-this->endkx)+1, abs(this->startky-this->endky)+1);
+    outfile << "Distance and k " << distance << " " << k << endl;
     if(distance==k){
         ansvec.push_back(make_pair(make_pair(this->startkx,this->startky),make_pair(this->endkx, this->endky)));
     }else{
