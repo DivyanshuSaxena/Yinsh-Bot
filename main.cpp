@@ -108,7 +108,7 @@ int test() {
     outfile << "select n move done "<<endl;
     board->printnormalconfig();
     
-    State* state = new State(board);
+    State* state = new State(board, 1);
     outfile << state->evaluate() << endl;
     outfile << state->getEvaluation() << endl;
     auto tempsuccessors = state->getSuccessors(2);
@@ -124,7 +124,7 @@ int test() {
 
 int test1(){
     board = new Board(5,5,5,3);
-    State* state = new State(board);
+    State* state = new State(board, 1);
     player_id=2;
     for(int i=0;i<10;i++){
         player_id = 3-player_id;
@@ -174,7 +174,7 @@ int test2(){
     board->printnormalconfigShaved();
     board->printBeautifiedconfigShaved();
     outfileShaved<<"lets do search"<<endl;
-    State * state = new State(board);
+    State * state = new State(board, 2);
     int temp;
     timeHelper->setMaxAllowedTime(150);
     timeHelper->setClockISpecific();
@@ -307,7 +307,7 @@ int play() {
     while(true) {
         timeHelper->setClockISpecific();
         timeHelper->setMaxAllowedTimeSpecific(3);
-        State* currState = new State(board);
+        State* currState = new State(board, player_id);
         outfileShaved<<"lets see this one"<<endl;
         board->printnormalconfigShaved();
         board->printBeautifiedconfigShaved();

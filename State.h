@@ -45,9 +45,10 @@ class State {
         void checkCount(int, int, bool, int, int, int, int);
 
     public:
-        State(Board* board);
-        State(State* state);
+        State(Board* board, int player);
+        // State(State* state);
         Board* stboard;
+        int playerToMove;
         bool isSuccessorsUpdated;
         int bestMove; // Index of best successor in successors
         vector<string> moves;
