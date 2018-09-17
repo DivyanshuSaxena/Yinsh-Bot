@@ -38,6 +38,5 @@ main
 .vscode/*
 tryme
 tryme.cpp
-board.txt
 !coordihelper.log
 

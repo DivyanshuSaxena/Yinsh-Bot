@@ -76,8 +76,8 @@ int main(int argc, char** argv) {
     outfileShaved.open("consoleshaved.log");
 
     // test1();
-    play();
-    // test2();
+    // play();
+    test2();
     // boardhelper();
     return 0;
 }
@@ -182,7 +182,7 @@ int test2(){
     outfileShaved<<"state is "<<endl;
     state->stboard->printnormalconfigShaved();
     state->stboard->printBeautifiedconfigShaved();
-    temp = state->iterativeDeepening(2,2);
+    temp = state->iterativeDeepening(4,2);
     outfile << "Best Move at: " << state->bestMove << endl; // Debug
     cout << state->moves.at(state->bestMove) << endl; // Make appropriate moves here.
     outfileShaved<< "I did "<< state->moves.at(state->bestMove) << endl;
@@ -281,7 +281,7 @@ int play() {
     time_limit = stoi(word);
     
     timeHelper->setMaxAllowedTime(time_limit);
-    max_depth = 2;
+    max_depth = 3;
 
     string move;
     int movenum = 1;
