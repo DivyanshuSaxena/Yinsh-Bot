@@ -38,5 +38,8 @@ main
 .vscode/*
 tryme
 tryme.cpp
+board2.txt
+anomaly.txt
+
 !coordihelper.log
 
