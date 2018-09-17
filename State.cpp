@@ -214,7 +214,7 @@ void State::getLinearMarkers() {
     // Vertical and Horizontal Rows for both opponents
     for (int i = 0; i <= 2*n; i++) {
         int startj = i>n ? (i-n) : 0;
-        int completej = i<=n ? (n+i) : 2*n;
+        int completej = i<=n ? (n+i) : 2*n+1;
         int prevMarkerVert = stboard->config[i][startj];
         int prevMarkerHorz = stboard->config[startj][i];
         int countVert = 1, countHorz = 1;
@@ -426,7 +426,7 @@ bool State::isTerminalNode() {
     }
     if (retVal) {
         if (WRITE_FILE) outfile << "~~~~~~~~~~~Found Terminal Node~~~~~~~~~~~~" << endl;
-        this->stboard->printnormalconfig();
+        if (WRITE_FILE) this->stboard->printnormalconfig();
         if (WRITE_FILE) outfile << endl;
         if (WRITE_FILE) outfile << "   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   " << endl;
     }
@@ -490,7 +490,7 @@ vector<State*> State::getSuccessors(int currPlayer){
             iter_swap(this->moves.begin(), this->moves.begin()+this->bestMove);
             this->bestMove=0;
         }
-        outfile<<"returning get successor"<<endl;
+        if (WRITE_FILE) outfile<<"returning get successor"<<endl;
         return this->successors;
     }
     this->getEvaluation();
@@ -548,7 +548,7 @@ vector<State*> State::getSuccessors(int currPlayer){
             changePlayer(movedStates);
             this->successors = movedStates;
             this->moves = movedMoves;
-            outfile<<"returning get successor"<<endl;
+            if (WRITE_FILE) outfile<<"returning get successor"<<endl;
             return movedStates;
         }
     } else {
@@ -611,7 +611,7 @@ vector<State*> State::getSuccessors(int currPlayer){
     changePlayer(finStatesvec);
     this->successors = finStatesvec;
     this->moves = finStatesMoves;
-    outfile<<"returning get successor"<<endl;
+    if (WRITE_FILE) outfile<<"returning get successor"<<endl;
     return finStatesvec;
 }
 
