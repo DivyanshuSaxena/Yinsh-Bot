@@ -368,13 +368,13 @@ double State::weightedSum() {
     }
 
     // Number of rings removed
-    if (player_id == 1) {
-        h += (m - stboard->p1Rings.size()) * weights.at(13);
-        h += (m - stboard->p2Rings.size()) * weights.at(14);
-    } else {
-        h += (m - stboard->p2Rings.size()) * weights.at(13);
-        h += (m - stboard->p1Rings.size()) * weights.at(14);
-    }
+    // if (player_id == 1) {
+    h += (m - stboard->p1Rings.size()) * weights.at(13);
+    h += (m - stboard->p2Rings.size()) * weights.at(14);
+    // } else {
+    //     h += (m - stboard->p2Rings.size()) * weights.at(13);
+    //     h += (m - stboard->p1Rings.size()) * weights.at(14);
+    // }
     return h;
 }
 

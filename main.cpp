@@ -167,7 +167,7 @@ void setWeights() {
     int w[] = {0,3,5,9,11,30,2,50};
     weights.push_back(0);
     for (int i = 1; i <= 7; i++) {
-        if (player_id == 1) {
+        if (player_id == 2) {
             weights.push_back(w[i]);
             weights.push_back(-w[i]);
         } else {
@@ -195,7 +195,8 @@ int test2(){
     board->printnormalconfigShaved();
     board->printBeautifiedconfigShaved();
     outfileShaved<<"lets do search"<<endl;
-    State * state = new State(board, 2);
+    player_id = 1;
+    State * state = new State(board, 1);
     int temp;
     timeHelper->setMaxAllowedTime(150);
     timeHelper->setClockISpecific();
@@ -206,10 +207,10 @@ int test2(){
     // DEBUG_EVAL = true;
     // outfile << state->getEvaluation() << endl;
     DEBUG_EVAL = false;
-    temp = state->iterativeDeepening(2,2);
+    temp = state->iterativeDeepening(1,1);
     outfile << "Best Move at: " << state->bestMove << endl; // Debug
     cout << state->moves.at(state->bestMove) << endl; // Make appropriate moves here.
-    outfileShaved<< "I did "<< state->moves.at(state->bestMove) << endl;
+    outfileShaved<< "I, player"<< state->playerToMove <<" did "<< state->moves.at(state->bestMove) << endl;
     outfileShaved<<"fin state is "<<endl;
     state->successors[state->bestMove]->stboard->printnormalconfigShaved();
     state->successors[state->bestMove]->stboard->printBeautifiedconfigShaved();
@@ -306,7 +307,7 @@ int play() {
     
     NON_FLIP = false;
     timeHelper->setMaxAllowedTime(time_limit);
-    max_depth = 4;
+    max_depth = 2;
 
     string move;
     int movenum = 1;
@@ -338,7 +339,7 @@ int play() {
             currState->iterativeDeepening(max_depth, player_id);
             outfile << "Best Move at: " << currState->bestMove << endl; // Debug
             cout << currState->moves.at(currState->bestMove) << endl; // Make appropriate moves here.
-            outfileShaved<< "I did "<< currState->moves.at(currState->bestMove)  << " which means "<< endl;
+            outfileShaved<< "I, player "<<currState->playerToMove <<" did "<< currState->moves.at(currState->bestMove)  << " which means "<< endl;
             currState->successors[currState->bestMove]->stboard->printnormalconfigShaved();
             currState->successors[currState->bestMove]->stboard->printBeautifiedconfigShaved();
             currState->makeMove();
