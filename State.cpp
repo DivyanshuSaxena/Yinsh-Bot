@@ -369,11 +369,11 @@ double State::weightedSum() {
 
     // Number of rings removed
     // if (player_id == 1) {
-    h += (m - stboard->p1Rings.size()) * weights.at(13);
-    h += (m - stboard->p2Rings.size()) * weights.at(14);
+    //     h += (m - stboard->p1Rings.size()) * weights.at(13);
+    //     h += (m - stboard->p2Rings.size()) * weights.at(14);
     // } else {
-    //     h += (m - stboard->p2Rings.size()) * weights.at(13);
-    //     h += (m - stboard->p1Rings.size()) * weights.at(14);
+        h += (m - stboard->p2Rings.size()) * weights.at(13);
+        h += (m - stboard->p1Rings.size()) * weights.at(14);
     // }
     return h;
 }
@@ -432,7 +432,7 @@ double State::iterativeDeepening(int max_depth, int playerId){
     // outfile << "ID starting for depth " << max_depth << endl;
     for(int distance = 1; distance <= max_depth && !timeHelper->outOfTime(); distance++) {
         outfile << "ID evaluating for depth " << distance << endl;
-        val = this->alphaBeta(distance,-DBL_MAX, DBL_MAX, playerId);
+        val = this->alphaBeta(distance,-DBL_MAX, DBL_MAX, playerId, 1);
     }
     outfile << "ID Done for this move, found successor at: " << this->bestMove << endl;
     this->successors.at(bestMove)->stboard->printnormalconfig();
@@ -440,12 +440,12 @@ double State::iterativeDeepening(int max_depth, int playerId){
     return val;
 }
 
-double State::alphaBeta(int depth, double alpha, double beta, int currPlayer){
+double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, int evSign){
     if(depth==0){
-        return this->getEvaluation();
+        return evSign * this->getEvaluation();
     }
     if (this->isTerminalNode()) {
-        return this->getEvaluation();
+        return evSign * this->getEvaluation();
     }    
     outfile << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
     outfile << "executing alphabeta at depth "<<depth << " alpha is "<<alpha << " beta is "<< beta << " player is "<<currPlayer<< " ";
@@ -456,28 +456,22 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer){
     double tempscore = -DBL_MAX;
     vector<State *> successsors = this->getSuccessors(currPlayer);
     for(int i = 0; i < successsors.size() && !timeHelper->outOfTime(); i++){
-        double value = -successsors[i]->alphaBeta(depth-1,-beta,-alpha, 3-currPlayer);
+        double value = -successsors[i]->alphaBeta(depth-1,-beta,-alpha, 3-currPlayer, -evSign);
         outfile << value ;
         if(value>tempscore) {
             outfile << "    Better -> " << successors.at(i)->getEvaluation() << endl;
-            // successors.at(i)->stboard->printnormalconfig();
-            // outfile << endl;
             this->bestMove = i;
             tempscore=value;
         }
-        if(tempscore>alpha) {
-            alpha=tempscore;
+        if(tempscore > alpha) {
+            alpha = tempscore;
         }
-        if(tempscore>=beta) {
+        if(tempscore >= beta) {
             break;
         }
         outfile << endl;
     }
     outfile << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
-    // outfile << "returning alphabeta at depth "<<depth << " alpha is "<<alpha << " beta is "<< beta << " player is "<<currPlayer<< " ";
-    // outfile << "state is "<<endl;
-    // this->stboard->printnormalconfig();
-    // outfile <<endl;
     return tempscore;
 }
 
@@ -528,14 +522,26 @@ vector<State*> State::getSuccessors(int currPlayer){
                 tempmoves.push_back(tempMove + " " + parseMove(3, ringx, ringy, -1, -1));
             }
         }
-        
-        outfile <<"removed markers and rings, subproblem 1 done, jumping to subproblem 2"<<endl;
-        for(int tempiter=0;tempiter<tempvec.size();tempiter++){
-            auto movePair = tempvec[tempiter]->getStatesForMoves(currPlayer, tempmoves[tempiter]);
-            vector<State*> tempthisMovedStates = movePair.first;
-            vector<string> tempthisMoves = movePair.second;
-            movedStates.insert(movedStates.end(), tempthisMovedStates.begin(), tempthisMovedStates.end());
-            movedMoves.insert(movedMoves.end(), tempthisMoves.begin(), tempthisMoves.end());
+        vector<pair<int,int>> rings = currPlayer == 1 ? this->stboard->p1Rings : this->stboard->p2Rings;
+        if (rings.size() != m-l+1) {
+            outfile <<"removed markers and rings, subproblem 1 done, jumping to subproblem 2"<<endl;
+            for(int tempiter=0;tempiter<tempvec.size();tempiter++){
+                auto movePair = tempvec[tempiter]->getStatesForMoves(currPlayer, tempmoves[tempiter]);
+                vector<State*> tempthisMovedStates = movePair.first;
+                vector<string> tempthisMoves = movePair.second;
+                movedStates.insert(movedStates.end(), tempthisMovedStates.begin(), tempthisMovedStates.end());
+                movedMoves.insert(movedMoves.end(), tempthisMoves.begin(), tempthisMoves.end());
+            }
+        } else {
+            movedStates.insert(movedStates.end(), tempvec.begin(), tempvec.end());
+            movedMoves.insert(movedMoves.end(), tempmoves.begin(), tempmoves.end());
+
+            this->isSuccessorsUpdated = true;
+            changePlayer(movedStates);
+            this->successors = movedStates;
+            this->moves = movedMoves;
+            outfile<<"returning get successor"<<endl;
+            return movedStates;
         }
     } else {
         outfile << "skipped subproblem 1, calculating subproblem 2"<<endl;

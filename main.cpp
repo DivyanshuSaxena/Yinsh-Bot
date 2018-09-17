@@ -125,46 +125,9 @@ int test() {
     }
 }
 
-int test1(){
-    board = new Board(5,5,5,3);
-    State* state = new State(board, 1);
-    player_id=2;
-    for(int i=0;i<10;i++){
-        player_id = 3-player_id;
-        state->stboard->makeInitialMoves(i/2+1);
-        // state->stboard->printnormalconfig();
-        // outfile <<endl;
-    }
-    outfile <<"done "<<endl;
-    // state->stboard->printnormalconfig();
-    state->stboard->printnormalconfig();
-    int temp;
-    temp = state->alphaBeta(3,-DBL_MAX, +DBL_MAX, 1);
-    outfile<<"from"<<endl;
-    state->stboard->printnormalconfig();
-    outfile << "to"<<endl;
-    state->successors[state->bestMove]->stboard->printnormalconfig();
-    for(int i=0;i<state->successors.size();i++){
-        outfile << "eval for all children is "<< state->successors[i]->getEvaluation()<<endl;
-    }
-    // int templayer =2;
-    // state->getEvaluation();
-    // while(true){
-    //     int temp;
-    //     temp = state->alphaBeta(2,-DBL_MAX, +DBL_MAX, 3-templayer);
-    //     cout<<"from"<<endl;
-    //     state->stboard->printnormalconfig();
-    //     cout << "to"<<endl;
-    //     state->successors[state->bestMove]->stboard->printnormalconfig();
-    //     state = state->successors[state->bestMove];
-    //     // state->getEvaluation();
-    //     // state = null;
-    // }
-}
-
 void setWeights() {
     // Initialize weights
-    int w[] = {0,3,5,9,11,30,2,50};
+    int w[] = {0,2,4,10,12,50,4,70};
     weights.push_back(0);
     for (int i = 1; i <= 7; i++) {
         if (player_id == 2) {
@@ -179,16 +142,6 @@ void setWeights() {
 }
 
 int test2(){
-    // weights.push_back(0);
-    // for (int i = 1; i <= 6; i++) {
-    //     if (player_id == 1) {
-    //         weights.push_back(i);
-    //         weights.push_back(-i);
-    //     } else {
-    //         weights.push_back(-i);
-    //         weights.push_back(i);
-    //     }
-    // }
     setWeights();
     board = new Board(5,5,5,3);
     board->createBoardFromFile("board.txt");
@@ -307,7 +260,7 @@ int play() {
     
     NON_FLIP = false;
     timeHelper->setMaxAllowedTime(time_limit);
-    max_depth = 2;
+    max_depth = 4;
 
     string move;
     int movenum = 1;
