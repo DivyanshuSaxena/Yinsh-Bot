@@ -25,6 +25,7 @@ extern ofstream outfile;
 extern ofstream outfileShaved;
 extern TimeHelper * timeHelper;
 extern bool DEBUG_EVAL;
+extern bool NON_FLIP;
 
 class Board{
     public:

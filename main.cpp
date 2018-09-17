@@ -58,6 +58,7 @@ ofstream outfile;
 ofstream outfileShaved;
 vector<double> weights;
 bool DEBUG_EVAL;
+bool NON_FLIP;
 
 Board* board;
 int player_id, time_limit, max_depth;
@@ -303,8 +304,9 @@ int play() {
     }
     time_limit = stoi(word);
     
+    NON_FLIP = false;
     timeHelper->setMaxAllowedTime(time_limit);
-    max_depth = 3;
+    max_depth = 4;
 
     string move;
     int movenum = 1;

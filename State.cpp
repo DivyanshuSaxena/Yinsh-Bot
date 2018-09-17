@@ -229,7 +229,7 @@ void State::getLinearMarkers() {
             if (stboard->config[i][j] == prevMarkerVert) {
                 if (!(prevMarkerVert == player1 || prevMarkerVert == player2) ) goto horizontal;
                 countVert++;
-                flipVert = flipVert || stboard->isFlippable(i, j);
+                if (NON_FLIP) flipVert = flipVert || stboard->isFlippable(i, j);
             } else {
                 if (countVert >= k-2) {
                     checkCount(countVert, prevMarkerVert, flipVert, startkxVert, startkyVert, i, j-1);
@@ -248,7 +248,7 @@ void State::getLinearMarkers() {
             if (stboard->config[j][i] == prevMarkerHorz) {
                 if (!(prevMarkerHorz == player1 || prevMarkerHorz == player2) ) continue;
                 countHorz++;
-                flipHorz = flipHorz || stboard->isFlippable(j, i);
+                if (NON_FLIP) flipHorz = flipHorz || stboard->isFlippable(j, i);
             } else {
                 if (countHorz > 0) {
                     checkCount(countHorz, prevMarkerHorz, flipHorz, startkxHorz, startkyHorz, j-1, i);
@@ -283,7 +283,7 @@ void State::getLinearMarkers() {
             if (stboard->config[j][j-diff] == prevMarker) {
                 if (prevMarker != player1 && prevMarker != player2) continue;
                 count++;
-                flip = flip || stboard->isFlippable(j, j-diff);
+                if (NON_FLIP) flip = flip || stboard->isFlippable(j, j-diff);
             } else {
                 if (count >= k-2) {
                     if (DEBUG_EVAL) outfile << "Found a streak (Slant) of length " << count << endl;
@@ -313,14 +313,16 @@ double State::weightedSum() {
         h += rowsktwo2 * weights.at(2);
     }
 
-    // Rows of k-2 non flippable markers
-    if (nonFlipRowsktwo1 != -1) {
-        if (DEBUG_EVAL) outfile << "Rows k-2 for player 1 - non flip " << nonFlipRowsktwo1 << endl;        
-        h += nonFlipRowsktwo1 * weights.at(3); 
-    }
-    if (nonFlipRowsktwo2 != -1) {
-        if (DEBUG_EVAL) outfile << "Rows k-2 for player 2 -  non flip " << nonFlipRowsktwo2 << endl;    
-        h += nonFlipRowsktwo2 * weights.at(4); 
+    if (NON_FLIP) {
+        // Rows of k-2 non flippable markers
+        if (nonFlipRowsktwo1 != -1) {
+            if (DEBUG_EVAL) outfile << "Rows k-2 for player 1 - non flip " << nonFlipRowsktwo1 << endl;        
+            h += nonFlipRowsktwo1 * weights.at(3); 
+        }
+        if (nonFlipRowsktwo2 != -1) {
+            if (DEBUG_EVAL) outfile << "Rows k-2 for player 2 -  non flip " << nonFlipRowsktwo2 << endl;    
+            h += nonFlipRowsktwo2 * weights.at(4); 
+        }
     }
 
     // Rows of k-1 markers
@@ -333,14 +335,16 @@ double State::weightedSum() {
         h += rowskone2 * weights.at(6);
     }
 
-    // Rows of k-1 non flippable markers
-    if (nonFlipRowskone1 != -1) {
-        if (DEBUG_EVAL) outfile << "Rows k-1 for player 1 - non flip " << nonFlipRowskone1 << endl;        
-        h += nonFlipRowskone1 * weights.at(7);
-    }
-    if (nonFlipRowskone2 != -1) {
-        if (DEBUG_EVAL) outfile << "Rows k-1 for player 2 - non flip " << nonFlipRowskone2 << endl;
-        h += nonFlipRowskone2 * weights.at(8);
+    if (NON_FLIP) {
+        // Rows of k-1 non flippable markers
+        if (nonFlipRowskone1 != -1) {
+            if (DEBUG_EVAL) outfile << "Rows k-1 for player 1 - non flip " << nonFlipRowskone1 << endl;        
+            h += nonFlipRowskone1 * weights.at(7);
+        }
+        if (nonFlipRowskone2 != -1) {
+            if (DEBUG_EVAL) outfile << "Rows k-1 for player 2 - non flip " << nonFlipRowskone2 << endl;
+            h += nonFlipRowskone2 * weights.at(8);
+        }
     }
 
     // Rows of k markers
