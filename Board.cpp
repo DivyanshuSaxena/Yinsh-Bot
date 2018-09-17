@@ -659,10 +659,10 @@ bool Board::selectAndMoveRing(int ringx, int ringy, int finringx, int finringy){
 bool Board::removeMarkers(int startx, int starty, int finx, int finy){
     auto inipair = make_pair(startx, starty);
     auto destpair= make_pair(finx, finy);
-    outfile << "inipair is "<<inipair.first << " "<<inipair.second<<endl;
-    outfile << "destpair is "<<destpair.first << " "<<destpair.second<<endl;
+    // outfile << "inipair is "<<inipair.first << " "<<inipair.second<<endl;
+    // outfile << "destpair is "<<destpair.first << " "<<destpair.second<<endl;
     auto dirvec = getDirectionVector(inipair, destpair);
-    outfile << "dirvec is "<<dirvec.first << " "<<dirvec.second<<endl;
+    // outfile << "dirvec is "<<dirvec.first << " "<<dirvec.second<<endl;
     for(int i=0;i< k;i++){
         this->config[inipair.first + i*dirvec.first][inipair.second + i*dirvec.second] = 1;
     }

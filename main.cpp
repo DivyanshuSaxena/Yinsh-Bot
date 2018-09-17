@@ -183,17 +183,17 @@ int test2(){
     outfileShaved<<"state is "<<endl;
     state->stboard->printnormalconfigShaved();
     state->stboard->printBeautifiedconfigShaved();
-    DEBUG_EVAL = true;
-    state->evaluate();
-    outfile << state->getEvaluation() << endl;
-    // DEBUG_EVAL = false;
-    // temp = state->iterativeDeepening(3,2);
-    // outfile << "Best Move at: " << state->bestMove << endl; // Debug
-    // cout << state->moves.at(state->bestMove) << endl; // Make appropriate moves here.
-    // outfileShaved<< "I did "<< state->moves.at(state->bestMove) << endl;
-    // outfileShaved<<"fin state is "<<endl;
-    // state->successors[state->bestMove]->stboard->printnormalconfigShaved();
-    // state->successors[state->bestMove]->stboard->printBeautifiedconfigShaved();
+    // DEBUG_EVAL = true;
+    // state->evaluate();
+    // outfile << state->getEvaluation() << endl;
+    DEBUG_EVAL = false;
+    temp = state->iterativeDeepening(2,2);
+    outfile << "Best Move at: " << state->bestMove << endl; // Debug
+    cout << state->moves.at(state->bestMove) << endl; // Make appropriate moves here.
+    outfileShaved<< "I did "<< state->moves.at(state->bestMove) << endl;
+    outfileShaved<<"fin state is "<<endl;
+    state->successors[state->bestMove]->stboard->printnormalconfigShaved();
+    state->successors[state->bestMove]->stboard->printBeautifiedconfigShaved();
 }
 
 int boardhelper(){

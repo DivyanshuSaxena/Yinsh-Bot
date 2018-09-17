@@ -58,7 +58,7 @@ State::State(Board* board, int player) {
 
     playerToMove = player;
     bestMove = -1;
-    isSuccessorsUpdated =false;
+    isSuccessorsUpdated = false;
     resetFeatures();
 }
 
@@ -75,12 +75,12 @@ State::State(Board* board, int player) {
 // }
 
 void State::resetFeatures() {
-    int rowsk1 = -1, rowsk2 = -1;
-    int rowskone1 = -1, nonFlipRowskone1 = -1;
-    int rowsktwo1 = -1, nonFlipRowsktwo1 = -1;
-    int rowskone2 = -1, nonFlipRowskone2 = -1;
-    int rowsktwo2 = -1, nonFlipRowsktwo2 = -1;
-    int blockDoF1 = -1, blockDoF2 = -1;
+    rowsk1 = -1; rowsk2 = -1;
+    rowskone1 = -1; nonFlipRowskone1 = -1;
+    rowsktwo1 = -1; nonFlipRowsktwo1 = -1;
+    rowskone2 = -1; nonFlipRowskone2 = -1;
+    rowsktwo2 = -1; nonFlipRowsktwo2 = -1;
+    blockDoF1 = -1; blockDoF2 = -1;
 }
 
 void State::duplicateFeatures(State* state){
@@ -132,16 +132,19 @@ void State::setWeight(double weight, int feature) {
 
 void State::incrementkRows(int marker, bool flip, int endx, int endy) {
     if (marker == 4) {
-        if (DEBUG_EVAL) outfile << "Found k for 1" << endl;
         rowsk1++;
+        if (DEBUG_EVAL) outfile << "Found k for 1, rowsk1: " << rowsk1 << endl;
     } else {
-        if (DEBUG_EVAL) outfile << "Found k for 2" << endl;
+        if (DEBUG_EVAL) outfile << "rowsk2: " << rowsk2 << endl;
         rowsk2++;
+        if (DEBUG_EVAL) outfile << "Found k for 2, rowsk2: " << rowsk2 << endl;
     }
     if (marker-playerToMove == 3) {
         outfile << "Found streak end: " << endx << " " << endy << " for player " << playerToMove << " in state " << endl;
-        this->stboard->printnormalconfig();
-        outfile << endl;
+        if (DEBUG_EVAL) {
+            this->stboard->printnormalconfig();
+            outfile << endl;
+        }
         endkx = endx;
         endky = endy;
         kInRow = true;
@@ -272,7 +275,7 @@ void State::getLinearMarkers() {
                 flip = flip || stboard->isFlippable(j, j-diff);
             } else {
                 if (count >= k-2) {
-                    outfile << "Found a streak of length " << count << endl;
+                    if (DEBUG_EVAL) outfile << "Found a streak (Slant) of length " << count << endl;
                     checkCount(count, prevMarker, flip, startkxSlant, startkySlant, j-1, j-1-diff); 
                 }
                 startkxSlant = j;
@@ -358,7 +361,7 @@ double State::weightedSum() {
  */
 bool State::evaluate() {
     // Assumption - At a time, only a single row of k markers can be present
-    outfile << "Starting Evaluation" << endl; // Debug
+    if (DEBUG_EVAL) outfile << "Starting Evaluation" << endl; // Debug
     stboard->updateRingPositions();
     this->getLinearMarkers();
     this->getBlockedRings();
@@ -372,6 +375,10 @@ bool State::evaluate() {
 }
 
 double State::getEvaluation() {
+    if (heuristic == -DBL_MAX) {
+        bool check = this->evaluate();
+        if (!check) outfile << "WARNING: Invalid state evaluated" << endl;
+    }
     return heuristic;
 }
 
@@ -414,6 +421,7 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer){
     if(depth==0 || this->isTerminalNode()){
         return this->getEvaluation();
     }
+    outfile << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
     outfile << "executing alphabeta at depth "<<depth << " alpha is "<<alpha << " beta is "<< beta << " player is "<<currPlayer<< " ";
     outfile << "state is "<<endl;
     this->stboard->printnormalconfig();
@@ -421,10 +429,14 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer){
 
     double tempscore = -DBL_MAX;
     vector<State *> successsors = this->getSuccessors(currPlayer);
-    for(int i=0;i<successsors.size() && !timeHelper->outOfTime();i++){
+    for(int i = 0; i < successsors.size() && !timeHelper->outOfTime(); i++){
         double value = -successsors[i]->alphaBeta(depth-1,-beta,-alpha, 3-currPlayer);
+        outfile << value << endl;
         if(value>tempscore){
-            outfile << "Found better successor at index " << i << endl;
+            successors.at(i)->evaluate();
+            outfile << "    Better -> " << successors.at(i)->getEvaluation() << endl;
+            successors.at(i)->stboard->printnormalconfig();
+            outfile << endl;
             this->bestMove = i;
             tempscore=value;
         }
@@ -435,10 +447,11 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer){
             break;
         }
     }
-    outfile << "returning alphabeta at depth "<<depth << " alpha is "<<alpha << " beta is "<< beta << " player is "<<currPlayer<< " ";
-    outfile << "state is "<<endl;
-    this->stboard->printnormalconfig();
-    outfile <<endl;
+    outfile << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
+    // outfile << "returning alphabeta at depth "<<depth << " alpha is "<<alpha << " beta is "<< beta << " player is "<<currPlayer<< " ";
+    // outfile << "state is "<<endl;
+    // this->stboard->printnormalconfig();
+    // outfile <<endl;
     return tempscore;
 }
 
