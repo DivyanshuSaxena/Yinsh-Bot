@@ -239,7 +239,6 @@ void State::getLinearMarkers() {
 
     // Slant Rows for both opponents
     bool flip = false;
-    int startkxSlant = 0, startkySlant = 0;
     for (int diff = -n; diff <= n; diff++) {
         // Let the slant line be x-y = c, then diff is the iterator for c
         int startj = (diff<=0) ? 0 : diff;
@@ -247,6 +246,7 @@ void State::getLinearMarkers() {
         int prevMarker = stboard->config[startj][startj-diff];
         int count = 0;
         int j = startj+1;
+        int startkxSlant = startj, startkySlant = startj-diff;
         for (j = startj+1; j <= endj; j++) {
             if (stboard->config[j][j-diff] == prevMarker) {
                 if (prevMarker != player1 && prevMarker != player2) continue;
