@@ -55,6 +55,7 @@
 
 int n, m, k, l;
 ofstream outfile;
+ofstream outfileShaved;
 vector<double> weights;
 
 Board* board;
@@ -62,6 +63,8 @@ int player_id, time_limit, max_depth;
 
 int test();
 int test1();
+int test2();
+int boardhelper();
 int play();
 TimeHelper * timeHelper;
 int main(int argc, char** argv) {
@@ -70,9 +73,12 @@ int main(int argc, char** argv) {
 
     // Initialize streams
     outfile.open("console.log");
+    outfileShaved.open("consoleshaved.log");
 
     // test1();
     play();
+    // test2();
+    // boardhelper();
     return 0;
 }
 
@@ -151,6 +157,43 @@ int test1(){
     //     // state->evaluate();
     //     // state = null;
     // }
+}
+int test2(){
+    weights.push_back(0);
+    for (int i = 1; i <= 6; i++) {
+        if (player_id == 1) {
+            weights.push_back(i);
+            weights.push_back(-i);
+        } else {
+            weights.push_back(-i);
+            weights.push_back(i);
+        }
+    }
+    board = new Board(5,5,5,3);
+    board->createBoardFromFile("board.txt");
+    board->printnormalconfigShaved();
+    board->printBeautifiedconfigShaved();
+    outfileShaved<<"lets do search"<<endl;
+    State * state = new State(board, 2);
+    int temp;
+    timeHelper->setMaxAllowedTime(150);
+    timeHelper->setClockISpecific();
+    timeHelper->setMaxAllowedTimeSpecific(3);
+    outfileShaved<<"state is "<<endl;
+    state->stboard->printnormalconfigShaved();
+    state->stboard->printBeautifiedconfigShaved();
+    temp = state->iterativeDeepening(2,2);
+    outfile << "Best Move at: " << state->bestMove << endl; // Debug
+    cout << state->moves.at(state->bestMove) << endl; // Make appropriate moves here.
+    outfileShaved<< "I did "<< state->moves.at(state->bestMove) << endl;
+    outfileShaved<<"fin state is "<<endl;
+    state->successors[state->bestMove]->stboard->printnormalconfigShaved();
+    state->successors[state->bestMove]->stboard->printBeautifiedconfigShaved();
+}
+
+int boardhelper(){
+    board=new Board(5,5,5,3);
+    board->printhexagonalconfig();
 }
 
 void parseAndMove(string move) {
@@ -265,10 +308,15 @@ int play() {
         timeHelper->setClockISpecific();
         timeHelper->setMaxAllowedTimeSpecific(3);
         State* currState = new State(board, player_id);
+        outfileShaved<<"lets see this one"<<endl;
+        board->printnormalconfigShaved();
+        board->printBeautifiedconfigShaved();
+        outfileShaved<< "starting iteration on above"<<endl;
         // outfile << movenum << endl;           
         if (movenum <= m) {
             pair<int,int> movePair = board->makeInitialMoves(movenum);
             cout << "P " << movePair.first << " " << movePair.second << endl;
+            outfileShaved<< "I did "<< "P " << movePair.first << " " << movePair.second << endl;
         } else {
             // Check this block
             // currState->alphaBeta(depth, -DBL_MAX, DBL_MAX, player_id);
@@ -276,10 +324,14 @@ int play() {
             currState->iterativeDeepening(max_depth, player_id);
             outfile << "Best Move at: " << currState->bestMove << endl; // Debug
             cout << currState->moves.at(currState->bestMove) << endl; // Make appropriate moves here.
+            outfileShaved<< "I did "<< currState->moves.at(currState->bestMove)  << "which means "<< endl;
+            currState->successors[currState->bestMove]->stboard->printnormalconfigShaved();
+            currState->successors[currState->bestMove]->stboard->printBeautifiedconfigShaved();
             currState->makeMove();
         }
         outfile << "Moved self move" << endl;
         getline(cin, move);
+        outfileShaved << "He did "<< move << endl;
         parseAndMove(move);
         timeHelper->updateElapsedTimePersonal();
         outfile << "Opponent move done" << endl;
