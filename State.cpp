@@ -36,7 +36,7 @@ string State::parseMove(int movetype, int x1, int y1, int x2, int y2) {
     return str;
 }
 
-State::State(Board* board) {
+State::State(Board* board, int player) {
     // Duplicate the argument board
     stboard = new Board(n,m,k,l);
     for(int j=2*n;j>=0;j--){
@@ -50,22 +50,23 @@ State::State(Board* board) {
     heuristic = -DBL_MAX;
     kInRow = false;
 
+    playerToMove = player;
     bestMove = -1;
     isSuccessorsUpdated =false;
     resetFeatures();
 }
 
-State::State(State* state){
-    stboard = new Board(n,m,k,l);
-    for(int j=2*n;j>=0;j--){
-        for(int i=0;i<2*n+1;i++){
-            stboard->config[i][j] = state->stboard->config[i][j];
-        }
-    }
-    heuristic= state->heuristic;
-    kInRow = state->kInRow;
-    duplicateFeatures(state);
-}
+// State::State(State* state){
+//     stboard = new Board(n,m,k,l);
+//     for(int j=2*n;j>=0;j--){
+//         for(int i=0;i<2*n+1;i++){
+//             stboard->config[i][j] = state->stboard->config[i][j];
+//         }
+//     }
+//     heuristic= state->heuristic;
+//     kInRow = state->kInRow;
+//     duplicateFeatures(state);
+// }
 
 void State::resetFeatures() {
     int rowsk1 = -1, rowsk2 = -1;
@@ -130,9 +131,11 @@ void State::incrementkRows(int marker, bool flip, int endx, int endy) {
         rowsk2++;
     }
     outfile << "~~~~~~~~~~~~~~~~~~~~~~~~Found streak ending at " << endx << " " << endy << endl;
-    endkx = endx;
-    endky = endy;
-    kInRow = true;
+    if (marker-playerToMove != 3) {
+        endkx = endx;
+        endky = endy;
+        kInRow = true;
+    }
 }
 
 void State::incrementRows(int count, int marker, bool flip) {
@@ -171,8 +174,10 @@ void State::checkCount(int count, int prevMarker, bool flip, int startx, int sta
         incrementRows(count, prevMarker, flip);
     if (count >= k) {
         incrementkRows(prevMarker, flip, endx, endy);
-        startkx = startx;
-        startky = starty;
+        if (prevMarker-playerToMove != 3) {
+            startkx = startx;
+            startky = starty;
+        }
     }
 }
 
@@ -413,7 +418,7 @@ vector<State*> State::getSuccessors(int currPlayer){
             /* 
             * For Debug -> Take care to change code in subproblem 3 as well
             */
-            State * changedstate = new State(this->stboard);
+            State * changedstate = new State(this->stboard, 3-playerToMove);
             int startx = removaliter->first.first, starty = removaliter->first.second;
             int endx = removaliter->second.first, endy = removaliter->second.second;
             changedstate->stboard->removeMarkers(startx, starty, endx, endy);
@@ -422,7 +427,7 @@ vector<State*> State::getSuccessors(int currPlayer){
             vector<pair<int,int>> remrings = currPlayer==1 ? changedstate->stboard->p1Rings : changedstate->stboard->p2Rings;
 
             for(int ringsiter=0;ringsiter<remrings.size();ringsiter++){
-                State * removedRingState = new State(changedstate->stboard);
+                State * removedRingState = new State(changedstate->stboard, 3-playerToMove);
                 int ringx = remrings[ringsiter].first, ringy = remrings[ringsiter].second;
                 removedRingState->stboard->removeRing(ringx, ringy);
                 removedRingState->stboard->updateRingPositions();
@@ -468,7 +473,7 @@ vector<State*> State::getSuccessors(int currPlayer){
             int trashcount =1;
             for(auto removaliter= removalCoordinates.begin();removaliter<removalCoordinates.end();removaliter++){
                 outfile << "iterating on removalcoordinates number "<< trashcount<<endl;
-                State * changedstate = new State(thismovedstate->stboard);
+                State * changedstate = new State(thismovedstate->stboard, 3-playerToMove);
                 int startx = removaliter->first.first, starty = removaliter->first.second;
                 int endx = removaliter->second.first, endy = removaliter->second.second;
                 changedstate->stboard->removeMarkers(startx, starty, endx, endy);
@@ -479,7 +484,7 @@ vector<State*> State::getSuccessors(int currPlayer){
 
                 vector<pair<int,int>> remrings = currPlayer==1 ? changedstate->stboard->p1Rings : changedstate->stboard->p2Rings;
                 for(int ringsiter=0; ringsiter < remrings.size(); ringsiter++){
-                    State * removedRingState = new State(changedstate->stboard);
+                    State * removedRingState = new State(changedstate->stboard, 3-playerToMove);
                     int ringx = remrings[ringsiter].first, ringy = remrings[ringsiter].second;
                     removedRingState->stboard->removeRing(ringx, ringy);
                     removedRingState->stboard->updateRingPositions();                    
@@ -513,7 +518,7 @@ pair<vector<State*>, vector<string>> State::getStatesForMoves(int currPlayer, st
         auto possibleMoves = this->stboard->showPossibleMoves(thisring.first,thisring.second);
         for(int individualmoveiter=0; individualmoveiter<possibleMoves.size(); individualmoveiter++){
             auto thismovefin = possibleMoves[individualmoveiter];
-            State * tempstate = new State(this->stboard);
+            State * tempstate = new State(this->stboard, 3-playerToMove);
             tempstate->stboard->selectAndMoveRing(thisring.first, thisring.second, thismovefin.first, thismovefin.second);
             string move = parseMove(1, thisring.first, thisring.second, thismovefin.first, thismovefin.second);
 
