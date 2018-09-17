@@ -57,6 +57,7 @@ int n, m, k, l;
 ofstream outfile;
 ofstream outfileShaved;
 vector<double> weights;
+bool DEBUG_EVAL;
 
 Board* board;
 int player_id, time_limit, max_depth;
@@ -76,8 +77,8 @@ int main(int argc, char** argv) {
     outfileShaved.open("consoleshaved.log");
 
     // test1();
-    play();
-    // test2();
+    // play();
+    test2();
     // boardhelper();
     return 0;
 }
@@ -182,13 +183,17 @@ int test2(){
     outfileShaved<<"state is "<<endl;
     state->stboard->printnormalconfigShaved();
     state->stboard->printBeautifiedconfigShaved();
-    temp = state->iterativeDeepening(3,2);
-    outfile << "Best Move at: " << state->bestMove << endl; // Debug
-    cout << state->moves.at(state->bestMove) << endl; // Make appropriate moves here.
-    outfileShaved<< "I did "<< state->moves.at(state->bestMove) << endl;
-    outfileShaved<<"fin state is "<<endl;
-    state->successors[state->bestMove]->stboard->printnormalconfigShaved();
-    state->successors[state->bestMove]->stboard->printBeautifiedconfigShaved();
+    DEBUG_EVAL = true;
+    state->evaluate();
+    outfile << state->getEvaluation() << endl;
+    // DEBUG_EVAL = false;
+    // temp = state->iterativeDeepening(3,2);
+    // outfile << "Best Move at: " << state->bestMove << endl; // Debug
+    // cout << state->moves.at(state->bestMove) << endl; // Make appropriate moves here.
+    // outfileShaved<< "I did "<< state->moves.at(state->bestMove) << endl;
+    // outfileShaved<<"fin state is "<<endl;
+    // state->successors[state->bestMove]->stboard->printnormalconfigShaved();
+    // state->successors[state->bestMove]->stboard->printBeautifiedconfigShaved();
 }
 
 int boardhelper(){

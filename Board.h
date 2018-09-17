@@ -24,6 +24,7 @@ extern int max_depth;
 extern ofstream outfile;
 extern ofstream outfileShaved;
 extern TimeHelper * timeHelper;
+extern bool DEBUG_EVAL;
 
 class Board{
     public:

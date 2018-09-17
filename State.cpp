@@ -132,8 +132,10 @@ void State::setWeight(double weight, int feature) {
 
 void State::incrementkRows(int marker, bool flip, int endx, int endy) {
     if (marker == 4) {
+        if (DEBUG_EVAL) outfile << "Found k for 1" << endl;
         rowsk1++;
     } else {
+        if (DEBUG_EVAL) outfile << "Found k for 2" << endl;
         rowsk2++;
     }
     if (marker-playerToMove == 3) {
@@ -182,8 +184,9 @@ void State::checkCount(int count, int prevMarker, bool flip, int startx, int sta
         incrementRows(count, prevMarker, flip);
     if (count >= k) {
         incrementkRows(prevMarker, flip, endx, endy);
+        outfile << "Found streak starting at: " << startx << " " << starty << endl;
         if (prevMarker-playerToMove == 3) {
-            outfile << "Found streak starintg at: " << startx << " " << starty << endl;
+            outfile << "For same player" << endl;
             startkx = startx;
             startky = starty;
         }
@@ -206,6 +209,7 @@ void State::getLinearMarkers() {
         int j = startj+1;
         int startkxVert = i, startkyVert = startj;
         int startkxHorz = startj, startkyHorz = i;
+        if (DEBUG_EVAL) outfile << "Checking vertical at " << i << " from " << startj << " to " << completej << endl; 
         for (j = startj+1; j < completej; j++) {
             // Vertical Rows
             if (stboard->config[i][j] == prevMarkerVert) {
@@ -213,13 +217,12 @@ void State::getLinearMarkers() {
                 countVert++;
                 flipVert = flipVert || stboard->isFlippable(i, j);
             } else {
-                // if (stboard->config[i][j] == player1 || stboard->config[i][j] == player2) {
-                if (countVert > 0) {
+                if (countVert >= k-2) {
                     checkCount(countVert, prevMarkerVert, flipVert, startkxVert, startkyVert, i, j-1);
-                    startkxVert = i;
-                    startkyVert = j; // Set the start indices of streak start
-                    // outfile << "Start streak at " << i << " " << j << endl; // Debug
                 } 
+                startkxVert = i;
+                startkyVert = j; // Set the start indices of streak start
+                // if (DEBUG_EVAL) outfile << "Start streak (Vert) at " << i << " " << j << endl; // Debug
                 countVert = 1;
                 prevMarkerVert = stboard->config[i][j];
                 flipVert = false;
@@ -233,12 +236,12 @@ void State::getLinearMarkers() {
                 countHorz++;
                 flipHorz = flipHorz || stboard->isFlippable(j, i);
             } else {
-                // if (stboard->config[j][i] == player1 || stboard->config[j][i] == player2) {
                 if (countHorz > 0) {
                     checkCount(countHorz, prevMarkerHorz, flipHorz, startkxHorz, startkyHorz, j-1, i);
-                    startkxHorz = j;
-                    startkyHorz = i; // Set the start indices of streak start
                 } 
+                startkxHorz = j;
+                startkyHorz = i; // Set the start indices of streak start
+                // if (DEBUG_EVAL) outfile << "Start streak (Horz) at " << j << " " << i << endl; // Debug
                 countHorz = 1;
                 prevMarkerHorz = stboard->config[j][i];
                 flipHorz = false;
@@ -256,23 +259,25 @@ void State::getLinearMarkers() {
     for (int diff = -n; diff <= n; diff++) {
         // Let the slant line be x-y = c, then diff is the iterator for c
         int startj = (diff<=0) ? 0 : diff;
-        int endj = (diff<=0) ? (10+diff) : 10;
+        int completej = (diff<=0) ? (10+diff) : 10;
         int prevMarker = stboard->config[startj][startj-diff];
-        int count = 0;
+        int count = 1;
         int j = startj+1;
         int startkxSlant = startj, startkySlant = startj-diff;
-        for (j = startj+1; j <= endj; j++) {
+        if (DEBUG_EVAL) outfile << "Checking slant rows from: " << startj << "," << startj-diff << " to " << completej << "," << completej-diff << endl;
+        for (j = startj+1; j <= completej; j++) {
             if (stboard->config[j][j-diff] == prevMarker) {
-                // outfile << "Streak continues for " << j << " " << (j-diff) << endl;
                 if (prevMarker != player1 && prevMarker != player2) continue;
                 count++;
                 flip = flip || stboard->isFlippable(j, j-diff);
             } else {
-                // if (stboard->config[j][j-diff] == player1 || stboard->config[j][j-diff] == player2) {
-                if (count >= k-2) checkCount(count, prevMarker, flip, startkxSlant, startkySlant, j-1, j-1-diff); 
+                if (count >= k-2) {
+                    outfile << "Found a streak of length " << count << endl;
+                    checkCount(count, prevMarker, flip, startkxSlant, startkySlant, j-1, j-1-diff); 
+                }
                 startkxSlant = j;
                 startkySlant = j-diff; // Set the start indices of streak start
-                // outfile << "Streak start for " << j << " " << (j-diff) << endl;
+                // if (DEBUG_EVAL) outfile << "Streak start (Slant) at " << j << " " << (j-diff) << endl;
                 count = 1;
                 prevMarker = stboard->config[j][j-diff];
                 flip = false;
@@ -285,28 +290,64 @@ void State::getLinearMarkers() {
 double State::weightedSum() {
     double h;
     // Rows of k-2 markers
-    if (rowsktwo1 != -1) h += rowsktwo1 * weights.at(1);
-    if (rowsktwo2 != -1) h += rowsktwo2 * weights.at(2);
+    if (rowsktwo1 != -1) {
+        if (DEBUG_EVAL) outfile << "Rows k-2 for player 1 " << rowsktwo1 << endl;
+        h += rowsktwo1 * weights.at(1);
+    } 
+    if (rowsktwo2 != -1) {
+        if (DEBUG_EVAL) outfile << "Rows k-2 for player 2 " << rowsktwo1 << endl;
+        h += rowsktwo2 * weights.at(2);
+    }
 
     // Rows of k-2 non flippable markers
-    if (nonFlipRowsktwo1 != -1) h += nonFlipRowsktwo1 * weights.at(3); 
-    if (nonFlipRowsktwo2 != -1) h += nonFlipRowsktwo2 * weights.at(4); 
-    
+    if (nonFlipRowsktwo1 != -1) {
+        if (DEBUG_EVAL) outfile << "Rows k-2 for player 1 - non flip " << nonFlipRowsktwo1 << endl;        
+        h += nonFlipRowsktwo1 * weights.at(3); 
+    }
+    if (nonFlipRowsktwo2 != -1) {
+        if (DEBUG_EVAL) outfile << "Rows k-2 for player 2 -  non flip " << nonFlipRowsktwo2 << endl;    
+        h += nonFlipRowsktwo2 * weights.at(4); 
+    }
+
     // Rows of k-1 markers
-    if (rowskone1 != -1) h += rowskone1 * weights.at(5);
-    if (rowskone2 != -1) h += rowskone2 * weights.at(6);
+    if (rowskone1 != -1) {
+        if (DEBUG_EVAL) outfile << "Rows k-1 for player 1 " << rowskone1 << endl;
+        h += rowskone1 * weights.at(5);
+    }
+    if (rowskone2 != -1) {
+        if (DEBUG_EVAL) outfile << "Rows k-1 for player 2 " << rowskone2 << endl;
+        h += rowskone2 * weights.at(6);
+    }
 
     // Rows of k-1 non flippable markers
-    if (nonFlipRowskone1 != -1) h += nonFlipRowskone1 * weights.at(7);
-    if (nonFlipRowskone2 != -1) h += nonFlipRowskone2 * weights.at(8);
+    if (nonFlipRowskone1 != -1) {
+        if (DEBUG_EVAL) outfile << "Rows k-1 for player 1 - non flip " << nonFlipRowskone1 << endl;        
+        h += nonFlipRowskone1 * weights.at(7);
+    }
+    if (nonFlipRowskone2 != -1) {
+        if (DEBUG_EVAL) outfile << "Rows k-1 for player 2 - non flip " << nonFlipRowskone2 << endl;
+        h += nonFlipRowskone2 * weights.at(8);
+    }
 
     // Rows of k markers
-    if (rowsk1 != -1) h += rowsk1 * weights.at(9);
-    if (rowsk2 != -1) h += rowsk2 * weights.at(10);
+    if (rowsk1 != -1) {
+        if (DEBUG_EVAL) outfile << "Rows k for player 1 " << rowsk1 << endl;
+        h += rowsk1 * weights.at(9);
+    }
+    if (rowsk2 != -1) {
+        if (DEBUG_EVAL) outfile << "Rows k for player 2 " << rowsk2 << endl;
+        h += rowsk2 * weights.at(10);
+    }
 
     // Blocked rings
-    if (blockDoF1 != -1) h += blockDoF1 * weights.at(11);
-    if (blockDoF2 != -1) h += blockDoF2 * weights.at(12);
+    if (blockDoF1 != -1) {
+        if (DEBUG_EVAL) outfile << "Blocked DoF for player 1 " << blockDoF1 << endl;
+        h += blockDoF1 * weights.at(11);
+    }
+    if (blockDoF2 != -1) {
+        if (DEBUG_EVAL) outfile << "Blocked DoF for player 2 " << blockDoF2 << endl;
+        h += blockDoF2 * weights.at(12);
+    }
     return h;
 }
 
@@ -317,15 +358,16 @@ double State::weightedSum() {
  */
 bool State::evaluate() {
     // Assumption - At a time, only a single row of k markers can be present
-    // outfile << "Starting Evaluation" << endl; // Debug
+    outfile << "Starting Evaluation" << endl; // Debug
     stboard->updateRingPositions();
     this->getLinearMarkers();
+    this->getBlockedRings();
+    if (DEBUG_EVAL) outfile << "Features done" << endl;
+    double h = this->weightedSum();
+    heuristic = h;
     if (kInRow) {
         return false;
     }
-    this->getBlockedRings();
-    double h = weightedSum();
-    heuristic = h;
     return true;
 }
 
