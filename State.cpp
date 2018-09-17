@@ -136,8 +136,10 @@ void State::incrementkRows(int marker, bool flip, int endx, int endy) {
     } else {
         rowsk2++;
     }
-    outfile << "~~~~~~~~~~~~~~~~~~~~~~~~Found streak ending at " << endx << " " << endy << endl;
-    if (marker-playerToMove != 3) {
+    if (marker-playerToMove == 3) {
+        outfile << "Found streak end: " << endx << " " << endy << " for player " << playerToMove << " in state " << endl;
+        this->stboard->printnormalconfig();
+        outfile << endl;
         endkx = endx;
         endky = endy;
         kInRow = true;
@@ -254,23 +256,23 @@ void State::getLinearMarkers() {
     for (int diff = -n; diff <= n; diff++) {
         // Let the slant line be x-y = c, then diff is the iterator for c
         int startj = (diff<=0) ? 0 : diff;
-        int endj = (diff<=0) ? 10 : (10-diff);
+        int endj = (diff<=0) ? (10+diff) : 10;
         int prevMarker = stboard->config[startj][startj-diff];
         int count = 0;
         int j = startj+1;
         int startkxSlant = startj, startkySlant = startj-diff;
         for (j = startj+1; j <= endj; j++) {
             if (stboard->config[j][j-diff] == prevMarker) {
+                // outfile << "Streak continues for " << j << " " << (j-diff) << endl;
                 if (prevMarker != player1 && prevMarker != player2) continue;
                 count++;
                 flip = flip || stboard->isFlippable(j, j-diff);
             } else {
                 // if (stboard->config[j][j-diff] == player1 || stboard->config[j][j-diff] == player2) {
-                if (count > 0) {
-                    checkCount(count, prevMarker, flip, startkxSlant, startkySlant, j-1, j-1-diff);
-                    startkxSlant = j;
-                    startkySlant = j-diff; // Set the start indices of streak start
-                } 
+                if (count >= k-2) checkCount(count, prevMarker, flip, startkxSlant, startkySlant, j-1, j-1-diff); 
+                startkxSlant = j;
+                startkySlant = j-diff; // Set the start indices of streak start
+                // outfile << "Streak start for " << j << " " << (j-diff) << endl;
                 count = 1;
                 prevMarker = stboard->config[j][j-diff];
                 flip = false;
@@ -315,7 +317,7 @@ double State::weightedSum() {
  */
 bool State::evaluate() {
     // Assumption - At a time, only a single row of k markers can be present
-    outfile << "Starting Evaluation" << endl; // Debug
+    // outfile << "Starting Evaluation" << endl; // Debug
     stboard->updateRingPositions();
     this->getLinearMarkers();
     if (kInRow) {
@@ -370,7 +372,7 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer){
     if(depth==0 || this->isTerminalNode()){
         return this->getEvaluation();
     }
-    outfile << "executing alphabeta at depth "<<depth << " alpha is "<<alpha << " beta is "<< beta << " player is "<<currPlayer<<endl;
+    outfile << "executing alphabeta at depth "<<depth << " alpha is "<<alpha << " beta is "<< beta << " player is "<<currPlayer<< " ";
     outfile << "state is "<<endl;
     this->stboard->printnormalconfig();
     outfile << endl;
@@ -391,7 +393,7 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer){
             break;
         }
     }
-    outfile << "returning alphabeta at depth "<<depth << " alpha is "<<alpha << " beta is "<< beta << " player is "<<currPlayer<<endl;
+    outfile << "returning alphabeta at depth "<<depth << " alpha is "<<alpha << " beta is "<< beta << " player is "<<currPlayer<< " ";
     outfile << "state is "<<endl;
     this->stboard->printnormalconfig();
     outfile <<endl;
@@ -541,7 +543,6 @@ vector<pair< pair<int,int>, pair<int,int>>> State::getPossibleMarkerRemovals(){
     vector<pair< pair<int,int>, pair<int,int>>> ansvec;
     outfile << "marker coordinates are "<< this->startkx << " " <<this->startky<< " " << this->endkx<< " " <<this->endky<< " "<< endl;
     int distance = max( abs(this->startkx-this->endkx)+1, abs(this->startky-this->endky)+1);
-    outfile << "Distance and k " << distance << " " << k << endl;
     if(distance==k){
         ansvec.push_back(make_pair(make_pair(this->startkx,this->startky),make_pair(this->endkx, this->endky)));
     }else{

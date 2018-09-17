@@ -98,25 +98,25 @@ pair<int,int> Board::makeInitialMoves(int movenum) {
         
         bool madeMove = false;
         if (ring.second >= n) {
-            if (config[ring.first+1][ring.second-1] == 1) {
+            if (ring.first < 2*n && config[ring.first+1][ring.second-1] == 1) {
                 retPair = make_pair(ring.first+1, ring.second-1);
                 madeMove = true;
-            } else if (config[ring.first-1][ring.second-2] == 1) {
+            } else if (ring.first > 0 && config[ring.first-1][ring.second-2] == 1) {
                 retPair = make_pair(ring.first-1, ring.second-2);
                 madeMove = true;
-            } else if (config[ring.first-2][ring.second-1] == 1) {
+            } else if (ring.first > 1 && config[ring.first-2][ring.second-1] == 1) {
                 retPair = make_pair(ring.first-2, ring.second-1);
                 madeMove = true;
             }
         } 
         if (!madeMove) {
-            if (config[ring.first-1][ring.second+1] == 1) {
+            if (ring.first > 0 && ring.second < 2*n && config[ring.first-1][ring.second+1] == 1) {
                 retPair = make_pair(ring.first-1, ring.second+1);
                 madeMove = true;
-            } else if (config[ring.first+1][ring.second+2] == 1) {
+            } else if (ring.first < 2*n && ring.second < 2*n-1 && config[ring.first+1][ring.second+2] == 1) {
                 retPair = make_pair(ring.first+1, ring.second+2);
                 madeMove = true;
-            } else if (config[ring.first+2][ring.second+1] == 1) {
+            } else if (ring.first < 2*n-1 && ring.second < 2*n && config[ring.first+2][ring.second+1] == 1) {
                 retPair = make_pair(ring.first+2, ring.second+1);
                 madeMove = true;
             }
