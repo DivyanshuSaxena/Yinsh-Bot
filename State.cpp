@@ -538,8 +538,8 @@ vector<pair< pair<int,int>, pair<int,int>>> State::getPossibleMarkerRemovals(){
         ansvec.push_back(make_pair(make_pair(this->startkx,this->startky),make_pair(this->endkx, this->endky)));
     }else{
         auto dirvec = this->stboard->getDirectionVector(make_pair(this->startkx,this->startky), make_pair(this->endkx, this->endky));
-        ansvec.push_back(make_pair(make_pair(this->startkx,this->startky),make_pair(this->startkx + k*dirvec.first, this->startky+k*dirvec.second)));
-        ansvec.push_back(make_pair(make_pair(this->endkx-k*dirvec.first, this->endky-k*dirvec.second),make_pair(this->endkx, this->endky)));
+        ansvec.push_back(make_pair(make_pair(this->startkx,this->startky),make_pair(this->startkx + (k-1)*dirvec.first, this->startky+(k-1)*dirvec.second)));
+        ansvec.push_back(make_pair(make_pair(this->endkx-(k-1)*dirvec.first, this->endky-(k-1)*dirvec.second),make_pair(this->endkx, this->endky)));
     }
     return ansvec;
 }
