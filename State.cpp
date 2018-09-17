@@ -90,12 +90,14 @@ void State::duplicateFeatures(State* state){
 void State::getBlockedRings() {
     int p1len = stboard->p1Rings.size();
     int p2len = stboard->p2Rings.size();
+    bool p1blocked = true, p2blocked = true;
     for (int i = 0; i < p1len+p2len; i++) {
         // Ring pair available at index i
         pair<int,int> ring = i>=p1len ? stboard->p2Rings.at(i-p1len) : stboard->p1Rings.at(i);
         int ringx = ring.first, ringy = ring.second;
         // outfile << "Ring: " << ringx << " " << ringy << endl; // Debug
         int blockdof = 0;
+        bool allDirBlocked = true;
         for (int dir = 0; dir < 9; dir++) {
             if (dir==2 || dir==4 || dir==6) continue;
             int xchange = dir/3 - 1;
@@ -108,6 +110,7 @@ void State::getBlockedRings() {
                 if (stboard->config[x][y] == 0) break;
                 if (stboard->config[x][y] == 1) {
                     moveAvailable = true;
+                    allDirBlocked = false;
                     break;
                 }
                 if (stboard->config[x][y]==2 || stboard->config[x][y]==2) break;
@@ -119,9 +122,17 @@ void State::getBlockedRings() {
             }
         }
         // outfile << "For ring at " << ringx << " " << ringy << " blocked directions are: " << blockdof << endl; // Debug
-        if (i<p1len) this->blockDoF1 += blockdof;
-        else this->blockDoF2 += blockdof;
+        if (i<p1len) {
+            p1blocked = p1blocked && allDirBlocked;
+            this->blockDoF1 += blockdof;
+        }
+        else {
+            p2blocked = p2blocked && allDirBlocked;
+            this->blockDoF2 += blockdof;
+        }
     }
+    this->rings1Blocked = p1blocked;
+    this->rings2Blocked = p2blocked;
 }
 
 void State::setWeight(double weight, int feature) {
@@ -345,11 +356,20 @@ double State::weightedSum() {
     // Blocked rings
     if (blockDoF1 != -1) {
         if (DEBUG_EVAL) outfile << "Blocked DoF for player 1 " << blockDoF1 << endl;
-        h += blockDoF1 * weights.at(11);
+        h += blockDoF1 * weights.at(12);
     }
     if (blockDoF2 != -1) {
         if (DEBUG_EVAL) outfile << "Blocked DoF for player 2 " << blockDoF2 << endl;
-        h += blockDoF2 * weights.at(12);
+        h += blockDoF2 * weights.at(11);
+    }
+
+    // Number of rings removed
+    if (player_id == 1) {
+        h += (m - stboard->p1Rings.size()) * weights.at(13);
+        h += (m - stboard->p2Rings.size()) * weights.at(14);
+    } else {
+        h += (m - stboard->p2Rings.size()) * weights.at(13);
+        h += (m - stboard->p1Rings.size()) * weights.at(14);
     }
     return h;
 }
@@ -391,15 +411,13 @@ bool State::isTerminalNode() {
     if (stboard->p1Rings.size() == m-l || stboard->p2Rings.size() == m-l) {
         retVal = true;
     } else {
-        retVal = true;
-        for (pair<int,int> ring : stboard->p1Rings) {
-            vector<pair<int,int>> moves = stboard->showPossibleMoves(ring.first, ring.second);
-            if (moves.size() != 0) {
-                retVal = false;
-                break;
-            }
-        }
+        this->getBlockedRings();
+        retVal = rings1Blocked || rings2Blocked;
     }
+    outfile << "~~~~~~~~~~~Found Terminal Node~~~~~~~~~~~~" << endl;
+    this->stboard->printnormalconfig();
+    outfile << endl;
+    outfile << "   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   " << endl;
     return retVal;
 }
 
@@ -419,9 +437,12 @@ double State::iterativeDeepening(int max_depth, int playerId){
 }
 
 double State::alphaBeta(int depth, double alpha, double beta, int currPlayer){
-    if(depth==0 || this->isTerminalNode()){
+    if(depth==0){
         return this->getEvaluation();
     }
+    if (this->isTerminalNode()) {
+        return this->getEvaluation();
+    }    
     outfile << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
     outfile << "executing alphabeta at depth "<<depth << " alpha is "<<alpha << " beta is "<< beta << " player is "<<currPlayer<< " ";
     outfile << "state is "<<endl;

@@ -61,13 +61,14 @@ bool DEBUG_EVAL;
 
 Board* board;
 int player_id, time_limit, max_depth;
+TimeHelper * timeHelper;
 
 int test();
 int test1();
 int test2();
 int boardhelper();
 int play();
-TimeHelper * timeHelper;
+
 int main(int argc, char** argv) {
     std::srand ( unsigned ( std::time(0) ) );
     timeHelper = new TimeHelper();
@@ -159,17 +160,35 @@ int test1(){
     //     // state = null;
     // }
 }
-int test2(){
+
+void setWeights() {
+    // Initialize weights
+    int w[] = {0,3,5,9,11,30,2,50};
     weights.push_back(0);
-    for (int i = 1; i <= 6; i++) {
+    for (int i = 1; i <= 7; i++) {
         if (player_id == 1) {
-            weights.push_back(i);
-            weights.push_back(-i);
+            weights.push_back(w[i]);
+            weights.push_back(-w[i]);
         } else {
-            weights.push_back(-i);
-            weights.push_back(i);
+            weights.push_back(-w[i]);
+            weights.push_back(w[i]);
         }
     }
+    // cout << weights.size() << endl;
+}
+
+int test2(){
+    // weights.push_back(0);
+    // for (int i = 1; i <= 6; i++) {
+    //     if (player_id == 1) {
+    //         weights.push_back(i);
+    //         weights.push_back(-i);
+    //     } else {
+    //         weights.push_back(-i);
+    //         weights.push_back(i);
+    //     }
+    // }
+    setWeights();
     board = new Board(5,5,5,3);
     board->createBoardFromFile("board.txt");
     board->printnormalconfigShaved();
@@ -285,23 +304,12 @@ int play() {
     time_limit = stoi(word);
     
     timeHelper->setMaxAllowedTime(time_limit);
-    max_depth = 2;
+    max_depth = 3;
 
     string move;
     int movenum = 1;
     board = new Board(n,5,5,3);
-
-    // Initialize weights
-    weights.push_back(0);
-    for (int i = 1; i <= 6; i++) {
-        if (player_id == 1) {
-            weights.push_back(i);
-            weights.push_back(-i);
-        } else {
-            weights.push_back(-i);
-            weights.push_back(i);
-        }
-    }
+    setWeights();
 
     if(player_id == 2) {
         // Get other player's move

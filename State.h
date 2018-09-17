@@ -38,6 +38,7 @@ class State {
         int startkx, startky;
         int endkx, endky;
         bool kInRow;
+        bool rings1Blocked, rings2Blocked;
         double heuristic;
 
         void incrementkRows(int, bool, int, int);
