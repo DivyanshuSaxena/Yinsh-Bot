@@ -378,8 +378,12 @@ double State::weightedSum() {
     //     h += (m - stboard->p1Rings.size()) * weights.at(13);
     //     h += (m - stboard->p2Rings.size()) * weights.at(14);
     // } else {
-        h += (m - stboard->p2Rings.size()) * weights.at(13);
-        h += (m - stboard->p1Rings.size()) * weights.at(14);
+    h += (m - stboard->p1Rings.size()) * weights.at(13);
+    h += (m - stboard->p2Rings.size()) * weights.at(14);
+    if (DEBUG_EVAL) {
+        outfile << "Player 1 removed rings:- " << weights.at(13) << endl;
+        outfile << "Player 2 removed rings:- " << weights.at(14) << endl;
+    }
     // }
     return h;
 }
@@ -394,13 +398,13 @@ bool State::evaluate() {
     if (DEBUG_EVAL) outfile << "Starting Evaluation" << endl; // Debug
     stboard->updateRingPositions();
     this->getLinearMarkers();
+    if (kInRow) {
+        return false;
+    }
     this->getBlockedRings();
     if (DEBUG_EVAL) outfile << "Features done" << endl;
     double h = this->weightedSum();
     heuristic = h;
-    if (kInRow) {
-        return false;
-    }
     return true;
 }
 
@@ -465,7 +469,11 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
     vector<State *> successsors = this->getSuccessors(currPlayer);
     for(int i = 0; i < successsors.size() && !timeHelper->outOfTime(); i++){
         double value = -successsors[i]->alphaBeta(depth-1,-beta,-alpha, 3-currPlayer, -evSign);
-        if (WRITE_FILE) outfile << value ;
+        if (WRITE_FILE) outfile << value << " " << this->successors[i]->getEvaluation() << endl;
+        if (WRITE_FILE) {
+            this->successors[i]->stboard->printnormalconfig();
+            outfile << endl;
+        }
         if(value>tempscore) {
             if (WRITE_FILE) outfile << "    Better -> " << successors.at(i)->getEvaluation() << endl;
             this->bestMove = i;
@@ -474,7 +482,7 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
         if(tempscore > alpha) {
             alpha = tempscore;
         }
-        if(tempscore >= beta) {
+        if(alpha >= beta) {
             break;
         }
         if (WRITE_FILE) outfile << endl;
@@ -497,7 +505,6 @@ vector<State*> State::getSuccessors(int currPlayer){
     bool isKinRow = this->kInRow;
     // bool isKinRow = this->evaluate();
     // outfile << "evaluation for the state done "<<isKinRow<<endl;
-    // outfile << "myass "<< true<<endl;
 
     vector<State*> movedStates, finStatesvec;
     vector<string> movedMoves, finStatesMoves;

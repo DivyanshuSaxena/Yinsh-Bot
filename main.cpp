@@ -130,7 +130,7 @@ void setWeights() {
     double w[] = {0,5,8,10,15,80,2,100};
     weights.push_back(0);
     for (int i = 1; i <= 7; i++) {
-        if (player_id == 2) {
+        if (player_id == 1) {
             weights.push_back(w[i]);
             weights.push_back(-w[i]);
         } else {
@@ -162,8 +162,8 @@ int test2(){
     DEBUG_EVAL = false;
     NON_FLIP = true;
     WRITE_FILE = true;
-    max_depth = 1;
-    temp = state->iterativeDeepening(1,2);
+    max_depth = 3;
+    temp = state->iterativeDeepening(3,2);
     outfile << "Best Move at: " << state->bestMove << endl; // Debug
     cout << state->moves.at(state->bestMove) << endl; // Make appropriate moves here.
     outfileShaved<< "I, player"<< state->playerToMove <<" did "<< state->moves.at(state->bestMove) << endl;
