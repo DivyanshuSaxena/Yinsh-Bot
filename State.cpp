@@ -473,12 +473,14 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
     this->getSuccessors(currPlayer);
 
     // Sort the successors
-    sort(successors.begin(), successors.end(), [currPlayer](pair<State*,string> p1, pair<State*,string> p2) -> bool {
-        if (currPlayer == player_id)
-            return p1.first->getEvaluation() > p2.first->getEvaluation();
-        return p1.first->getEvaluation() < p2.first->getEvaluation();
-    });
-    this->bestMove = 0;
+    // sort(successors.begin(), successors.end(), [currPlayer](pair<State*,string> p1, pair<State*,string> p2) -> bool {
+    //     if (p1.first == NULL || p2.first == NULL)
+    //         return true;
+    //     if (currPlayer == player_id)
+    //         return p1.first->getEvaluation() > p2.first->getEvaluation();
+    //     return p1.first->getEvaluation() < p2.first->getEvaluation();
+    // });
+    // this->bestMove = 0;
 
     /*
      * Not much effect in the overall timing of gameplay was observed when
@@ -488,8 +490,8 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
      * CHECK -> WHETHER THIS LOCATION FOR ERASING THE VECTOR IS FINE OR NOT
      */
     int len = successors.size();
-    int beam = successors.size() < 10 ? successors.size() : 10;
-    successors.erase(successors.begin()+beam, successors.end());
+    // int beam = successors.size() < 15 ? successors.size() : 15;
+    // successors.erase(successors.begin()+beam, successors.end());
     // outfile << "Pruned successors length: " << successors.size() << endl;
 
     for(int i = 0; i < successors.size() && !timeHelper->outOfTime(); i++){
@@ -518,15 +520,15 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
 }
 
 vector<pair<State*,string> > State::getSuccessors(int currPlayer){
-    // if(this->isSuccessorsUpdated){
-    //     if(this->bestMove>0 ){
-    //         iter_swap(this->successors.begin(),this->successors.begin()+this->bestMove );
-    //         // iter_swap(this->moves.begin(), this->moves.begin()+this->bestMove);
-    //         this->bestMove=0;
-    //     }
-    //     if (WRITE_FILE) outfile<<"returning get successor"<<endl;
-    //     return this->successors;
-    // }
+    if(this->isSuccessorsUpdated){
+        if(this->bestMove>0 ){
+            iter_swap(this->successors.begin(),this->successors.begin()+this->bestMove );
+            // iter_swap(this->moves.begin(), this->moves.begin()+this->bestMove);
+            this->bestMove=0;
+        }
+        if (WRITE_FILE) outfile<<"returning get successor"<<endl;
+        return this->successors;
+    }
     this->getEvaluation();
     bool isKinRow = this->kInRow;
     // bool isKinRow = this->evaluate();

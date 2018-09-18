@@ -127,7 +127,7 @@ int test() {
 
 void setWeights() {
     // Initialize weights
-    double w[] = {0,5,8,10,15,80,2,250};
+    double w[] = {0,5,15,12,25,200,2,600};
     weights.push_back(0);
     for (int i = 1; i <= 7; i++) {
         if (player_id == 1) {
@@ -265,7 +265,7 @@ int play() {
     DEBUG_EVAL = false;
     WRITE_FILE = false;
     timeHelper->setMaxAllowedTime(time_limit);
-    max_depth = 4;
+    max_depth = 3;
 
     string move;
     int movenum = 1;
