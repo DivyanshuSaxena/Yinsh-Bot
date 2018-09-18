@@ -72,7 +72,7 @@ int boardhelper();
 int play();
 
 int main(int argc, char** argv) {
-    std::srand ( unsigned ( std::time(0) ) );
+    // std::srand ( unsigned ( std::time(0) ) );
     timeHelper = new TimeHelper();
 
     // Initialize streams
