@@ -439,8 +439,8 @@ bool State::isTerminalNode() {
 
 double State::iterativeDeepening(int max_depth, int playerId){
     double val;
-    // outfile.close();
-    // outfile.open("console.log");
+    outfile.close();
+    outfile.open("console.log");
     // outfile << "ID starting for depth " << max_depth << endl;
     for(int distance = 1; distance <= max_depth && !timeHelper->outOfTime(); distance++) {
         if (WRITE_FILE) outfile << "ID evaluating for depth " << distance << endl;
@@ -486,7 +486,7 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
      */
     int len = successors.size();
     int beam = successors.size() < 15 ? successors.size() : 15;
-    successors.erase(successors.begin()+successors.size(), successors.end());
+    successors.erase(successors.begin()+beam, successors.end());
 
     for(int i = 0; i < successors.size() && !timeHelper->outOfTime(); i++){
         double value = -successors[i].first->alphaBeta(depth-1,-beta,-alpha, 3-currPlayer, -evSign);
