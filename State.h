@@ -9,6 +9,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <algorithm>
 #include <cfloat>
 #include <limits>
 #include "Board.h"
@@ -52,14 +53,15 @@ class State {
         int playerToMove;
         bool isSuccessorsUpdated;
         int bestMove; // Index of best successor in successors
-        vector<string> moves;
-        vector<State*> successors;
+        // vector<string> moves;
+        // Same vector to hold state and string
+        vector<pair<State*,string> > successors;
         void setWeight(double weight, int feature);
 
         // Accessor Methods
         bool isTerminalNode();
-        vector<State*> getSuccessors(int currPlayer);
-        pair<vector<State*>, vector<string>> getStatesForMoves(int currPlayer, string);
+        vector<pair<State*,string> > getSuccessors(int currPlayer);
+        vector<pair<State*,string> > getStatesForMoves(int currPlayer, string);
         vector<pair< pair<int,int>, pair<int,int>>> getPossibleMarkerRemovals();
 
         // Operations

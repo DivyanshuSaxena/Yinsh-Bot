@@ -120,17 +120,17 @@ int test() {
     state->stboard->printnormalconfig();
     outfile<<"answers are "<<endl;
     for(int i=0;i<tempsuccessors.size();i++){
-        tempsuccessors[i]->stboard->printnormalconfig();
+        tempsuccessors[i].first->stboard->printnormalconfig();
         outfile <<endl;
     }
 }
 
 void setWeights() {
     // Initialize weights
-    int w[] = {0,2,4,10,12,30,4,70};
+    double w[] = {0,5,8,10,15,80,2,250};
     weights.push_back(0);
     for (int i = 1; i <= 7; i++) {
-        if (player_id == 2) {
+        if (player_id == 1) {
             weights.push_back(w[i]);
             weights.push_back(-w[i]);
         } else {
@@ -161,14 +161,15 @@ int test2(){
     // outfile << state->getEvaluation() << endl;
     DEBUG_EVAL = false;
     NON_FLIP = true;
+    WRITE_FILE = true;
     max_depth = 3;
     temp = state->iterativeDeepening(3,2);
     outfile << "Best Move at: " << state->bestMove << endl; // Debug
-    cout << state->moves.at(state->bestMove) << endl; // Make appropriate moves here.
-    outfileShaved<< "I, player"<< state->playerToMove <<" did "<< state->moves.at(state->bestMove) << endl;
+    cout << state->successors.at(state->bestMove).second << endl; // Make appropriate moves here.
+    outfileShaved<< "I, player"<< state->playerToMove <<" did "<< state->successors.at(state->bestMove).second << endl;
     outfileShaved<<"fin state is "<<endl;
-    state->successors[state->bestMove]->stboard->printnormalconfigShaved();
-    state->successors[state->bestMove]->stboard->printBeautifiedconfigShaved();
+    state->successors[state->bestMove].first->stboard->printnormalconfigShaved();
+    state->successors[state->bestMove].first->stboard->printBeautifiedconfigShaved();
 }
 
 int boardhelper(){
@@ -297,10 +298,10 @@ int play() {
             outfile << "Starting ID" << endl;
             currState->iterativeDeepening(max_depth, player_id);
             outfile << "Best Move at: " << currState->bestMove << endl; // Debug
-            cout << currState->moves.at(currState->bestMove) << endl; // Make appropriate moves here.
-            outfileShaved<< "I, player "<<currState->playerToMove <<" did "<< currState->moves.at(currState->bestMove)  << " which means "<< endl;
-            currState->successors[currState->bestMove]->stboard->printnormalconfigShaved();
-            currState->successors[currState->bestMove]->stboard->printBeautifiedconfigShaved();
+            cout << currState->successors.at(currState->bestMove).second << endl; // Make appropriate moves here.
+            outfileShaved<< "I, player "<<currState->playerToMove <<" did "<< currState->successors.at(currState->bestMove).second  << " which means "<< endl;
+            currState->successors[currState->bestMove].first->stboard->printnormalconfigShaved();
+            currState->successors[currState->bestMove].first->stboard->printBeautifiedconfigShaved();
             currState->makeMove();
         }
         outfile << "Moved self move" << endl;
