@@ -79,8 +79,8 @@ int main(int argc, char** argv) {
     outfile.open("console.log");
     outfileShaved.open("consoleshaved.log");
 
-    play();
-    // test2();
+    // play();
+    test2();
     // boardhelper();
     return 0;
 }
@@ -162,8 +162,8 @@ int test2(){
     DEBUG_EVAL = false;
     NON_FLIP = true;
     WRITE_FILE = true;
-    max_depth = 3;
-    temp = state->iterativeDeepening(3,2);
+    max_depth = 4;
+    temp = state->iterativeDeepening(max_depth,2);
     outfile << "Best Move at: " << state->bestMove << endl; // Debug
     cout << state->successors.at(state->bestMove).second << endl; // Make appropriate moves here.
     outfileShaved<< "I, player"<< state->playerToMove <<" did "<< state->successors.at(state->bestMove).second << endl;
