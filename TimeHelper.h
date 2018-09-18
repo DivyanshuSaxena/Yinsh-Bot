@@ -19,6 +19,8 @@ class TimeHelper{
         int clockISpecific;
         float maxAllowedTimeSpecific;
         int elapsedTimePersonal;
+        int averageNumMoves;
+        int halfMovesCount;
     // public:
         TimeHelper();
         bool outOfTime();
@@ -27,5 +29,6 @@ class TimeHelper{
         bool setClockISpecific();
         bool setMaxAllowedTimeSpecific(float);
         bool updateElapsedTimePersonal();
+        bool setMaxAllowedTimeSpecificAutomatic();
 };
 #endif /* Time_Helper */

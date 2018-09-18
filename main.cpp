@@ -264,7 +264,7 @@ int play() {
     DEBUG_EVAL = false;
     WRITE_FILE = false;
     timeHelper->setMaxAllowedTime(time_limit);
-    max_depth = 3;
+    max_depth = 4;
 
     string move;
     int movenum = 1;
@@ -278,7 +278,9 @@ int play() {
     }
     while(true) {
         timeHelper->setClockISpecific();
-        timeHelper->setMaxAllowedTimeSpecific(3);
+        timeHelper->setMaxAllowedTimeSpecificAutomatic();
+        cerr<< "time alloted is "<<timeHelper->maxAllowedTimeSpecific<<endl;
+        cerr<< "time passed according to personal timer is "<<timeHelper->maxAllowedTime - timeHelper->elapsedTimePersonal<<endl;
         State* currState = new State(board, player_id);
         outfileShaved<<"lets see this one"<<endl;
         board->printnormalconfigShaved();
