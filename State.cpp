@@ -200,7 +200,7 @@ void State::checkCount(int count, int prevMarker, bool flip, int startx, int sta
         incrementkRows(prevMarker, flip, endx, endy);
         if (WRITE_FILE) outfile << "Found streak starting at: " << startx << " " << starty << endl;
         if (prevMarker-playerToMove == 3) {
-            if (WRITE_FILE) outfile << "For same player" << endl;
+            // outfile << "For same player" << endl;
             startkx = startx;
             startky = starty;
         }
@@ -439,8 +439,8 @@ bool State::isTerminalNode() {
 
 double State::iterativeDeepening(int max_depth, int playerId){
     double val;
-    outfile.close();
-    outfile.open("console.log");
+    // outfile.close();
+    // outfile.open("console.log");
     // outfile << "ID starting for depth " << max_depth << endl;
     for(int distance = 1; distance <= max_depth && !timeHelper->outOfTime(); distance++) {
         if (WRITE_FILE) outfile << "ID evaluating for depth " << distance << endl;
@@ -461,11 +461,13 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
     if (this->isTerminalNode()) {
         return evSign * this->getEvaluation();
     }    
-    if (WRITE_FILE) outfile << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
-    if (WRITE_FILE) outfile << "executing alphabeta at depth "<<depth << " alpha is "<<alpha << " beta is "<< beta << " player is "<<currPlayer<< " ";
-    if (WRITE_FILE) outfile << "state is "<<endl;
-    this->stboard->printnormalconfig();
-    if (WRITE_FILE) outfile << endl;
+    if (WRITE_FILE) {
+        outfile << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
+        outfile << "executing alphabeta at depth "<<depth << " alpha is "<<alpha << " beta is "<< beta << " player is "<<currPlayer<< " ";
+        outfile << "state is "<<endl;
+        this->stboard->printnormalconfig();
+        outfile << endl;
+    } 
 
     double tempscore = -DBL_MAX;
     this->getSuccessors(currPlayer);
@@ -485,8 +487,8 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
      * CHECK -> WHETHER THIS LOCATION FOR ERASING THE VECTOR IS FINE OR NOT
      */
     int len = successors.size();
-    int beam = successors.size() < 15 ? successors.size() : 15;
-    successors.erase(successors.begin()+beam, successors.end());
+    successors.erase(successors.begin()+10, successors.end());
+    // outfile << "Pruned successors length: " << successors.size() << endl;
 
     for(int i = 0; i < successors.size() && !timeHelper->outOfTime(); i++){
         double value = -successors[i].first->alphaBeta(depth-1,-beta,-alpha, 3-currPlayer, -evSign);
@@ -504,7 +506,7 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
             alpha = tempscore;
         }
         if(alpha >= beta) {
-            outfile << "Pruning done at " << i << " at depth " << depth << endl; 
+            // outfile << "Pruning done at " << i << " at depth " << depth << endl; 
             break;
         }
         if (WRITE_FILE) outfile << endl;

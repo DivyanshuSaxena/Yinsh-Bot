@@ -127,7 +127,7 @@ int test() {
 
 void setWeights() {
     // Initialize weights
-    double w[] = {0,5,9,10,18,80,2,500};
+    double w[] = {0,5,8,10,15,80,2,250};
     weights.push_back(0);
     for (int i = 1; i <= 7; i++) {
         if (player_id == 1) {
@@ -148,8 +148,8 @@ int test2(){
     board->printnormalconfigShaved();
     board->printBeautifiedconfigShaved();
     outfileShaved<<"lets do search"<<endl;
-    player_id = 1;
-    State * state = new State(board, 1);
+    player_id = 2;
+    State * state = new State(board, 2);
     int temp;
     timeHelper->setMaxAllowedTime(150);
     timeHelper->setClockISpecific();
@@ -163,7 +163,7 @@ int test2(){
     NON_FLIP = true;
     WRITE_FILE = true;
     max_depth = 3;
-    temp = state->iterativeDeepening(max_depth,player_id);
+    temp = state->iterativeDeepening(3,2);
     outfile << "Best Move at: " << state->bestMove << endl; // Debug
     cout << state->successors.at(state->bestMove).second << endl; // Make appropriate moves here.
     outfileShaved<< "I, player"<< state->playerToMove <<" did "<< state->successors.at(state->bestMove).second << endl;
@@ -265,7 +265,7 @@ int play() {
     DEBUG_EVAL = false;
     WRITE_FILE = false;
     timeHelper->setMaxAllowedTime(time_limit);
-    max_depth = 5;
+    max_depth = 4;
 
     string move;
     int movenum = 1;
