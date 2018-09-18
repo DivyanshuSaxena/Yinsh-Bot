@@ -487,7 +487,8 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
      * CHECK -> WHETHER THIS LOCATION FOR ERASING THE VECTOR IS FINE OR NOT
      */
     int len = successors.size();
-    successors.erase(successors.begin()+10, successors.end());
+    int beam = successors.size() < 10 ? successors.size() : 10;
+    successors.erase(successors.begin()+beam, successors.end());
     // outfile << "Pruned successors length: " << successors.size() << endl;
 
     for(int i = 0; i < successors.size() && !timeHelper->outOfTime(); i++){
