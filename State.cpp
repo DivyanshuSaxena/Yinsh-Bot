@@ -200,7 +200,7 @@ void State::checkCount(int count, int prevMarker, bool flip, int startx, int sta
         incrementkRows(prevMarker, flip, endx, endy);
         if (WRITE_FILE) outfile << "Found streak starting at: " << startx << " " << starty << endl;
         if (prevMarker-playerToMove == 3) {
-            // outfile << "For same player" << endl;
+            if (WRITE_FILE) outfile << "For same player" << endl;
             startkx = startx;
             startky = starty;
         }
@@ -485,7 +485,8 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
      * CHECK -> WHETHER THIS LOCATION FOR ERASING THE VECTOR IS FINE OR NOT
      */
     int len = successors.size();
-    successors.erase(successors.end()-3*len/4, successors.end());
+    int beam = successors.size() < 15 ? successors.size() : 15;
+    successors.erase(successors.begin()+successors.size(), successors.end());
 
     for(int i = 0; i < successors.size() && !timeHelper->outOfTime(); i++){
         double value = -successors[i].first->alphaBeta(depth-1,-beta,-alpha, 3-currPlayer, -evSign);
