@@ -439,16 +439,18 @@ bool State::isTerminalNode() {
 
 double State::iterativeDeepening(int max_depth, int playerId){
     double val;
-    outfile.close();
-    outfile.open("console.log");
+    // outfile.close();
+    // outfile.open("console.log");
     // outfile << "ID starting for depth " << max_depth << endl;
     for(int distance = 1; distance <= max_depth && !timeHelper->outOfTime(); distance++) {
         if (WRITE_FILE) outfile << "ID evaluating for depth " << distance << endl;
         val = this->alphaBeta(distance,-DBL_MAX, DBL_MAX, playerId, 1);
     }
-    if (WRITE_FILE) outfile << "ID Done for this move, found successor at: " << this->bestMove << endl;
-    this->successors.at(bestMove)->stboard->printnormalconfig();
-    if (WRITE_FILE) outfile << endl; // Debug
+    if (WRITE_FILE) {
+        outfile << "ID Done for this move, found successor at: " << this->bestMove << endl;
+        this->successors.at(bestMove)->stboard->printnormalconfig();
+        outfile << endl; // Debug
+    } 
     return val;
 }
 
@@ -483,6 +485,7 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
             alpha = tempscore;
         }
         if(alpha >= beta) {
+            outfile << "Pruning done at " << i << " at depth " << depth << endl; 
             break;
         }
         if (WRITE_FILE) outfile << endl;
