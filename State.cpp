@@ -469,6 +469,24 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
 
     double tempscore = -DBL_MAX;
     this->getSuccessors(currPlayer);
+
+    // Sort the successors
+    sort(successors.begin(), successors.end(), [currPlayer](pair<State*,string> p1, pair<State*,string> p2) -> bool {
+        if (currPlayer == player_id)
+            return p1.first->getEvaluation() > p2.first->getEvaluation();
+        return p1.first->getEvaluation() < p2.first->getEvaluation();
+    });
+
+    /*
+     * Not much effect in the overall timing of gameplay was observed when
+     * the nodes were ordered, thereby implying that the best move (zero index) is quite good in most cases
+     * Hence, Pruning the worst ones, can be a really good option
+     * 
+     * CHECK -> WHETHER THIS LOCATION FOR ERASING THE VECTOR IS FINE OR NOT
+     */
+    int len = successors.size();
+    successors.erase(successors.end()-3*len/4, successors.end());
+
     for(int i = 0; i < successors.size() && !timeHelper->outOfTime(); i++){
         double value = -successors[i].first->alphaBeta(depth-1,-beta,-alpha, 3-currPlayer, -evSign);
         if (WRITE_FILE) outfile << value << " " << this->successors[i].first->getEvaluation() << endl;
