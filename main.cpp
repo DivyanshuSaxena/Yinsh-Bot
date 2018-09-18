@@ -85,46 +85,6 @@ int main(int argc, char** argv) {
     return 0;
 }
 
-int test() {
-    board = new Board(5,5,5,3);
-    board->printhexagonalconfig();
-    outfile << endl;
-
-    board->setMarker(make_pair(5, 6 ), 2);
-    board->setMarker(make_pair(5, 7 ), 2);
-    board->setMarker(make_pair(5, 8 ), 2);
-    board->addRing(2, 5, 5);
-    board->addRing(1, 7, 6);
-    // board->setMarker(board->getCoordinates(4, 0 ), 2);
-    auto adjpoints = board->showPossibleMoves(5,5);
-
-    for(int i=0;i<adjpoints.size();i++){
-        outfile << adjpoints[i].first << " , " << adjpoints[i].second << " | ";
-    }
-    outfile << endl;
-    
-    board->printnormalconfig();
-    board->selectAndMoveRing(5,5,5,9);
-    outfile << "select n move done "<<endl;
-    board->printnormalconfig();
-    board->selectAndMoveRing(7,6,8,7);
-    outfile << "select n move done "<<endl;
-    board->printnormalconfig();
-    
-    State* state = new State(board, 1);
-    outfile << state->getEvaluation() << endl;
-    outfile << state->getEvaluation() << endl;
-    auto tempsuccessors = state->getSuccessors(2);
-    outfile << "size of successors is "<<tempsuccessors.size()<<endl;
-    outfile<< "initial state"<<endl;
-    state->stboard->printnormalconfig();
-    outfile<<"answers are "<<endl;
-    for(int i=0;i<tempsuccessors.size();i++){
-        tempsuccessors[i].first->stboard->printnormalconfig();
-        outfile <<endl;
-    }
-}
-
 void setWeights() {
     // Initialize weights
     double w[] = {0,5,8,10,15,80,2,250};
@@ -165,11 +125,11 @@ int test2(){
     max_depth = 3;
     temp = state->iterativeDeepening(3,2);
     outfile << "Best Move at: " << state->bestMove << endl; // Debug
-    cout << state->successors.at(state->bestMove).second << endl; // Make appropriate moves here.
-    outfileShaved<< "I, player"<< state->playerToMove <<" did "<< state->successors.at(state->bestMove).second << endl;
+    cout << state->successors.at(state->bestMove)->move << endl; // Make appropriate moves here.
+    outfileShaved<< "I, player"<< state->playerToMove <<" did "<< state->successors.at(state->bestMove)->move << endl;
     outfileShaved<<"fin state is "<<endl;
-    state->successors[state->bestMove].first->stboard->printnormalconfigShaved();
-    state->successors[state->bestMove].first->stboard->printBeautifiedconfigShaved();
+    state->successors[state->bestMove]->state->stboard->printnormalconfigShaved();
+    state->successors[state->bestMove]->state->stboard->printBeautifiedconfigShaved();
 }
 
 int boardhelper(){
@@ -265,7 +225,7 @@ int play() {
     DEBUG_EVAL = false;
     WRITE_FILE = false;
     timeHelper->setMaxAllowedTime(time_limit);
-    max_depth = 4;
+    max_depth = 5;
 
     string move;
     int movenum = 1;
@@ -296,10 +256,10 @@ int play() {
             outfile << "Starting ID" << endl;
             currState->iterativeDeepening(max_depth, player_id);
             outfile << "Best Move at: " << currState->bestMove << endl; // Debug
-            cout << currState->successors.at(currState->bestMove).second << endl; // Make appropriate moves here.
-            outfileShaved<< "I, player "<<currState->playerToMove <<" did "<< currState->successors.at(currState->bestMove).second  << " which means "<< endl;
-            currState->successors[currState->bestMove].first->stboard->printnormalconfigShaved();
-            currState->successors[currState->bestMove].first->stboard->printBeautifiedconfigShaved();
+            cout << currState->successors.at(currState->bestMove)->move << endl; // Make appropriate moves here.
+            outfileShaved<< "I, player "<<currState->playerToMove <<" did "<< currState->successors.at(currState->bestMove)->move  << " which means "<< endl;
+            currState->successors[currState->bestMove]->state->stboard->printnormalconfigShaved();
+            currState->successors[currState->bestMove]->state->stboard->printBeautifiedconfigShaved();
             currState->makeMove();
         }
         outfile << "Moved self move" << endl;

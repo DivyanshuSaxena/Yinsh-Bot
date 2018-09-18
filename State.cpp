@@ -14,9 +14,9 @@ vector<pair<int,int>> copyVectorOfPairs(vector<pair<int,int>> thisvec){
     return tempring;
 }
 
-void changePlayer(vector<pair<State*,string> > preFinal) {
+void changePlayer(vector<SortState*> preFinal) {
     for (int i = 0; i < preFinal.size(); i++) {
-        preFinal.at(i).first->playerToMove = 3-preFinal.at(i).first->playerToMove;
+        preFinal.at(i)->state->playerToMove = 3-preFinal.at(i)->state->playerToMove;
     }
 }
 
@@ -448,7 +448,7 @@ double State::iterativeDeepening(int max_depth, int playerId){
     }
     if (WRITE_FILE) {
         outfile << "ID Done for this move, found successor at: " << this->bestMove << endl;
-        this->successors.at(bestMove).first->stboard->printnormalconfig();
+        this->successors.at(bestMove)->state->stboard->printnormalconfig();
         outfile << endl; // Debug
     } 
     return val;
@@ -473,10 +473,10 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
     this->getSuccessors(currPlayer);
 
     // Sort the successors
-    sort(successors.begin(), successors.end(), [currPlayer](pair<State*,string> p1, pair<State*,string> p2) -> bool {
+    sort(successors.begin(), successors.end(), [currPlayer](SortState* p1, SortState* p2) -> bool {
         if (currPlayer == player_id)
-            return p1.first->getEvaluation() > p2.first->getEvaluation();
-        return p1.first->getEvaluation() < p2.first->getEvaluation();
+            return p1->state->getEvaluation() > p2->state->getEvaluation();
+        return p1->state->getEvaluation() < p2->state->getEvaluation();
     });
 
     /*
@@ -492,14 +492,14 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
     // outfile << "Pruned successors length: " << successors.size() << endl;
 
     for(int i = 0; i < successors.size() && !timeHelper->outOfTime(); i++){
-        double value = -successors[i].first->alphaBeta(depth-1,-beta,-alpha, 3-currPlayer, -evSign);
-        if (WRITE_FILE) outfile << value << " " << this->successors[i].first->getEvaluation() << endl;
+        double value = -successors[i]->state->alphaBeta(depth-1,-beta,-alpha, 3-currPlayer, -evSign);
+        if (WRITE_FILE) outfile << value << " " << this->successors[i]->state->getEvaluation() << endl;
         if (WRITE_FILE) {
-            this->successors[i].first->stboard->printnormalconfig();
+            this->successors[i]->state->stboard->printnormalconfig();
             outfile << endl;
         }
         if(value>tempscore) {
-            if (WRITE_FILE) outfile << "    Better -> " << successors.at(i).first->getEvaluation() << endl;
+            if (WRITE_FILE) outfile << "    Better -> " << successors.at(i)->state->getEvaluation() << endl;
             this->bestMove = i;
             tempscore=value;
         }
@@ -516,7 +516,7 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
     return tempscore;
 }
 
-vector<pair<State*,string> > State::getSuccessors(int currPlayer){
+vector<SortState*> State::getSuccessors(int currPlayer){
     if(this->isSuccessorsUpdated){
         if(this->bestMove>0 ){
             iter_swap(this->successors.begin(),this->successors.begin()+this->bestMove );
@@ -531,11 +531,11 @@ vector<pair<State*,string> > State::getSuccessors(int currPlayer){
     // bool isKinRow = this->evaluate();
     // outfile << "evaluation for the state done "<<isKinRow<<endl;
 
-    vector<pair<State*,string> > movedStates, finStatesvec;
+    vector<SortState*> movedStates, finStatesvec;
 
     if(isKinRow) {
         //there are k in row we need to remove them
-        vector<pair<State*,string> > tempvec; 
+        vector<SortState*> tempvec; 
         outfile<<"removing markers case, subproblem 1 "<<endl;
         vector<pair< pair<int,int>, pair<int,int>>> removalCoordinates = this->getPossibleMarkerRemovals();
         for(auto removaliter= removalCoordinates.begin();removaliter<removalCoordinates.end();removaliter++){
@@ -555,7 +555,7 @@ vector<pair<State*,string> > State::getSuccessors(int currPlayer){
                 int ringx = remrings[ringsiter].first, ringy = remrings[ringsiter].second;
                 removedRingState->stboard->removeRing(ringx, ringy);
                 removedRingState->stboard->updateRingPositions();
-                auto tempPair = make_pair(removedRingState, tempMove + " " + parseMove(3, ringx, ringy, -1, -1));
+                SortState* tempPair = new SortState(removedRingState, tempMove + " " + parseMove(3, ringx, ringy, -1, -1));
                 tempvec.push_back(tempPair);
             }
         }
@@ -563,7 +563,7 @@ vector<pair<State*,string> > State::getSuccessors(int currPlayer){
         if (rings.size() != m-l+1) {
             if (WRITE_FILE) outfile <<"removed markers and rings, subproblem 1 done, jumping to subproblem 2"<<endl;
             for (int tempiter = 0; tempiter < tempvec.size(); tempiter++){
-                auto movePair = tempvec[tempiter].first->getStatesForMoves(currPlayer, tempvec[tempiter].second);
+                auto movePair = tempvec[tempiter]->state->getStatesForMoves(currPlayer, tempvec[tempiter]->move);
                 movedStates.insert(movedStates.end(), movePair.begin(), movePair.end());
             }
         } else {
@@ -585,8 +585,8 @@ vector<pair<State*,string> > State::getSuccessors(int currPlayer){
     if (WRITE_FILE) outfile << "subproblem 2 is done, now lets move to subproblem 3 if there or not, it will be checked "<< movedStates.size()<< " times"<<endl; // Debug
 
     for(int iterMovedStates=0; iterMovedStates<movedStates.size(); iterMovedStates++){
-        State * thismovedstate = movedStates[iterMovedStates].first;
-        string appendMove = movedStates[iterMovedStates].second;
+        State * thismovedstate = movedStates[iterMovedStates]->state;
+        string appendMove = movedStates[iterMovedStates]->move;
 
         thismovedstate->getEvaluation();
         bool isKinRow = thismovedstate->kInRow;
@@ -617,14 +617,15 @@ vector<pair<State*,string> > State::getSuccessors(int currPlayer){
                     int ringx = remrings[ringsiter].first, ringy = remrings[ringsiter].second;
                     removedRingState->stboard->removeRing(ringx, ringy);
                     removedRingState->stboard->updateRingPositions();   
-                    auto finPair = make_pair(removedRingState, appendMove + " " + tempmove + " " + parseMove(3, ringx, ringy, -1, -1));     
+                    SortState* finPair = new SortState(removedRingState, appendMove + " " + tempmove + " " + parseMove(3, ringx, ringy, -1, -1));     
                     finStatesvec.push_back(finPair);
                 }
                 trashcount++;
             }
         } else {
             // outfile << "skipped subproblem three as not true"<<endl;
-            finStatesvec.push_back(make_pair(thismovedstate,appendMove));
+            SortState* finPair = new SortState(thismovedstate, appendMove);
+            finStatesvec.push_back(finPair);
         }
     }
     
@@ -635,8 +636,8 @@ vector<pair<State*,string> > State::getSuccessors(int currPlayer){
     return finStatesvec;
 }
 
-vector<pair<State*,string> > State::getStatesForMoves(int currPlayer, string appendMove){
-    vector<pair<State*,string> > ansvec;
+vector<SortState*> State::getStatesForMoves(int currPlayer, string appendMove){
+    vector<SortState*> ansvec;
     vector<pair<int,int>> allRings = currPlayer==1 ? stboard->p1Rings : stboard->p2Rings; 
     
     for(int iterring=0; iterring<allRings.size(); iterring++){
@@ -647,8 +648,8 @@ vector<pair<State*,string> > State::getStatesForMoves(int currPlayer, string app
             State * tempstate = new State(this->stboard, playerToMove);
             tempstate->stboard->selectAndMoveRing(thisring.first, thisring.second, thismovefin.first, thismovefin.second);
             string move = parseMove(1, thisring.first, thisring.second, thismovefin.first, thismovefin.second);
-
-            ansvec.push_back(make_pair(tempstate,appendMove + " " + move));
+            SortState* ansPair = new SortState(tempstate,appendMove + " " + move);
+            ansvec.push_back(ansPair);
         }
     }
     return ansvec;
@@ -669,6 +670,6 @@ vector<pair< pair<int,int>, pair<int,int>>> State::getPossibleMarkerRemovals(){
 }
 
 void State::makeMove() {
-    State* nextState = this->successors.at(bestMove).first;
+    State* nextState = this->successors.at(bestMove)->state;
     board = nextState->stboard;
 }

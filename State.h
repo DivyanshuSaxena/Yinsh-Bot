@@ -18,6 +18,19 @@ using namespace std;
 
 extern vector<double> weights;
 
+class State;
+
+class SortState {
+    public:
+        State* state;
+        string move;
+
+        SortState(State* st, string mv) {
+            this->state = st;
+            move = mv;
+        }
+};
+
 class State {
     private:
         // Number of rows with k markers for players 1 and 2
@@ -55,13 +68,13 @@ class State {
         int bestMove; // Index of best successor in successors
         // vector<string> moves;
         // Same vector to hold state and string
-        vector<pair<State*,string> > successors;
+        vector<SortState*> successors;
         void setWeight(double weight, int feature);
 
         // Accessor Methods
         bool isTerminalNode();
-        vector<pair<State*,string> > getSuccessors(int currPlayer);
-        vector<pair<State*,string> > getStatesForMoves(int currPlayer, string);
+        vector<SortState*> getSuccessors(int currPlayer);
+        vector<SortState*> getStatesForMoves(int currPlayer, string);
         vector<pair< pair<int,int>, pair<int,int>>> getPossibleMarkerRemovals();
 
         // Operations
@@ -79,4 +92,5 @@ class State {
         bool evaluate(); 
         double getEvaluation();
 };
+
 #endif /* State_H */
