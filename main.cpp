@@ -70,7 +70,7 @@ int test1();
 int test2();
 int boardhelper();
 int play();
-
+double DBLMAX = 9999999999;
 int main(int argc, char** argv) {
     // std::srand ( unsigned ( std::time(0) ) );
     timeHelper = new TimeHelper();
@@ -292,10 +292,11 @@ int play() {
             outfileShaved<< "I did "<< "P " << movePair.first << " " << movePair.second << endl;
         } else {
             // Check this block
-            // currState->alphaBeta(depth, -DBL_MAX, DBL_MAX, player_id);
+            // currState->alphaBeta(depth, -DBLMAX, DBLMAX, player_id);
             outfile << "Starting ID" << endl;
             currState->iterativeDeepening(max_depth, player_id);
             outfile << "Best Move at: " << currState->bestMove << endl; // Debug
+            //nothing does that
             cout << currState->successors.at(currState->bestMove).second << endl; // Make appropriate moves here.
             outfileShaved<< "I, player "<<currState->playerToMove <<" did "<< currState->successors.at(currState->bestMove).second  << " which means "<< endl;
             currState->successors[currState->bestMove].first->stboard->printnormalconfigShaved();

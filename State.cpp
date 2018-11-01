@@ -53,7 +53,7 @@ State::State(Board* board, int player) {
     // stboard->p1Rings = copyVectorOfPairs(board->p1Rings);
     // stboard->p2Rings = copyVectorOfPairs(board->p2Rings);
     stboard->updateRingPositions();
-    heuristic = -DBL_MAX;
+    heuristic = -DBLMAX;
     kInRow = false;
 
     playerToMove = player;
@@ -409,7 +409,8 @@ bool State::evaluate() {
 }
 
 double State::getEvaluation() {
-    if (heuristic == -DBL_MAX) {
+    if (heuristic == -DBLMAX) {
+        // outfile << " this should not be done , heuristic equals -dblmax"<<endl;
         bool check = this->evaluate();
         // if (!check) outfile << "WARNING: Invalid state evaluated" << endl; // getEvaluation() being called everywhere
     }
@@ -444,7 +445,8 @@ double State::iterativeDeepening(int max_depth, int playerId){
     // outfile << "ID starting for depth " << max_depth << endl;
     for(int distance = 1; distance <= max_depth && !timeHelper->outOfTime(); distance++) {
         if (WRITE_FILE) outfile << "ID evaluating for depth " << distance << endl;
-        val = this->alphaBeta(distance,-DBL_MAX, DBL_MAX, playerId, 1);
+        val = this->alphaBeta(distance,-DBLMAX, DBLMAX, playerId, 1);
+        outfile << "best move at distance "<<distance << " is "<< this->bestMove<<endl;
     }
     if (WRITE_FILE) {
         outfile << "ID Done for this move, found successor at: " << this->bestMove << endl;
@@ -469,7 +471,7 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
         outfile << endl;
     } 
 
-    double tempscore = -DBL_MAX;
+    double tempscore = -DBLMAX;
     this->getSuccessors(currPlayer);
 
     // Sort the successors
@@ -496,12 +498,14 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
 
     for(int i = 0; i < successors.size() && !timeHelper->outOfTime(); i++){
         double value = -successors[i].first->alphaBeta(depth-1,-beta,-alpha, 3-currPlayer, -evSign);
+        // double temp = this->successors[i].first->getEvaluation();
         if (WRITE_FILE) outfile << value << " " << this->successors[i].first->getEvaluation() << endl;
         if (WRITE_FILE) {
             this->successors[i].first->stboard->printnormalconfig();
             outfile << endl;
         }
         if(value>tempscore) {
+            // double temp = this->successors[i].first->getEvaluation();
             if (WRITE_FILE) outfile << "    Better -> " << successors.at(i).first->getEvaluation() << endl;
             this->bestMove = i;
             tempscore=value;
