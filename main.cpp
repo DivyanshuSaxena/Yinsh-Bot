@@ -79,8 +79,8 @@ int main(int argc, char** argv) {
     outfile.open("console.log");
     outfileShaved.open("consoleshaved.log");
 
-    play();
-    // test2();
+    // play();
+    test2();
     // boardhelper();
     return 0;
 }
