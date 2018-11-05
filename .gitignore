@@ -35,10 +35,12 @@
 *.log
 
 main
+build/*
 .vscode/*
 tryme
 tryme.cpp
 
+debug/*
 board2.txt
 anomaly.txt
 eval.txt

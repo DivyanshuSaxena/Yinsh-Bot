@@ -83,10 +83,6 @@ void State::resetFeatures() {
     blockDoF1 = -1; blockDoF2 = -1;
 }
 
-void State::duplicateFeatures(State* state){
-
-}
-
 void State::getBlockedRings() {
     int p1len = stboard->p1Rings.size();
     int p2len = stboard->p2Rings.size();
@@ -410,7 +406,6 @@ bool State::evaluate() {
 
 double State::getEvaluation() {
     if (heuristic == -DBLMAX) {
-        // outfile << " this should not be done , heuristic equals -dblmax"<<endl;
         bool check = this->evaluate();
         // if (!check) outfile << "WARNING: Invalid state evaluated" << endl; // getEvaluation() being called everywhere
     }
@@ -475,14 +470,14 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
     this->getSuccessors(currPlayer);
 
     // Sort the successors
-    // sort(successors.begin(), successors.end(), [currPlayer](pair<State*,string> p1, pair<State*,string> p2) -> bool {
+    // sort(successors.begin(), successors.end(), [currPlayer](const pair<State*,string>& p1, const pair<State*,string>& p2) -> bool {
     //     if (p1.first == NULL || p2.first == NULL)
     //         return true;
     //     if (currPlayer == player_id)
     //         return p1.first->getEvaluation() > p2.first->getEvaluation();
     //     return p1.first->getEvaluation() < p2.first->getEvaluation();
     // });
-    // this->bestMove = 0;
+    this->bestMove = 0;
 
     /*
      * Not much effect in the overall timing of gameplay was observed when
@@ -492,8 +487,8 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
      * CHECK -> WHETHER THIS LOCATION FOR ERASING THE VECTOR IS FINE OR NOT
      */
     int len = successors.size();
-    // int beam = successors.size() < 15 ? successors.size() : 15;
-    // successors.erase(successors.begin()+beam, successors.end());
+    int beam = successors.size() < 15 ? successors.size() : 15;
+    successors.erase(successors.begin()+beam, successors.end());
     // outfile << "Pruned successors length: " << successors.size() << endl;
 
     for(int i = 0; i < successors.size() && !timeHelper->outOfTime(); i++){
@@ -526,7 +521,7 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
 vector<pair<State*,string> > State::getSuccessors(int currPlayer){
     if(this->isSuccessorsUpdated){
         if(this->bestMove>0 ){
-            iter_swap(this->successors.begin(),this->successors.begin()+this->bestMove );
+            iter_swap(this->successors.begin(), this->successors.begin()+this->bestMove);
             // iter_swap(this->moves.begin(), this->moves.begin()+this->bestMove);
             this->bestMove=0;
         }

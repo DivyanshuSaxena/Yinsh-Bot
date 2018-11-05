@@ -80,7 +80,6 @@ int main(int argc, char** argv) {
     outfileShaved.open("consoleshaved.log");
 
     play();
-    // test2();
     // boardhelper();
     return 0;
 }
@@ -265,7 +264,7 @@ int play() {
     DEBUG_EVAL = false;
     WRITE_FILE = false;
     timeHelper->setMaxAllowedTime(time_limit);
-    max_depth = 3;
+    max_depth = 5;
 
     string move;
     int movenum = 1;
