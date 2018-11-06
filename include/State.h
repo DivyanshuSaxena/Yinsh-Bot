@@ -46,6 +46,11 @@ class State {
         void checkCount(int, int, bool, int, int, int, int);
 
     public:
+        float alphaBetaValue;
+        float initempalpha=0.5;
+        float initempbeta = 0.5;
+        float fintempalpha =0.5;
+        float fintempbeta = 0.5;
         State(Board* board, int player);
         double heuristic;
         Board* stboard;
@@ -77,5 +82,7 @@ class State {
         double weightedSum();
         bool evaluate(); 
         double getEvaluation();
+        void mydebug();
+        void mydebugdepth(int);
 };
 #endif /* State_H */

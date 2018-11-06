@@ -79,7 +79,12 @@ int main(int argc, char** argv) {
     outfile.open("console.log");
     outfileShaved.open("consoleshaved.log");
 
+<<<<<<< HEAD:src/Main.cpp
     play();
+=======
+    // play();
+    test2();
+>>>>>>> 6c27c13280568db563fcc5d5a7067b0b213c776d:main.cpp
     // boardhelper();
     return 0;
 }

@@ -452,7 +452,10 @@ double State::iterativeDeepening(int max_depth, int playerId){
 }
 
 double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, int evSign){
+    initempalpha=alpha;
+    initempbeta=beta;
     if(depth==0){
+        alphaBetaValue = evSign * this->getEvaluation();
         return evSign * this->getEvaluation();
     }
     if (this->isTerminalNode()) {
@@ -515,6 +518,9 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
         if (WRITE_FILE) outfile << endl;
     }
     if (WRITE_FILE) outfile << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
+    alphaBetaValue=tempscore;
+    fintempalpha=alpha;
+    fintempbeta = beta;
     return tempscore;
 }
 
@@ -673,4 +679,31 @@ vector<pair< pair<int,int>, pair<int,int>>> State::getPossibleMarkerRemovals(){
 void State::makeMove() {
     State* nextState = this->successors.at(bestMove).first;
     board = nextState->stboard;
+}
+
+void State::mydebug(){
+    outfileShaved << "my inialpha, inibeta, finalpha, finbeta is "<< initempalpha<<" "<<initempbeta << " " << fintempalpha << " "<< fintempbeta<<endl;
+    outfileShaved << "alphabeta values are "<<endl;
+    for(int i=0;i<successors.size();i++){
+        outfileShaved << successors[i].first->alphaBetaValue << " "; 
+    }
+    outfileShaved << endl << "bestMoves values are "<<endl;
+    for(int i=0;i<successors.size();i++){
+        outfileShaved << successors[i].first->bestMove << " "; 
+    }
+    outfileShaved << endl;
+}
+
+void State::mydebugdepth(int depthm){
+    outfileShaved << "depth is "<<depthm<<endl;
+    if(depthm==0){
+        return;
+    }
+    this->mydebug();
+    outfileShaved << "time for children "<<endl;
+    for(int i=0;i<successors.size();i++){
+        successors[i].first->mydebug();
+        outfileShaved << "next child please "<<endl;
+    }
+    outfileShaved << "all childs complete of depth "<<depthm<<endl;
 }
