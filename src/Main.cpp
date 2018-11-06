@@ -265,7 +265,7 @@ int play() {
     DEBUG_EVAL = false;
     WRITE_FILE = false;
     timeHelper->setMaxAllowedTime(time_limit);
-    max_depth = 3;
+    max_depth = 4;
 
     string move;
     int movenum = 1;
