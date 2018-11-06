@@ -470,13 +470,13 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
     this->getSuccessors(currPlayer);
 
     // Sort the successors
-    // sort(successors.begin(), successors.end(), [currPlayer](const pair<State*,string>& p1, const pair<State*,string>& p2) -> bool {
-    //     if (p1.first == NULL || p2.first == NULL)
-    //         return true;
-    //     if (currPlayer == player_id)
-    //         return p1.first->getEvaluation() > p2.first->getEvaluation();
-    //     return p1.first->getEvaluation() < p2.first->getEvaluation();
-    // });
+    sort(successors.begin(), successors.end(), [currPlayer](const pair<State*,string>& p1, const pair<State*,string>& p2) -> bool {
+        if (p1.first == NULL || p2.first == NULL)
+            return true;
+        if (currPlayer == player_id)
+            return p1.first->getEvaluation() > p2.first->getEvaluation();
+        return p1.first->getEvaluation() < p2.first->getEvaluation();
+    });
     this->bestMove = 0;
 
     /*

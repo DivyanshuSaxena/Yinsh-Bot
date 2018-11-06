@@ -40,7 +40,6 @@ class State {
         int endkx, endky;
         bool kInRow;
         bool rings1Blocked, rings2Blocked;
-        double heuristic;
 
         void incrementkRows(int, bool, int, int);
         void incrementRows(int, int, bool);
@@ -48,7 +47,7 @@ class State {
 
     public:
         State(Board* board, int player);
-        // State(State* state);
+        double heuristic;
         Board* stboard;
         int playerToMove;
         bool isSuccessorsUpdated;
