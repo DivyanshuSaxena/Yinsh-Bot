@@ -473,9 +473,11 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
     this->getSuccessors(currPlayer);
 
     // Sort the successors
-    sort(successors.begin(), successors.end(), [currPlayer](const pair<State*,string>& p1, const pair<State*,string>& p2) -> bool {
+    sort(successors.begin(), successors.end(), [currPlayer](pair<State*,string> p1, pair<State*,string> p2) -> bool {
         if (p1.first == NULL || p2.first == NULL)
             return true;
+        p1.first->getEvaluation();
+        p2.first->getEvaluation();
         if (currPlayer == player_id)
             return p1.first->getEvaluation() > p2.first->getEvaluation();
         return p1.first->getEvaluation() < p2.first->getEvaluation();
@@ -490,9 +492,11 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
      * CHECK -> WHETHER THIS LOCATION FOR ERASING THE VECTOR IS FINE OR NOT
      */
     int len = successors.size();
-    int beam = successors.size() < 15 ? successors.size() : 15;
-    successors.erase(successors.begin()+beam, successors.end());
-    // outfile << "Pruned successors length: " << successors.size() << endl;
+    if (len > 10) {
+        int beam = len/2;
+        successors.erase(successors.begin()+beam, successors.end());
+    }
+    outfile << "Pruned successors length: " << successors.size() << endl;
 
     for(int i = 0; i < successors.size() && !timeHelper->outOfTime(); i++){
         double value = -successors[i].first->alphaBeta(depth-1,-beta,-alpha, 3-currPlayer, -evSign);
