@@ -409,7 +409,7 @@ bool State::evaluate() {
 }
 
 double State::getEvaluation() {
-    if (heuristic < THRESHOLD) {
+    if (heuristic == -DBLMAX) {
         // outfile << " this should not be done , heuristic equals -dblmax"<<endl;
         bool check = this->evaluate();
         // if (!check) outfile << "WARNING: Invalid state evaluated" << endl; // getEvaluation() being called everywhere
@@ -474,12 +474,19 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
     double tempscore = -DBLMAX;
     this->getSuccessors(currPlayer);
 
+    // outfile << "Starting sort for successor length: " << this->successors.size() << endl;
+    // this->stboard->printnormalconfig();
+
     // Sort the successors
+    // this->sortSuccessors();
     sort(successors.begin(), successors.end(), [currPlayer](pair<State*,string> p1, pair<State*,string> p2) -> bool {
         if (p1.first == NULL || p2.first == NULL)
             return true;
-        // p1.first->getEvaluation();
-        // p2.first->getEvaluation();
+        // p1.first->stboard->printnormalconfig();
+        // p2.first->stboard->printnormalconfig();
+        // outfile << "--------------" << endl;
+        p1.first->getEvaluation();
+        p2.first->getEvaluation();
         if (currPlayer == player_id)
             return p1.first->getEvaluation() > p2.first->getEvaluation();
         return p1.first->getEvaluation() < p2.first->getEvaluation();
@@ -494,7 +501,7 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
      * CHECK -> WHETHER THIS LOCATION FOR ERASING THE VECTOR IS FINE OR NOT
      */
     int len = successors.size();
-    if (len > 10) {
+    if (len > 3*m) {
         int beam = len/2;
         successors.erase(successors.begin()+beam, successors.end());
     }
@@ -682,4 +689,22 @@ vector<pair< pair<int,int>, pair<int,int>>> State::getPossibleMarkerRemovals(){
 void State::makeMove() {
     State* nextState = this->successors.at(bestMove).first;
     board = nextState->stboard;
+}
+
+void State::sortSuccessors() {
+    int i, j, p; 
+  
+    int len = this->successors.size();
+    // One by one move boundary of unsorted subarray 
+    for (i = 0; i < len-1; i++) 
+    { 
+        // Find the minimum element in unsorted array 
+        p = i; 
+        for (j = i+1; j < len; j++) 
+          if (successors[j].first->getEvaluation() < successors[p].first->getEvaluation()) 
+            p = j; 
+  
+        // Swap the found minimum element with the first element 
+        swap(successors[p], successors[i]); 
+    } 
 }

@@ -68,6 +68,7 @@ class State {
 
         // Operations
         void resetFeatures();
+        void sortSuccessors();
         void duplicateFeatures(State* state);
         double alphaBeta(int depth, double alpha, double beta, int currPlayer, int evSign);
         double iterativeDeepening(int max_depth, int playerId);
