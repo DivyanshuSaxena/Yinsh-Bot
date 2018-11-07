@@ -70,7 +70,10 @@ int test1();
 int test2();
 int boardhelper();
 int play();
-double DBLMAX = 9999999999;
+
+double DBLMAX = 99999999;
+double THRESHOLD = -10000000;
+
 int main(int argc, char** argv) {
     // std::srand ( unsigned ( std::time(0) ) );
     timeHelper = new TimeHelper();

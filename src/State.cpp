@@ -409,7 +409,7 @@ bool State::evaluate() {
 }
 
 double State::getEvaluation() {
-    if (heuristic == -DBLMAX) {
+    if (heuristic < THRESHOLD) {
         // outfile << " this should not be done , heuristic equals -dblmax"<<endl;
         bool check = this->evaluate();
         // if (!check) outfile << "WARNING: Invalid state evaluated" << endl; // getEvaluation() being called everywhere
@@ -478,8 +478,8 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
     sort(successors.begin(), successors.end(), [currPlayer](pair<State*,string> p1, pair<State*,string> p2) -> bool {
         if (p1.first == NULL || p2.first == NULL)
             return true;
-        p1.first->getEvaluation();
-        p2.first->getEvaluation();
+        // p1.first->getEvaluation();
+        // p2.first->getEvaluation();
         if (currPlayer == player_id)
             return p1.first->getEvaluation() > p2.first->getEvaluation();
         return p1.first->getEvaluation() < p2.first->getEvaluation();

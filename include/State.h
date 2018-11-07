@@ -15,7 +15,9 @@
 #include "Board.h"
 #include "TimeHelper.h"
 using namespace std;
+
 extern double DBLMAX;
+extern double THRESHOLD;
 extern vector<double> weights;
 
 class State {
