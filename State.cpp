@@ -596,12 +596,12 @@ vector<pair<State*,string> > State::getSuccessors(int currPlayer){
         string appendMove = movedStates[iterMovedStates].second;
 
         thismovedstate->getEvaluation();
-        bool isKinRow = thismovedstate->kInRow;
+        // bool isKinRow = thismovedstate->kInRow;
         // bool isKinRow = thismovedstate->evaluate();
         /* 
          * For Debug -> Take care to change code in subproblem 1 as well
          */
-        if(isKinRow){
+        if(thismovedstate->kInRow){
             if (WRITE_FILE) outfile << "execute subproblem 3 as it is necessary"<<endl;
             vector<pair< pair<int,int>, pair<int,int>>> removalCoordinates = thismovedstate->getPossibleMarkerRemovals();
             if (WRITE_FILE) outfile << "removalcoordinates freq is "<< removalCoordinates.size()<<endl;
