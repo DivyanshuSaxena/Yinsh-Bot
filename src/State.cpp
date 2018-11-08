@@ -75,12 +75,12 @@ State::State(Board* board, int player) {
 // }
 
 void State::resetFeatures() {
-    rowsk1 = -1; rowsk2 = -1;
-    rowskone1 = -1; nonFlipRowskone1 = -1;
-    rowsktwo1 = -1; nonFlipRowsktwo1 = -1;
-    rowskone2 = -1; nonFlipRowskone2 = -1;
-    rowsktwo2 = -1; nonFlipRowsktwo2 = -1;
-    blockDoF1 = -1; blockDoF2 = -1;
+    rowsk1 = 0; rowsk2 = 0;
+    rowskone1 = 0; nonFlipRowskone1 = 0;
+    rowsktwo1 = 0; nonFlipRowsktwo1 = 0;
+    rowskone2 = 0; nonFlipRowskone2 = 0;
+    rowsktwo2 = 0; nonFlipRowsktwo2 = 0;
+    blockDoF1 = 0; blockDoF2 = 0;
 }
 
 void State::duplicateFeatures(State* state){
@@ -165,6 +165,7 @@ void State::incrementkRows(int marker, bool flip, int endx, int endy) {
 void State::incrementRows(int count, int marker, bool flip) {
     // Increments all the in-a-row heuristic variables 
     // for the State object based on the count and the player marker
+    if (DEBUG_EVAL) outfile << "In Increment rows for " << marker << " with count: " << count << endl;
     if (count == k-2) {
         if (marker == 4) {
             rowsktwo1++;
@@ -194,6 +195,7 @@ void State::incrementRows(int count, int marker, bool flip) {
 }
 
 void State::checkCount(int count, int prevMarker, bool flip, int startx, int starty, int endx, int endy) {
+    if (DEBUG_EVAL) outfile << "Received count: " << count << " for player " << prevMarker << endl;
     if (count >= k-2 && count <= k-1) 
         incrementRows(count, prevMarker, flip);
     if (count >= k) {
@@ -214,7 +216,7 @@ void State::getLinearMarkers() {
     // Vertical and Horizontal Rows for both opponents
     for (int i = 0; i <= 2*n; i++) {
         int startj = i>n ? (i-n) : 0;
-        int completej = i<=n ? (n+i) : 2*n+1;
+        int completej = i<=n ? (n+i) : 2*n;
         int prevMarkerVert = stboard->config[i][startj];
         int prevMarkerHorz = stboard->config[startj][i];
         int countVert = 1, countHorz = 1;
@@ -224,7 +226,7 @@ void State::getLinearMarkers() {
         int startkxVert = i, startkyVert = startj;
         int startkxHorz = startj, startkyHorz = i;
         if (DEBUG_EVAL) outfile << "Checking vertical at " << i << " from " << startj << " to " << completej << endl; 
-        for (j = startj+1; j < completej; j++) {
+        for (j = startj+1; j <= completej; j++) {
             // Vertical Rows
             if (stboard->config[i][j] == prevMarkerVert) {
                 if (!(prevMarkerVert == player1 || prevMarkerVert == player2) ) goto horizontal;
@@ -250,7 +252,7 @@ void State::getLinearMarkers() {
                 countHorz++;
                 if (NON_FLIP) flipHorz = flipHorz || stboard->isFlippable(j, i);
             } else {
-                if (countHorz > 0) {
+                if (countHorz >= k-2) {
                     checkCount(countHorz, prevMarkerHorz, flipHorz, startkxHorz, startkyHorz, j-1, i);
                 } 
                 startkxHorz = j;
@@ -262,7 +264,8 @@ void State::getLinearMarkers() {
             }
             // outfile << "Checked horizontal for " << j << " " << i << endl; // Debug
         }
-        
+
+        if (DEBUG_EVAL) outfile << "For " << i << ", " << j << " vert: " << countVert << " and horz: " << countHorz << endl;         
         // Check for the last place
         if (countVert >= k) {
             checkCount(countVert, prevMarkerVert, flipVert, startkxVert, startkyVert, i, j-1);
@@ -308,83 +311,85 @@ void State::getLinearMarkers() {
 }
 
 double State::weightedSum() {
-    double h;
+    double h = 0.0;
     // Rows of k-2 markers
-    if (rowsktwo1 != -1) {
+    if (rowsktwo1 != 0) {
         if (DEBUG_EVAL) outfile << "Rows k-2 for player 1 " << rowsktwo1 << endl;
         h += rowsktwo1 * weights.at(1);
     } 
-    if (rowsktwo2 != -1) {
-        if (DEBUG_EVAL) outfile << "Rows k-2 for player 2 " << rowsktwo1 << endl;
+    if (rowsktwo2 != 0) {
+        if (DEBUG_EVAL) outfile << "Rows k-2 for player 2 " << rowsktwo2 << endl;
         h += rowsktwo2 * weights.at(2);
     }
+    // if (DEBUG_EVAL) outfile << h << endl;
 
     if (NON_FLIP) {
         // Rows of k-2 non flippable markers
-        if (nonFlipRowsktwo1 != -1) {
+        if (nonFlipRowsktwo1 != 0) {
             if (DEBUG_EVAL) outfile << "Rows k-2 for player 1 - non flip " << nonFlipRowsktwo1 << endl;        
             h += nonFlipRowsktwo1 * weights.at(3); 
         }
-        if (nonFlipRowsktwo2 != -1) {
+        if (nonFlipRowsktwo2 != 0) {
             if (DEBUG_EVAL) outfile << "Rows k-2 for player 2 -  non flip " << nonFlipRowsktwo2 << endl;    
             h += nonFlipRowsktwo2 * weights.at(4); 
         }
     }
+    // if (DEBUG_EVAL) outfile << h << endl;
 
     // Rows of k-1 markers
-    if (rowskone1 != -1) {
+    if (rowskone1 != 0) {
         if (DEBUG_EVAL) outfile << "Rows k-1 for player 1 " << rowskone1 << endl;
         h += rowskone1 * weights.at(5);
     }
-    if (rowskone2 != -1) {
+    if (rowskone2 != 0) {
         if (DEBUG_EVAL) outfile << "Rows k-1 for player 2 " << rowskone2 << endl;
         h += rowskone2 * weights.at(6);
     }
+    // if (DEBUG_EVAL) outfile << h << endl;
 
     if (NON_FLIP) {
         // Rows of k-1 non flippable markers
-        if (nonFlipRowskone1 != -1) {
+        if (nonFlipRowskone1 != 0) {
             if (DEBUG_EVAL) outfile << "Rows k-1 for player 1 - non flip " << nonFlipRowskone1 << endl;        
             h += nonFlipRowskone1 * weights.at(7);
         }
-        if (nonFlipRowskone2 != -1) {
+        if (nonFlipRowskone2 != 0) {
             if (DEBUG_EVAL) outfile << "Rows k-1 for player 2 - non flip " << nonFlipRowskone2 << endl;
             h += nonFlipRowskone2 * weights.at(8);
         }
     }
+    // if (DEBUG_EVAL) outfile << h << endl;
 
     // Rows of k markers
-    if (rowsk1 != -1) {
+    if (rowsk1 != 0) {
         if (DEBUG_EVAL) outfile << "Rows k for player 1 " << rowsk1 << endl;
         h += rowsk1 * weights.at(9);
     }
-    if (rowsk2 != -1) {
+    if (rowsk2 != 0) {
         if (DEBUG_EVAL) outfile << "Rows k for player 2 " << rowsk2 << endl;
         h += rowsk2 * weights.at(10);
     }
+    // if (DEBUG_EVAL) outfile << h << endl;
 
     // Blocked rings
-    if (blockDoF1 != -1) {
+    if (blockDoF1 != 0) {
         if (DEBUG_EVAL) outfile << "Blocked DoF for player 1 " << blockDoF1 << endl;
         h += blockDoF1 * weights.at(12);
     }
-    if (blockDoF2 != -1) {
+    if (blockDoF2 != 0) {
         if (DEBUG_EVAL) outfile << "Blocked DoF for player 2 " << blockDoF2 << endl;
         h += blockDoF2 * weights.at(11);
     }
+    // if (DEBUG_EVAL) outfile << h << endl;
 
     // Number of rings removed
-    // if (player_id == 1) {
-    //     h += (m - stboard->p1Rings.size()) * weights.at(13);
-    //     h += (m - stboard->p2Rings.size()) * weights.at(14);
-    // } else {
     h += (m - stboard->p1Rings.size()) * weights.at(13);
     h += (m - stboard->p2Rings.size()) * weights.at(14);
     if (DEBUG_EVAL) {
-        outfile << "Player 1 removed rings:- " << weights.at(13) << endl;
-        outfile << "Player 2 removed rings:- " << weights.at(14) << endl;
+        outfile << "Player 1 removed rings:- " << (m - stboard->p1Rings.size()) << " at wt: " << weights.at(13) << endl;
+        outfile << "Player 2 removed rings:- " << (m - stboard->p2Rings.size()) << " at wt: " << weights.at(14) << endl;
     }
-    // }
+    if (DEBUG_EVAL) outfile << h << endl;
     return h;
 }
 
@@ -505,7 +510,7 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
         int beam = len/2;
         successors.erase(successors.begin()+beam, successors.end());
     }
-    outfile << "Pruned successors length: " << successors.size() << endl;
+    // outfile << "Pruned successors length: " << successors.size() << endl;
 
     for(int i = 0; i < successors.size() && !timeHelper->outOfTime(); i++){
         double value = -successors[i].first->alphaBeta(depth-1,-beta,-alpha, 3-currPlayer, -evSign);
@@ -547,7 +552,7 @@ vector<pair<State*,string> > State::getSuccessors(int currPlayer){
     this->getEvaluation();
     bool isKinRow = this->kInRow;
     // bool isKinRow = this->evaluate();
-    // outfile << "evaluation for the state done "<<isKinRow<<endl;
+    // outfile << "Found k in row: "<<isKinRow<<endl;
 
     vector<pair<State*,string> > movedStates, finStatesvec;
 

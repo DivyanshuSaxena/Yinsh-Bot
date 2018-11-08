@@ -145,14 +145,13 @@ void setWeights() {
 }
 
 int test2(){
-    setWeights();
     board = new Board(5,5,5,3);
-    board->createBoardFromFile("board.txt");
+    board->createBoardFromFile("debug/board.txt");
     board->printnormalconfigShaved();
-    board->printBeautifiedconfigShaved();
-    outfileShaved<<"lets do search"<<endl;
+    outfileShaved << "lets do search" << endl;
     player_id = 2;
-    State * state = new State(board, 2);
+    setWeights();
+    State * state = new State(board, player_id);
     int temp;
     timeHelper->setMaxAllowedTime(150);
     timeHelper->setClockISpecific();
@@ -160,19 +159,19 @@ int test2(){
     outfileShaved<<"state is "<<endl;
     state->stboard->printnormalconfigShaved();
     state->stboard->printBeautifiedconfigShaved();
-    // DEBUG_EVAL = true;
-    // outfile << state->getEvaluation() << endl;
-    DEBUG_EVAL = false;
-    NON_FLIP = true;
-    WRITE_FILE = true;
-    max_depth = 3;
-    temp = state->iterativeDeepening(3,2);
-    outfile << "Best Move at: " << state->bestMove << endl; // Debug
-    cout << state->successors.at(state->bestMove).second << endl; // Make appropriate moves here.
-    outfileShaved<< "I, player"<< state->playerToMove <<" did "<< state->successors.at(state->bestMove).second << endl;
-    outfileShaved<<"fin state is "<<endl;
-    state->successors[state->bestMove].first->stboard->printnormalconfigShaved();
-    state->successors[state->bestMove].first->stboard->printBeautifiedconfigShaved();
+    DEBUG_EVAL = true;
+    outfile << state->getEvaluation() << endl;
+    // DEBUG_EVAL = false;
+    // NON_FLIP = true;
+    // WRITE_FILE = true;
+    // max_depth = 4;
+    // temp = state->iterativeDeepening(max_depth, player_id);
+    // outfile << "Best Move at: " << state->bestMove << endl; // Debug
+    // cout << state->successors.at(state->bestMove).second << endl; // Make appropriate moves here.
+    // outfileShaved<< "I, player"<< state->playerToMove <<" did "<< state->successors.at(state->bestMove).second << endl;
+    // outfileShaved<<"fin state is "<<endl;
+    // state->successors[state->bestMove].first->stboard->printnormalconfigShaved();
+    // state->successors[state->bestMove].first->stboard->printBeautifiedconfigShaved();
 }
 
 int boardhelper(){
@@ -268,7 +267,7 @@ int play() {
     DEBUG_EVAL = false;
     WRITE_FILE = false;
     timeHelper->setMaxAllowedTime(time_limit);
-    max_depth = 4;
+    max_depth = 5;
 
     string move;
     int movenum = 1;
