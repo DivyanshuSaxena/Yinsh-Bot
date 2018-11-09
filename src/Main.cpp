@@ -52,6 +52,7 @@
 #include "Board.h"
 #include "State.h"
 #include <ctime>
+#include <stdlib.h>
 
 int n, m, k, l;
 ofstream outfile;
@@ -142,6 +143,80 @@ void setWeights() {
         }
     }
     // cout << weights.size() << endl;
+}
+
+void generate_weights() {
+    int rows_k2[] = {2,10};
+    int rows_k2_nonflip[] = {10,20};
+    int rows_k1[] = {8,16};
+    int rows_k1_nonflip[] = {18,32};
+    int rows_k[] = {150,250};
+    int blocked_dof[] = {1,8};
+    int ring_removed[] = {400,800};
+
+    int weight_limit[][2] = {
+        {rows_k2[0], rows_k2[1]}, 
+        {rows_k2_nonflip[0], rows_k2_nonflip[1]}, 
+        {rows_k1[0], rows_k1[1]}, 
+        {rows_k1_nonflip[0], rows_k1_nonflip[1]}, 
+        {rows_k[0], rows_k[1]}, 
+        {blocked_dof[0], blocked_dof[1]}, 
+        {ring_removed[0], ring_removed[1]}
+    };
+
+    ofstream weights_file;
+    if (player_id == 1) {
+        weights_file.open("train/player1.txt");
+    } else {
+        weights_file.open("train/player2.txt");
+    }
+    weights_file << "0\n";
+
+    weights.push_back(0);
+    for (int i = 0; i < 7; i++) {
+        double increment = (weight_limit[i][1] - weight_limit[i][0])/10;
+        if (increment < 1)
+            increment = 1;
+        int above = rand() % 11;
+        int weight = weight_limit[i][0] + above * increment;
+        weights_file << weight << " ";
+        if (player_id == 1) {
+            weights.push_back(weight);
+            weights.push_back(-weight);
+        } else {
+            weights.push_back(-weight);
+            weights.push_back(weight);
+        }
+    }
+    weights_file.close();
+}
+
+void update_weights() {
+    ifstream other_weight;
+    if (player_id == 1) {
+        other_weight.open("train/player2.txt");
+    } else {
+        other_weight.open("train/player1.txt");
+    }
+
+    vector<double> winner_weights;
+    winner_weights.push_back(0);
+    for (int i = 1; i <= 7; i++) {
+        int weight;
+        other_weight >> weight;
+        if (player_id == 1) {
+            winner_weights.push_back(weight);
+            winner_weights.push_back(-weight);
+        } else {
+            winner_weights.push_back(-weight);
+            winner_weights.push_back(weight);
+        }
+    }
+
+    double alpha = 0.5;
+    for (int i = 1; i <= 7; i++) {
+        weights[i] += alpha * (winner_weights[i] - weights[i]);
+    }
 }
 
 int test2(){
@@ -272,7 +347,35 @@ int play() {
     string move;
     int movenum = 1;
     board = new Board(n,5,5,3);
-    setWeights();
+    
+    ifstream weights_file;
+    if (player_id == 1) {
+        weights_file.open("train/player1.txt");
+    } else {
+        weights_file.open("train/player2.txt");
+    }
+    int is_winner, num_times;
+    weights_file >> is_winner >> num_times;
+    // Read weights from existing file.
+    weights.push_back(0);
+    for (int i = 1; i <= 7; i++) {
+        int weight;
+        weights_file >> weight;
+        if (player_id == 1) {
+            weights.push_back(weight);
+            weights.push_back(-weight);
+        } else {
+            weights.push_back(-weight);
+            weights.push_back(weight);
+        }
+    }
+    if (is_winner == 1) {
+        if (num_times > 10) {
+            generate_weights();
+        }
+    } else {
+        update_weights();
+    }
 
     if(player_id == 2) {
         // Get other player's move

@@ -490,8 +490,8 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
         // p1.first->stboard->printnormalconfig();
         // p2.first->stboard->printnormalconfig();
         // outfile << "--------------" << endl;
-        p1.first->getEvaluation();
-        p2.first->getEvaluation();
+        // p1.first->getEvaluation();
+        // p2.first->getEvaluation();
         if (currPlayer == player_id)
             return p1.first->getEvaluation() > p2.first->getEvaluation();
         return p1.first->getEvaluation() < p2.first->getEvaluation();
