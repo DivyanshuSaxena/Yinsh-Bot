@@ -55,25 +55,28 @@
 #include <stdlib.h>
 
 int n, m, k, l;
+vector<double> weights;
+
 ofstream outfile;
 ofstream outfileShaved;
-vector<double> weights;
+
 bool DEBUG_EVAL;
 bool NON_FLIP;
 bool WRITE_FILE;
+double DBLMAX = 99999999;
+double THRESHOLD = -10000000;
 
 Board* board;
 int player_id, time_limit, max_depth;
 TimeHelper * timeHelper;
+string player1_weight = "./Yinsh-Bot/train/player1.dat";
+string player2_weight = "./Yinsh-Bot/train/player2.dat";
 
 int test();
 int test1();
 int test2();
 int boardhelper();
 int play();
-
-double DBLMAX = 99999999;
-double THRESHOLD = -10000000;
 
 int main(int argc, char** argv) {
     // std::srand ( unsigned ( std::time(0) ) );
@@ -142,7 +145,6 @@ void setWeights() {
             weights.push_back(w[i]);
         }
     }
-    // cout << weights.size() << endl;
 }
 
 void generate_weights() {
@@ -166,9 +168,9 @@ void generate_weights() {
 
     ofstream weights_file;
     if (player_id == 1) {
-        weights_file.open("train/player1.txt");
+        weights_file.open(player1_weight);
     } else {
-        weights_file.open("train/player2.txt");
+        weights_file.open(player2_weight);
     }
     weights_file << "0\n";
 
@@ -194,9 +196,9 @@ void generate_weights() {
 void update_weights() {
     ifstream other_weight;
     if (player_id == 1) {
-        other_weight.open("train/player2.txt");
+        other_weight.open(player2_weight);
     } else {
-        other_weight.open("train/player1.txt");
+        other_weight.open(player1_weight);
     }
 
     vector<double> winner_weights;
@@ -213,10 +215,10 @@ void update_weights() {
         }
     }
 
-    double alpha = 0.5;
-    for (int i = 1; i <= 7; i++) {
-        weights[i] += alpha * (winner_weights[i] - weights[i]);
-    }
+    // double alpha = 0.5;
+    // for (int i = 1; i <= 7; i++) {
+    //     weights[i] += alpha * (winner_weights[i] - weights[i]);
+    // }
 }
 
 int test2(){
@@ -349,13 +351,15 @@ int play() {
     board = new Board(n,5,5,3);
     
     // Get Weights
-    ifstream weights_file;
+    fstream weights_file;
     if (player_id == 1) {
         outfileShaved << "Opening 1.txt" << endl;
-        weights_file.open("player1.txt");
+        // weights_file.open("Yinsh-Bot/train/player1.dat", std::ios_base::in);
+        weights_file.open(player1_weight, std::ios_base::in);
     } else {
         outfileShaved << "Opening 2.txt" << endl;
-        weights_file.open("player2.txt");
+        // weights_file.open("Yinsh-Bot/train/player2.dat", std::ios_base::in);
+        weights_file.open(player2_weight, std::ios_base::in);
     }
     int is_winner, num_times;
     weights_file >> is_winner >> num_times;
@@ -364,8 +368,9 @@ int play() {
     // Read weights from existing file.
     weights.push_back(0);
     for (int i = 1; i <= 7; i++) {
-        int weight;
+        double weight;
         weights_file >> weight;
+        outfileShaved << "Read from file: " << weight << endl;
         if (player_id == 1) {
             weights.push_back(weight);
             weights.push_back(-weight);
@@ -381,6 +386,7 @@ int play() {
     } else {
         update_weights();
     }
+    // setWeights();
 
     // Print weights
     for (double w : weights) 
