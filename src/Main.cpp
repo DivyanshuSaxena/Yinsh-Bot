@@ -348,14 +348,19 @@ int play() {
     int movenum = 1;
     board = new Board(n,5,5,3);
     
+    // Get Weights
     ifstream weights_file;
     if (player_id == 1) {
-        weights_file.open("train/player1.txt");
+        outfileShaved << "Opening 1.txt" << endl;
+        weights_file.open("player1.txt");
     } else {
-        weights_file.open("train/player2.txt");
+        outfileShaved << "Opening 2.txt" << endl;
+        weights_file.open("player2.txt");
     }
     int is_winner, num_times;
     weights_file >> is_winner >> num_times;
+    outfileShaved << is_winner << " " << num_times << endl;
+    
     // Read weights from existing file.
     weights.push_back(0);
     for (int i = 1; i <= 7; i++) {
@@ -376,6 +381,10 @@ int play() {
     } else {
         update_weights();
     }
+
+    // Print weights
+    for (double w : weights) 
+        outfileShaved << w << " " << endl;
 
     if(player_id == 2) {
         // Get other player's move
