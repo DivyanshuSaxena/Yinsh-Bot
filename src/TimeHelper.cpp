@@ -6,10 +6,10 @@ TimeHelper::TimeHelper(bool debug){
 }
 bool TimeHelper::outOfTime(){
     // if(TIME_DEBUG) cerr << "specific time elapsed is "<< difftime(time(NULL),startprocess) << endl;
-    if(elapsedTimePersonal>=maxAllowedTime){
-        if(TIME_DEBUG) cerr << "total out of time"<<endl;
-        return true;
-    }
+    // if(elapsedTimePersonal>=maxAllowedTime){
+    //     if(TIME_DEBUG) cerr << "total out of time"<<endl;
+    //     return true;
+    // }
     // time(&endprocess);
     endprocess = clock();
     // if(difftime(endprocess,startprocess)>=maxAllowedTimeSpecific){
