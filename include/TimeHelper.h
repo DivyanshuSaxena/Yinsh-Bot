@@ -18,7 +18,8 @@ class TimeHelper{
         int maxAllowedTime;
         int clockISpecific;
         float maxAllowedTimeSpecific;
-        int elapsedTimePersonal;
+        double elapsedTimePersonal;
+        time_t start, starttemp, endtemp, startprocess, endprocess;
     // public:
         TimeHelper();
         bool outOfTime();
