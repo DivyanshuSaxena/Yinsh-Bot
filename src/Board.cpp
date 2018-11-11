@@ -229,7 +229,7 @@ void Board::printnormalconfigShaved(){
 }
 void Board::printBeautifiedconfig(){
     for(int j=2*n;j>=0;j--){
-        for(int i=0;i<10-j;i++){
+        for(int i=0;i<2*n-j;i++){
             outfile << " ";
         }
         for(int i=0;i<2*n+1;i++){
@@ -247,7 +247,7 @@ void Board::printBeautifiedconfig(){
 }
 void Board::printBeautifiedconfigShaved(){
     for(int j=2*n;j>=0;j--){
-        for(int i=0;i<10-j;i++){
+        for(int i=0;i<2*n-j;i++){
             outfileShaved << " ";
         }
         for(int i=0;i<2*n+1;i++){
@@ -704,7 +704,7 @@ bool Board::isFlippable(int row, int col){
 }
 
 pair<int, int> Board::getHexagonalCoordinate(int x, int y){
-    int xarg = x-5, yarg = y-5;
+    int xarg = x-n, yarg = y-n;
     if(xarg==0 && yarg==0){
         return make_pair(0,0);
     }else if(xarg>=0 && yarg>0){
@@ -738,11 +738,11 @@ void Board::printhexagonalconfig(){
                 outfile << " x" << " , "<< " x" << " | ";
             }else{
                 temphex = this->getHexagonalCoordinate(i,j);
-                if(temphex.first<10){
+                if(temphex.first<2*n){
                     outfile<< " ";
                 }
                 outfile << temphex.first<< " , ";
-                if(temphex.second<10){
+                if(temphex.second<2*n){
                     outfile<< " ";
                 }
                 outfile << temphex.second << " | ";

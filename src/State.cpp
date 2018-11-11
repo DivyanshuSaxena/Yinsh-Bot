@@ -507,7 +507,7 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
      */
     int len = successors.size();
     if (len > 3*m) {
-        int beam = len/2;
+        int beam = (len)/2;
         successors.erase(successors.begin()+beam, successors.end());
     }
     // outfile << "Pruned successors length: " << successors.size() << endl;

@@ -312,6 +312,8 @@ int play() {
     // Get input from server about game specifications
     string basics;
     getline(cin, basics);
+    outfile << "The initial inputs are "<<endl;
+    outfile << basics << endl;
     string word = "";
     int input = 0;
     for (int i = 0; i < basics.length(); i++) {
@@ -331,6 +333,12 @@ int play() {
                     word = "";
                     break;
 
+                case 2:
+                    time_limit = stoi(word);
+                    input++;
+                    word = "";
+                    break;
+
                 default:
                     break;
             }
@@ -338,17 +346,23 @@ int play() {
             word = word + to_string(ch-48);
         }
     }
-    time_limit = stoi(word);
+    k = stoi(word);
     
     NON_FLIP = true;
     DEBUG_EVAL = false;
     WRITE_FILE = false;
     timeHelper->setMaxAllowedTime(time_limit);
-    max_depth = 5;
+    if(n==5){
+        max_depth = 5;
+    }else{
+        max_depth = 4;
+    }
+    // max_depth = 4;
 
     string move;
     int movenum = 1;
-    board = new Board(n,5,5,3);
+    board = new Board(n, n, k, 3); //n=m in cases
+    // board = new Board(n,5,5,3);
     
     // Get Weights
     fstream weights_file;
