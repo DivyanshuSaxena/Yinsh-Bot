@@ -71,6 +71,7 @@ int player_id, time_limit, max_depth;
 TimeHelper * timeHelper;
 string player1_weight = "./Yinsh-Bot/train/player1.dat";
 string player2_weight = "./Yinsh-Bot/train/player2.dat";
+string best_weight = "./Yinsh-Bot/train/best.log";
 
 int test();
 int test1();
@@ -81,10 +82,6 @@ int play();
 int main(int argc, char** argv) {
     // std::srand ( unsigned ( std::time(0) ) );
     timeHelper = new TimeHelper();
-
-    // Initialize streams
-    outfile.open("console.log");
-    outfileShaved.open("consoleshaved.log");
 
     play();
     // test2();
@@ -135,6 +132,7 @@ int test() {
 void setWeights() {
     // Initialize weights
     double w[] = {0,5,15,12,25,200,2,600};
+    // double w[] = {0,4,12,15,28,250,2,800};
     weights.push_back(0);
     for (int i = 1; i <= 7; i++) {
         if (player_id == 1) {
@@ -348,6 +346,7 @@ int play() {
     }
     k = stoi(word);
     
+    // Initialize hyper parameters
     NON_FLIP = true;
     DEBUG_EVAL = false;
     WRITE_FILE = false;
@@ -358,6 +357,15 @@ int play() {
         max_depth = 4;
     }
     // max_depth = 4;
+    
+    // Initialize streams
+    if (player_id == 1) {
+        outfile.open("console1.log");
+        outfileShaved.open("consoleshaved1.log");
+    } else {
+        outfile.open("console2.log");
+        outfileShaved.open("consoleshaved2.log");
+    }
 
     string move;
     int movenum = 1;
@@ -395,6 +403,11 @@ int play() {
     }
     if (is_winner == 1) {
         if (num_times > 10) {
+            // Back up this weight in a file and generate a new weight
+            ofstream best_file;
+            best_file.open(best_weight, std::ios_base::app);
+            for (double w : weights)
+                best_file << w << " ";
             generate_weights();
         }
     } else {
