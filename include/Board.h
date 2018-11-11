@@ -29,6 +29,7 @@ extern TimeHelper * timeHelper;
 extern bool DEBUG_EVAL;
 extern bool NON_FLIP;
 extern bool WRITE_FILE;
+extern bool TIME_DEBUG;
 
 class Board{
     public:

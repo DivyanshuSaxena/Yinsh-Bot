@@ -454,7 +454,7 @@ double State::iterativeDeepening(int max_depth, int playerId){
         val = this->alphaBeta(distance,-DBLMAX, DBLMAX, playerId, 1);
         outfile << "best move at distance "<<distance << " is "<< this->bestMove<<endl;
         if(timeHelper->outOfTime()){
-            cerr << "executed iterative deepening till distance " << distance <<endl;
+            if(TIME_DEBUG) cerr << "executed iterative deepening till distance " << distance <<endl;
             break;
         }
     }
@@ -542,7 +542,7 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
         }
         if (WRITE_FILE) outfile << endl;
         if(timeHelper->outOfTime()){
-            cerr << "outoftime in alphabeta, neighbours searched till "<< i<< " depth "<<depth<<endl;
+            if(TIME_DEBUG) cerr << "outoftime in alphabeta, neighbours searched till "<< i<< " depth "<<depth<<endl;
             break;
         }
     }

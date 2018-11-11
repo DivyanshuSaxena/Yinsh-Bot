@@ -759,7 +759,7 @@ void Board::createBoardFromFile(string filename){
     // l=3;
     fstream inFile(filename.c_str() );
     if (!inFile) {
-        cerr << "Cannot open file.\n";
+        cerr  << "Cannot open file.\n";
         return;
     }
     for(int j=2*n;j>=0;j--){

@@ -60,6 +60,7 @@ vector<double> weights;
 bool DEBUG_EVAL;
 bool NON_FLIP;
 bool WRITE_FILE;
+bool TIME_DEBUG;
 
 Board* board;
 int player_id, time_limit, max_depth;
@@ -76,7 +77,8 @@ double THRESHOLD = -10000000;
 
 int main(int argc, char** argv) {
     // std::srand ( unsigned ( std::time(0) ) );
-    timeHelper = new TimeHelper();
+    TIME_DEBUG = false;
+    timeHelper = new TimeHelper(TIME_DEBUG);
     timeHelper->setClockISpecific();
     // Initialize streams
     outfile.open("console.log");
@@ -155,7 +157,7 @@ int test2(){
     int temp;
     timeHelper->setMaxAllowedTime(150);
     timeHelper->setClockISpecific();
-    timeHelper->setMaxAllowedTimeSpecific(3);
+    timeHelper->setMaxAllowedTimeSpecific(3, 0 , n, k);
     outfileShaved<<"state is "<<endl;
     state->stboard->printnormalconfigShaved();
     state->stboard->printBeautifiedconfigShaved();
@@ -276,7 +278,7 @@ int play() {
     NON_FLIP = true;
     DEBUG_EVAL = false;
     WRITE_FILE = false;
-    timeHelper->setMaxAllowedTime(time_limit);
+    timeHelper->setMaxAllowedTime(time_limit-5);
     if(n==5){
         max_depth = 5;
     }else{
@@ -299,7 +301,7 @@ int play() {
     }
     while(true) {
         // timeHelper->setClockISpecific();
-        timeHelper->setMaxAllowedTimeSpecific(4);
+        timeHelper->setMaxAllowedTimeSpecific(0.5, movenum, n, k );
         State* currState = new State(board, player_id);
         outfileShaved<<"lets see this one"<<endl;
         board->printnormalconfigShaved();
@@ -326,7 +328,7 @@ int play() {
         outfile << "Moved self move" << endl;
         timeHelper->updateElapsedTimePersonal();
         getline(cin, move);
-        cerr << "Time elapsed is "<< timeHelper->elapsedTimePersonal<< endl;
+        if(TIME_DEBUG) cerr << "Time elapsed is "<< timeHelper->elapsedTimePersonal<< endl;
         timeHelper->setClockISpecific();
         outfileShaved << "He did "<< move << endl;
         parseAndMove(move);
