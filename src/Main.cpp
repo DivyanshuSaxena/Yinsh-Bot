@@ -198,8 +198,12 @@ void update_weights() {
     } else {
         other_weight.open(player1_weight);
     }
+    
+    int is_winner, num_times;
+    other_weight >> is_winner >> num_times;
 
     vector<double> winner_weights;
+    vector<double> updated_weights;
     winner_weights.push_back(0);
     for (int i = 1; i <= 7; i++) {
         int weight;
@@ -213,10 +217,23 @@ void update_weights() {
         }
     }
 
-    // double alpha = 0.5;
-    // for (int i = 1; i <= 7; i++) {
-    //     weights[i] += alpha * (winner_weights[i] - weights[i]);
-    // }
+    double alpha = 0.5;
+    for (int i = 1; i <= 14; i++) {
+        weights[i] += alpha * (winner_weights[i] - weights[i]);
+        if (i%2 == 0)
+            updated_weights.push_back(abs(weights[i]));
+    }
+
+    ofstream self_weight;
+    if (player_id == 1) {
+        self_weight.open(player1_weight);
+    } else {
+        self_weight.open(player2_weight);
+    }
+    self_weight << "0" << endl;
+    self_weight << "0" << endl;
+    for (double w : updated_weights)
+        self_weight << w << " "; 
 }
 
 int test2(){
@@ -408,9 +425,11 @@ int play() {
             best_file.open(best_weight, std::ios_base::app);
             for (double w : weights)
                 best_file << w << " ";
+            outfileShaved << "Generating new weights" << endl;
             generate_weights();
         }
     } else {
+        outfileShaved << "Updating lost weights towards the winner" << endl;
         update_weights();
     }
     // setWeights();
