@@ -63,6 +63,7 @@ ofstream outfileShaved;
 bool DEBUG_EVAL;
 bool NON_FLIP;
 bool WRITE_FILE;
+bool TRAIN;
 double DBLMAX = 99999999;
 double THRESHOLD = -10000000;
 
@@ -131,8 +132,8 @@ int test() {
 
 void setWeights() {
     // Initialize weights
-    double w[] = {0,5,15,12,25,200,2,600};
-    // double w[] = {0,4,12,15,28,250,2,800};
+    // double w[] = {0,4.03125,8.84375,14.40625,30.90625,160.9375,2,600};
+    double w[] = {0,4,12,15,28,250,6,800};
     weights.push_back(0);
     for (int i = 1; i <= 7; i++) {
         if (player_id == 1) {
@@ -170,6 +171,7 @@ void generate_weights() {
     } else {
         weights_file.open(player2_weight);
     }
+    weights_file << "0\n";
     weights_file << "0\n";
 
     weights.push_back(0);
@@ -241,7 +243,17 @@ int test2(){
     board->createBoardFromFile("debug/board.txt");
     board->printnormalconfigShaved();
     outfileShaved << "lets do search" << endl;
-    player_id = 2;
+    player_id = 1;
+
+    // Initialize streams
+    if (player_id == 1) {
+        outfile.open("console1.log");
+        outfileShaved.open("consoleshaved1.log");
+    } else {
+        outfile.open("console2.log");
+        outfileShaved.open("consoleshaved2.log");
+    }
+
     setWeights();
     State * state = new State(board, player_id);
     int temp;
@@ -251,19 +263,19 @@ int test2(){
     outfileShaved<<"state is "<<endl;
     state->stboard->printnormalconfigShaved();
     state->stboard->printBeautifiedconfigShaved();
-    DEBUG_EVAL = true;
-    outfile << state->getEvaluation() << endl;
-    // DEBUG_EVAL = false;
-    // NON_FLIP = true;
-    // WRITE_FILE = true;
-    // max_depth = 4;
-    // temp = state->iterativeDeepening(max_depth, player_id);
-    // outfile << "Best Move at: " << state->bestMove << endl; // Debug
-    // cout << state->successors.at(state->bestMove).second << endl; // Make appropriate moves here.
-    // outfileShaved<< "I, player"<< state->playerToMove <<" did "<< state->successors.at(state->bestMove).second << endl;
-    // outfileShaved<<"fin state is "<<endl;
-    // state->successors[state->bestMove].first->stboard->printnormalconfigShaved();
-    // state->successors[state->bestMove].first->stboard->printBeautifiedconfigShaved();
+    // DEBUG_EVAL = true;
+    // outfile << state->getEvaluation() << endl;
+    DEBUG_EVAL = false;
+    NON_FLIP = true;
+    WRITE_FILE = true;
+    max_depth = 5;
+    temp = state->iterativeDeepening(max_depth, player_id);
+    outfile << "Best Move at: " << state->bestMove << endl; // Debug
+    cout << state->successors.at(state->bestMove).second << endl; // Make appropriate moves here.
+    outfileShaved<< "I, player"<< state->playerToMove <<" did "<< state->successors.at(state->bestMove).second << endl;
+    outfileShaved<<"fin state is "<<endl;
+    state->successors[state->bestMove].first->stboard->printnormalconfigShaved();
+    state->successors[state->bestMove].first->stboard->printBeautifiedconfigShaved();
 }
 
 int boardhelper(){
@@ -367,11 +379,17 @@ int play() {
     NON_FLIP = true;
     DEBUG_EVAL = false;
     WRITE_FILE = false;
+    TRAIN = false;
+
     timeHelper->setMaxAllowedTime(time_limit);
-    if(n==5){
-        max_depth = 5;
-    }else{
-        max_depth = 4;
+    if (time_limit > 20) {
+        if (n==5){
+            max_depth = 5;
+        } else {
+            max_depth = 4;
+        }
+    } else {
+        max_depth = 3;
     }
     // max_depth = 4;
     
@@ -389,50 +407,53 @@ int play() {
     board = new Board(n, n, k, 3); //n=m in cases
     // board = new Board(n,5,5,3);
     
-    // Get Weights
-    fstream weights_file;
-    if (player_id == 1) {
-        outfileShaved << "Opening 1.txt" << endl;
-        // weights_file.open("Yinsh-Bot/train/player1.dat", std::ios_base::in);
-        weights_file.open(player1_weight, std::ios_base::in);
-    } else {
-        outfileShaved << "Opening 2.txt" << endl;
-        // weights_file.open("Yinsh-Bot/train/player2.dat", std::ios_base::in);
-        weights_file.open(player2_weight, std::ios_base::in);
-    }
-    int is_winner, num_times;
-    weights_file >> is_winner >> num_times;
-    outfileShaved << is_winner << " " << num_times << endl;
-    
-    // Read weights from existing file.
-    weights.push_back(0);
-    for (int i = 1; i <= 7; i++) {
-        double weight;
-        weights_file >> weight;
-        outfileShaved << "Read from file: " << weight << endl;
+    if (TRAIN) {
+        // Get Weights
+        fstream weights_file;
         if (player_id == 1) {
-            weights.push_back(weight);
-            weights.push_back(-weight);
+            outfileShaved << "Opening 1.txt" << endl;
+            // weights_file.open("Yinsh-Bot/train/player1.dat", std::ios_base::in);
+            weights_file.open(player1_weight, std::ios_base::in);
         } else {
-            weights.push_back(-weight);
-            weights.push_back(weight);
+            outfileShaved << "Opening 2.txt" << endl;
+            // weights_file.open("Yinsh-Bot/train/player2.dat", std::ios_base::in);
+            weights_file.open(player2_weight, std::ios_base::in);
         }
-    }
-    if (is_winner == 1) {
-        if (num_times > 10) {
-            // Back up this weight in a file and generate a new weight
-            ofstream best_file;
-            best_file.open(best_weight, std::ios_base::app);
-            for (double w : weights)
-                best_file << w << " ";
-            outfileShaved << "Generating new weights" << endl;
-            generate_weights();
+        int is_winner, num_times;
+        weights_file >> is_winner >> num_times;
+        outfileShaved << is_winner << " " << num_times << endl;
+        
+        // Read weights from existing file.
+        weights.push_back(0);
+        for (int i = 1; i <= 7; i++) {
+            double weight;
+            weights_file >> weight;
+            outfileShaved << "Read from file: " << weight << endl;
+            if (player_id == 1) {
+                weights.push_back(weight);
+                weights.push_back(-weight);
+            } else {
+                weights.push_back(-weight);
+                weights.push_back(weight);
+            }
+        }
+        if (is_winner == 1) {
+            if (num_times > 4) {
+                // Back up this weight in a file and generate a new weight
+                ofstream best_file;
+                best_file.open(best_weight, std::ios_base::app);
+                for (double w : weights)
+                    best_file << w << " ";
+                outfileShaved << "Generating new weights" << endl;
+                generate_weights();
+            }
+        } else {
+            outfileShaved << "Updating lost weights towards the winner" << endl;
+            update_weights();
         }
     } else {
-        outfileShaved << "Updating lost weights towards the winner" << endl;
-        update_weights();
+        setWeights();
     }
-    // setWeights();
 
     // Print weights
     for (double w : weights) 

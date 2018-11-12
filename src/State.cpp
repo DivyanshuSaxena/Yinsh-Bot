@@ -476,22 +476,12 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
         outfile << endl;
     } 
 
-    double tempscore = -DBLMAX;
     this->getSuccessors(currPlayer);
-
-    // outfile << "Starting sort for successor length: " << this->successors.size() << endl;
-    // this->stboard->printnormalconfig();
-
     // Sort the successors
     // this->sortSuccessors();
     sort(successors.begin(), successors.end(), [currPlayer](pair<State*,string> p1, pair<State*,string> p2) -> bool {
         if (p1.first == NULL || p2.first == NULL)
             return true;
-        // p1.first->stboard->printnormalconfig();
-        // p2.first->stboard->printnormalconfig();
-        // outfile << "--------------" << endl;
-        // p1.first->getEvaluation();
-        // p2.first->getEvaluation();
         if (currPlayer == player_id)
             return p1.first->getEvaluation() > p2.first->getEvaluation();
         return p1.first->getEvaluation() < p2.first->getEvaluation();
@@ -512,17 +502,18 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
     }
     // outfile << "Pruned successors length: " << successors.size() << endl;
 
+    double tempscore = -DBLMAX;
     for(int i = 0; i < successors.size() && !timeHelper->outOfTime(); i++){
         double value = -successors[i].first->alphaBeta(depth-1,-beta,-alpha, 3-currPlayer, -evSign);
         // double temp = this->successors[i].first->getEvaluation();
-        if (WRITE_FILE) outfile << value << " " << this->successors[i].first->getEvaluation() << endl;
+        if (WRITE_FILE) outfile << "Value for the board at depth:" << (depth-1) << " -> " << value << " " << this->successors[i].first->getEvaluation() << " " << tempscore << endl;
         if (WRITE_FILE) {
             this->successors[i].first->stboard->printnormalconfig();
             outfile << endl;
         }
         if(value>tempscore) {
             // double temp = this->successors[i].first->getEvaluation();
-            if (WRITE_FILE) outfile << "    Better -> " << successors.at(i).first->getEvaluation() << endl;
+            if (WRITE_FILE) outfile << "    Better -> " << value << endl;
             this->bestMove = i;
             tempscore=value;
         }
