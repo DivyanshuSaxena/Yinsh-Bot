@@ -66,6 +66,7 @@ bool WRITE_FILE;
 bool TRAIN;
 double DBLMAX = 99999999;
 double THRESHOLD = -10000000;
+bool TIME_DEBUG;
 
 Board* board;
 int player_id, time_limit, max_depth;
@@ -82,7 +83,12 @@ int play();
 
 int main(int argc, char** argv) {
     // std::srand ( unsigned ( std::time(0) ) );
-    timeHelper = new TimeHelper();
+    TIME_DEBUG = false;
+    timeHelper = new TimeHelper(TIME_DEBUG);
+    timeHelper->setClockISpecific();
+    // Initialize streams
+    outfile.open("console.log");
+    outfileShaved.open("consoleshaved.log");
 
     play();
     // test2();
@@ -259,7 +265,7 @@ int test2(){
     int temp;
     timeHelper->setMaxAllowedTime(150);
     timeHelper->setClockISpecific();
-    timeHelper->setMaxAllowedTimeSpecific(3);
+    timeHelper->setMaxAllowedTimeSpecific(3, 0 , n, k);
     outfileShaved<<"state is "<<endl;
     state->stboard->printnormalconfigShaved();
     state->stboard->printBeautifiedconfigShaved();
@@ -338,7 +344,9 @@ void parseAndMove(string move) {
 int play() {
     // Get input from server about game specifications
     string basics;
+    timeHelper->updateElapsedTimePersonal();
     getline(cin, basics);
+    timeHelper->setClockISpecific();
     outfile << "The initial inputs are "<<endl;
     outfile << basics << endl;
     string word = "";
@@ -461,18 +469,20 @@ int play() {
 
     if(player_id == 2) {
         // Get other player's move
-        getline(cin, move); 
+        timeHelper->updateElapsedTimePersonal();
+        getline(cin, move);
+        timeHelper->setClockISpecific(); 
         parseAndMove(move);
     }
     while(true) {
-        timeHelper->setClockISpecific();
-        timeHelper->setMaxAllowedTimeSpecific(3);
+        // timeHelper->setClockISpecific();
+        timeHelper->setMaxAllowedTimeSpecific(0.5, movenum, n, k );
         State* currState = new State(board, player_id);
         outfileShaved<<"lets see this one"<<endl;
         board->printnormalconfigShaved();
         board->printBeautifiedconfigShaved();
         outfileShaved<< "starting iteration on above"<<endl;
-        // outfile << movenum << endl;           
+        outfile <<"movenum is "<< movenum << endl;           
         if (movenum <= m) {
             pair<int,int> movePair = board->makeInitialMoves(movenum);
             cout << "P " << movePair.first << " " << movePair.second << endl;
@@ -491,10 +501,13 @@ int play() {
             currState->makeMove();
         }
         outfile << "Moved self move" << endl;
+        timeHelper->updateElapsedTimePersonal();
         getline(cin, move);
+        if(TIME_DEBUG) cerr << "Time elapsed is "<< timeHelper->elapsedTimePersonal<< endl;
+        timeHelper->setClockISpecific();
         outfileShaved << "He did "<< move << endl;
         parseAndMove(move);
-        timeHelper->updateElapsedTimePersonal();
+        // timeHelper->updateElapsedTimePersonal();
         outfile << "Opponent move done" << endl;
         movenum++;
     }

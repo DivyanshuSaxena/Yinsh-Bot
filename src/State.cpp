@@ -448,10 +448,15 @@ double State::iterativeDeepening(int max_depth, int playerId){
     // outfile.close();
     // outfile.open("console.log");
     // outfile << "ID starting for depth " << max_depth << endl;
-    for(int distance = 1; distance <= max_depth && !timeHelper->outOfTime(); distance++) {
+    for(int distance = 1; distance <= max_depth; distance++) {
+        
         if (WRITE_FILE) outfile << "ID evaluating for depth " << distance << endl;
         val = this->alphaBeta(distance,-DBLMAX, DBLMAX, playerId, 1);
         outfile << "best move at distance "<<distance << " is "<< this->bestMove<<endl;
+        if(timeHelper->outOfTime()){
+            if(TIME_DEBUG) cerr << "executed iterative deepening till distance " << distance <<endl;
+            break;
+        }
     }
     if (WRITE_FILE) {
         outfile << "ID Done for this move, found successor at: " << this->bestMove << endl;
@@ -501,9 +506,11 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
         successors.erase(successors.begin()+beam, successors.end());
     }
     // outfile << "Pruned successors length: " << successors.size() << endl;
+    // for(int i = 0; i < successors.size(); i++){
 
     double tempscore = -DBLMAX;
-    for(int i = 0; i < successors.size() && !timeHelper->outOfTime(); i++){
+
+    for(int i = 0; i < successors.size(); i++){        
         double value = -successors[i].first->alphaBeta(depth-1,-beta,-alpha, 3-currPlayer, -evSign);
         // double temp = this->successors[i].first->getEvaluation();
         if (WRITE_FILE) outfile << "Value for the board at depth:" << (depth-1) << " -> " << value << " " << this->successors[i].first->getEvaluation() << " " << tempscore << endl;
@@ -525,6 +532,10 @@ double State::alphaBeta(int depth, double alpha, double beta, int currPlayer, in
             break;
         }
         if (WRITE_FILE) outfile << endl;
+        if(timeHelper->outOfTime()){
+            if(TIME_DEBUG) cerr << "outoftime in alphabeta, neighbours searched till "<< i<< " depth "<<depth<<endl;
+            break;
+        }
     }
     if (WRITE_FILE) outfile << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
     return tempscore;
