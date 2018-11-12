@@ -132,8 +132,8 @@ int test() {
 
 void setWeights() {
     // Initialize weights
-    // double w[] = {0,4.03125,8.84375,14.40625,30.90625,160.9375,2,600};
-    double w[] = {0,4,12,15,28,250,6,800};
+    double w[] = {0,4.03125,8.84375,10.40625,16.90625,60.9375,0.5,193.75};
+    // double w[] = {0,4,12,15,28,250,6,800};
     weights.push_back(0);
     for (int i = 1; i <= 7; i++) {
         if (player_id == 1) {
