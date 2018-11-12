@@ -133,9 +133,9 @@ int test() {
 void setWeights() {
     // Initialize weights
     // double w[] = {0,4.03125,8.84375,14.40625,30.90625,160.9375,2,600};
-    double w[] = {0,4,12,15,28,250,6,800};
+    double w[] = {0,4,12,15,28,250,6,800,3};
     weights.push_back(0);
-    for (int i = 1; i <= 7; i++) {
+    for (int i = 1; i <= 8; i++) {
         if (player_id == 1) {
             weights.push_back(w[i]);
             weights.push_back(-w[i]);
@@ -175,7 +175,7 @@ void generate_weights() {
     weights_file << "0\n";
 
     weights.push_back(0);
-    for (int i = 0; i < 7; i++) {
+    for (int i = 0; i < 8; i++) {
         double increment = (weight_limit[i][1] - weight_limit[i][0])/10;
         if (increment < 1)
             increment = 1;
@@ -207,7 +207,7 @@ void update_weights() {
     vector<double> winner_weights;
     vector<double> updated_weights;
     winner_weights.push_back(0);
-    for (int i = 1; i <= 7; i++) {
+    for (int i = 1; i <= 8; i++) {
         int weight;
         other_weight >> weight;
         if (player_id == 1) {
@@ -383,11 +383,11 @@ int play() {
 
     timeHelper->setMaxAllowedTime(time_limit);
     if (time_limit > 20) {
-        if (n==5){
-            max_depth = 5;
-        } else {
-            max_depth = 4;
-        }
+        // if (n==5){
+        max_depth = 5;
+        // } else {
+            // max_depth = 4;
+        // }
     } else {
         max_depth = 3;
     }
@@ -425,7 +425,7 @@ int play() {
         
         // Read weights from existing file.
         weights.push_back(0);
-        for (int i = 1; i <= 7; i++) {
+        for (int i = 1; i <= 8; i++) {
             double weight;
             weights_file >> weight;
             outfileShaved << "Read from file: " << weight << endl;

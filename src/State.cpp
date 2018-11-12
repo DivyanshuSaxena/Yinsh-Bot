@@ -166,7 +166,13 @@ void State::incrementRows(int count, int marker, bool flip) {
     // Increments all the in-a-row heuristic variables 
     // for the State object based on the count and the player marker
     if (DEBUG_EVAL) outfile << "In Increment rows for " << marker << " with count: " << count << endl;
-    if (count == k-2) {
+    if (count == k-3) {
+        if (marker == 4) {
+            rowskthree1++;
+        } else {
+            rowskthree2++;
+        }
+    } else if (count == k-2) {
         if (marker == 4) {
             rowsktwo1++;
             if (!flip) nonFlipRowsktwo1++;
@@ -196,7 +202,7 @@ void State::incrementRows(int count, int marker, bool flip) {
 
 void State::checkCount(int count, int prevMarker, bool flip, int startx, int starty, int endx, int endy) {
     if (DEBUG_EVAL) outfile << "Received count: " << count << " for player " << prevMarker << endl;
-    if (count >= k-2 && count <= k-1) 
+    if (count >= k-3 && count <= k-1) 
         incrementRows(count, prevMarker, flip);
     if (count >= k) {
         incrementkRows(prevMarker, flip, endx, endy);
@@ -233,7 +239,7 @@ void State::getLinearMarkers() {
                 countVert++;
                 if (NON_FLIP) flipVert = flipVert || stboard->isFlippable(i, j);
             } else {
-                if (countVert >= k-2) {
+                if (countVert >= k-3) {
                     checkCount(countVert, prevMarkerVert, flipVert, startkxVert, startkyVert, i, j-1);
                 } 
                 startkxVert = i;
@@ -252,7 +258,7 @@ void State::getLinearMarkers() {
                 countHorz++;
                 if (NON_FLIP) flipHorz = flipHorz || stboard->isFlippable(j, i);
             } else {
-                if (countHorz >= k-2) {
+                if (countHorz >= k-3) {
                     checkCount(countHorz, prevMarkerHorz, flipHorz, startkxHorz, startkyHorz, j-1, i);
                 } 
                 startkxHorz = j;
@@ -292,7 +298,7 @@ void State::getLinearMarkers() {
                 count++;
                 if (NON_FLIP) flip = flip || stboard->isFlippable(j, j-diff);
             } else {
-                if (count >= k-2) {
+                if (count >= k-3) {
                     if (DEBUG_EVAL) outfile << "Found a streak (Slant) of length " << count << endl;
                     checkCount(count, prevMarker, flip, startkxSlant, startkySlant, j-1, j-1-diff); 
                 }
@@ -304,7 +310,7 @@ void State::getLinearMarkers() {
                 flip = false;
             }
         }
-        if (count >= k-2) {
+        if (count >= k-3) {
             checkCount(count, prevMarker, flip, startkxSlant, startkySlant, j-1, j-1-diff);
         }
     }
@@ -390,6 +396,17 @@ double State::weightedSum() {
         outfile << "Player 2 removed rings:- " << (m - stboard->p2Rings.size()) << " at wt: " << weights.at(14) << endl;
     }
     if (DEBUG_EVAL) outfile << h << endl;
+
+    // Rows of k-3 markers
+    if (rowskthree1 != 0) {
+        if (DEBUG_EVAL) outfile << "Rows k-3 for player 1 " << rowskthree1 << endl;
+        h += rowsktwo1 * weights.at(15);
+    } 
+    if (rowskthree2 != 0) {
+        if (DEBUG_EVAL) outfile << "Rows k-3 for player 2 " << rowskthree2 << endl;
+        h += rowsktwo2 * weights.at(16);
+    }
+    // if (DEBUG_EVAL) outfile << h << endl;
     return h;
 }
 
